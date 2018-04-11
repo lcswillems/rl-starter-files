@@ -4,10 +4,10 @@ from torch.autograd import Variable
 from utils.math import *
 
 
-class DiscretePolicy(nn.Module):
-    def __init__(self, obs_dim, action_num, hidden_size=(128, 128), activation='tanh'):
+class Policy(nn.Module):
+    def __init__(self, obs_space, action_space, activation='tanh'):
         super().__init__()
-        self.is_disc_action = True
+
         if activation == 'tanh':
             self.activation = F.tanh
         elif activation == 'relu':
@@ -15,21 +15,21 @@ class DiscretePolicy(nn.Module):
         elif activation == 'sigmoid':
             self.activation = F.sigmoid
 
-        self.affine_layers = nn.ModuleList()
-        last_dim = obs_dim
-        for nh in hidden_size:
-            self.affine_layers.append(nn.Linear(last_dim, nh))
-            last_dim = nh
+        self.layers = nn.ModuleList()
+        self.layers.append(nn.Linear(obs_space.shape[1], 128))
+        self.layers.append(nn.Linear(128, 128))
 
-        self.action_head = nn.Linear(last_dim, action_num)
+        self.action_head = nn.Linear(128, action_space.n)
         self.action_head.weight.data.mul_(0.1)
         self.action_head.bias.data.mul_(0.0)
 
     def forward(self, x):
-        for affine in self.affine_layers:
+        for affine in self.layers:
             x = self.activation(affine(x))
 
-        action_prob = F.softmax(self.action_head(x))
+        # print(self.action_head(x))
+
+        action_prob = F.softmax(self.action_head(x), dim=1)
         return action_prob
 
     def select_action(self, x):
