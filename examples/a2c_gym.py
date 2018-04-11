@@ -63,20 +63,20 @@ if use_gpu:
     torch.cuda.manual_seed_all(args.seed)
 
 env_dummy = env_factory(0)
-obs_dim = env_dummy.observation_space.shape[0]
+obs_space = env_dummy.observation_space
 is_disc_action = len(env_dummy.action_space.shape) == 0
 ActionTensor = LongTensor if is_disc_action else DoubleTensor
 
-running_obs = ZFilter((obs_dim,), clip=5)
+# running_obs = ZFilter((obs_dim,), clip=5)
 # running_reward = ZFilter((1,), demean=False, clip=10)
 
 """define actor and critic"""
 if args.model_path is None:
     if is_disc_action:
-        policy_net = DiscretePolicy(obs_dim, env_dummy.action_space.n)
+        policy_net = DiscretePolicy(obs_space, env_dummy.action_space.n)
     else:
-        policy_net = Policy(obs_dim, env_dummy.action_space.shape[0], log_std=args.log_std)
-    value_net = Value(obs_dim)
+        policy_net = Policy(obs_space, env_dummy.action_space.shape[0], log_std=args.log_std)
+    value_net = Value(obs_space)
 else:
     policy_net, value_net, running_obs = pickle.load(open(args.model_path, "rb"))
 if use_gpu:
@@ -88,7 +88,7 @@ optimizer_policy = torch.optim.Adam(policy_net.parameters(), lr=0.01)
 optimizer_value = torch.optim.Adam(value_net.parameters(), lr=0.01)
 
 """create agent"""
-agent = Agent(env_factory, policy_net, running_obs=running_obs, render=args.render, num_threads=args.num_threads)
+agent = Agent(env_factory, policy_net, render=args.render, num_threads=args.num_threads)
 
 
 def update_params(batch):
