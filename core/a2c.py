@@ -2,11 +2,11 @@ import torch
 from torch.autograd import Variable
 
 
-def a2c_step(policy_net, value_net, optimizer_policy, optimizer_value, states, actions, returns, advantages, l2_reg):
+def a2c_step(policy_net, value_net, optimizer_policy, optimizer_value, obss, actions, returns, advantages, l2_reg):
 
     """update critic"""
     values_target = Variable(returns)
-    values_pred = value_net(Variable(states))
+    values_pred = value_net(Variable(obss))
     value_loss = (values_pred - values_target).pow(2).mean()
     # weight decay
     for param in value_net.parameters():
@@ -16,7 +16,7 @@ def a2c_step(policy_net, value_net, optimizer_policy, optimizer_value, states, a
     optimizer_value.step()
 
     """update policy"""
-    log_probs = policy_net.get_log_prob(Variable(states), Variable(actions))
+    log_probs = policy_net.get_log_prob(Variable(obss), Variable(actions))
     policy_loss = -(log_probs * Variable(advantages)).mean()
     optimizer_policy.zero_grad()
     policy_loss.backward()

@@ -39,7 +39,7 @@ def line_search(model, f, x, fullstep, expected_improve_full, max_backtracks=10,
     return False, x
 
 
-def trpo_step(policy_net, value_net, states, actions, returns, advantages, max_kl, damping, l2_reg, use_fim=True):
+def trpo_step(policy_net, value_net, obss, actions, returns, advantages, max_kl, damping, l2_reg, use_fim=True):
 
     """update critic"""
     values_target = Variable(returns)
@@ -49,7 +49,7 @@ def trpo_step(policy_net, value_net, states, actions, returns, advantages, max_k
         for param in value_net.parameters():
             if param.grad is not None:
                 param.grad.data.fill_(0)
-        values_pred = value_net(Variable(states))
+        values_pred = value_net(Variable(obss))
         value_loss = (values_pred - values_target).pow(2).mean()
 
         # weight decay
@@ -64,16 +64,16 @@ def trpo_step(policy_net, value_net, states, actions, returns, advantages, max_k
     set_flat_params_to(value_net, torch.Tensor(flat_params))
 
     """update policy"""
-    fixed_log_probs = policy_net.get_log_prob(Variable(states, volatile=True), Variable(actions)).data
+    fixed_log_probs = policy_net.get_log_prob(Variable(obss, volatile=True), Variable(actions)).data
     """define the loss function for TRPO"""
     def get_loss(volatile=False):
-        log_probs = policy_net.get_log_prob(Variable(states, volatile=volatile), Variable(actions))
+        log_probs = policy_net.get_log_prob(Variable(obss, volatile=volatile), Variable(actions))
         action_loss = -Variable(advantages) * torch.exp(log_probs - Variable(fixed_log_probs))
         return action_loss.mean()
 
     """use fisher information matrix for Hessian*vector"""
     def Fvp_fim(v):
-        M, mu, info = policy_net.get_fim(Variable(states))
+        M, mu, info = policy_net.get_fim(Variable(obss))
         mu = mu.view(-1)
         filter_input_ids = set() if policy_net.is_disc_action else set([info['std_id']])
 
@@ -85,7 +85,7 @@ def trpo_step(policy_net, value_net, states, actions, returns, advantages, max_k
         MJv = Variable(M * Jv.data)
         mu_MJv = (MJv * mu).sum()
         JTMJv = compute_flat_grad(mu_MJv, policy_net.parameters(), filter_input_ids=filter_input_ids, retain_graph=True).data
-        JTMJv /= states.shape[0]
+        JTMJv /= obss.shape[0]
         if not policy_net.is_disc_action:
             std_index = info['std_index']
             JTMJv[std_index: std_index + M.shape[0]] += 2 * v[std_index: std_index + M.shape[0]]
@@ -93,7 +93,7 @@ def trpo_step(policy_net, value_net, states, actions, returns, advantages, max_k
 
     """directly compute Hessian*vector from KL"""
     def Fvp_direct(v):
-        kl = policy_net.get_kl(Variable(states))
+        kl = policy_net.get_kl(Variable(obss))
         kl = kl.mean()
 
         grads = torch.autograd.grad(kl, policy_net.parameters(), create_graph=True)

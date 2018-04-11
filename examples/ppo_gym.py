@@ -64,22 +64,22 @@ if use_gpu:
     torch.cuda.manual_seed_all(args.seed)
 
 env_dummy = env_factory(0)
-state_dim = env_dummy.observation_space.shape[0]
+obs_dim = env_dummy.observation_space.shape[0]
 is_disc_action = len(env_dummy.action_space.shape) == 0
 ActionTensor = LongTensor if is_disc_action else DoubleTensor
 
-running_state = ZFilter((state_dim,), clip=5)
+running_obs = ZFilter((obs_dim,), clip=5)
 # running_reward = ZFilter((1,), demean=False, clip=10)
 
 """define actor and critic"""
 if args.model_path is None:
     if is_disc_action:
-        policy_net = DiscretePolicy(state_dim, env_dummy.action_space.n)
+        policy_net = DiscretePolicy(obs_dim, env_dummy.action_space.n)
     else:
-        policy_net = Policy(state_dim, env_dummy.action_space.shape[0], log_std=args.log_std)
-    value_net = Value(state_dim)
+        policy_net = Policy(obs_dim, env_dummy.action_space.shape[0], log_std=args.log_std)
+    value_net = Value(obs_dim)
 else:
-    policy_net, value_net, running_state = pickle.load(open(args.model_path, "rb"))
+    policy_net, value_net, running_obs = pickle.load(open(args.model_path, "rb"))
 if use_gpu:
     policy_net = policy_net.cuda()
     value_net = value_net.cuda()
@@ -93,18 +93,18 @@ optim_epochs = 5
 optim_batch_size = 4096
 
 """create agent"""
-agent = Agent(env_factory, policy_net, running_state=running_state, render=args.render, num_threads=args.num_threads)
+agent = Agent(env_factory, policy_net, running_obs=running_obs, render=args.render, num_threads=args.num_threads)
 
 
 def update_params(batch, i_iter):
-    states = torch.from_numpy(np.stack(batch.state))
+    obss = torch.from_numpy(np.stack(batch.obs))
     actions = torch.from_numpy(np.stack(batch.action))
     rewards = torch.from_numpy(np.stack(batch.reward))
     masks = torch.from_numpy(np.stack(batch.mask).astype(np.float64))
     if use_gpu:
-        states, actions, rewards, masks = states.cuda(), actions.cuda(), rewards.cuda(), masks.cuda()
-    values = value_net(Variable(states, volatile=True)).data
-    fixed_log_probs = policy_net.get_log_prob(Variable(states, volatile=True), Variable(actions)).data
+        obss, actions, rewards, masks = obss.cuda(), actions.cuda(), rewards.cuda(), masks.cuda()
+    values = value_net(Variable(obss, volatile=True)).data
+    fixed_log_probs = policy_net.get_log_prob(Variable(obss, volatile=True), Variable(actions)).data
 
     """get advantage estimation from the trajectories"""
     advantages, returns = estimate_advantages(rewards, masks, values, args.gamma, args.tau, use_gpu)
@@ -112,21 +112,21 @@ def update_params(batch, i_iter):
     lr_mult = max(1.0 - float(i_iter) / args.max_iter_num, 0)
 
     """perform mini-batch PPO update"""
-    optim_iter_num = int(math.ceil(states.shape[0] / optim_batch_size))
+    optim_iter_num = int(math.ceil(obss.shape[0] / optim_batch_size))
     for _ in range(optim_epochs):
-        perm = np.arange(states.shape[0])
+        perm = np.arange(obss.shape[0])
         np.random.shuffle(perm)
         perm = LongTensor(perm).cuda() if use_gpu else LongTensor(perm)
 
-        states, actions, returns, advantages, fixed_log_probs = \
-            states[perm], actions[perm], returns[perm], advantages[perm], fixed_log_probs[perm]
+        obss, actions, returns, advantages, fixed_log_probs = \
+            obss[perm], actions[perm], returns[perm], advantages[perm], fixed_log_probs[perm]
 
         for i in range(optim_iter_num):
-            ind = slice(i * optim_batch_size, min((i + 1) * optim_batch_size, states.shape[0]))
-            states_b, actions_b, advantages_b, returns_b, fixed_log_probs_b = \
-                states[ind], actions[ind], advantages[ind], returns[ind], fixed_log_probs[ind]
+            ind = slice(i * optim_batch_size, min((i + 1) * optim_batch_size, obss.shape[0]))
+            obss_b, actions_b, advantages_b, returns_b, fixed_log_probs_b = \
+                obss[ind], actions[ind], advantages[ind], returns[ind], fixed_log_probs[ind]
 
-            ppo_step(policy_net, value_net, optimizer_policy, optimizer_value, 1, states_b, actions_b, returns_b,
+            ppo_step(policy_net, value_net, optimizer_policy, optimizer_value, 1, obss_b, actions_b, returns_b,
                      advantages_b, fixed_log_probs_b, lr_mult, args.learning_rate, args.clip_epsilon, args.l2_reg)
 
 
@@ -145,7 +145,7 @@ def main_loop():
         if args.save_model_interval > 0 and (i_iter+1) % args.save_model_interval == 0:
             if use_gpu:
                 policy_net.cpu(), value_net.cpu()
-            pickle.dump((policy_net, value_net, running_state),
+            pickle.dump((policy_net, value_net, running_obs),
                         open(os.path.join(assets_dir(), 'learned_models/{}_ppo.p'.format(args.env_name)), 'wb'))
             if use_gpu:
                 policy_net.cuda(), value_net.cuda()

@@ -64,45 +64,45 @@ if use_gpu:
     torch.cuda.manual_seed_all(args.seed)
 
 env_dummy = env_factory(0)
-state_dim = env_dummy.observation_space.shape[0]
+obs_dim = env_dummy.observation_space.shape[0]
 is_disc_action = len(env_dummy.action_space.shape) == 0
 ActionTensor = LongTensor if is_disc_action else DoubleTensor
 
-running_state = ZFilter((state_dim,), clip=5)
+running_obs = ZFilter((obs_dim,), clip=5)
 # running_reward = ZFilter((1,), demean=False, clip=10)
 
 """define actor and critic"""
 if args.model_path is None:
     if is_disc_action:
-        policy_net = DiscretePolicy(state_dim, env_dummy.action_space.n)
+        policy_net = DiscretePolicy(obs_dim, env_dummy.action_space.n)
     else:
-        policy_net = Policy(state_dim, env_dummy.action_space.shape[0], log_std=args.log_std)
-    value_net = Value(state_dim)
+        policy_net = Policy(obs_dim, env_dummy.action_space.shape[0], log_std=args.log_std)
+    value_net = Value(obs_dim)
 else:
-    policy_net, value_net, running_state = pickle.load(open(args.model_path, "rb"))
+    policy_net, value_net, running_obs = pickle.load(open(args.model_path, "rb"))
 if use_gpu:
     policy_net = policy_net.cuda()
     value_net = value_net.cuda()
 del env_dummy
 
 """create agent"""
-agent = Agent(env_factory, policy_net, running_state=running_state, render=args.render, num_threads=args.num_threads)
+agent = Agent(env_factory, policy_net, running_obs=running_obs, render=args.render, num_threads=args.num_threads)
 
 
 def update_params(batch):
-    states = torch.from_numpy(np.stack(batch.state))
+    obss = torch.from_numpy(np.stack(batch.obs))
     actions = torch.from_numpy(np.stack(batch.action))
     rewards = torch.from_numpy(np.stack(batch.reward))
     masks = torch.from_numpy(np.stack(batch.mask).astype(np.float64))
     if use_gpu:
-        states, actions, rewards, masks = states.cuda(), actions.cuda(), rewards.cuda(), masks.cuda()
-    values = value_net(Variable(states, volatile=True)).data
+        obss, actions, rewards, masks = obss.cuda(), actions.cuda(), rewards.cuda(), masks.cuda()
+    values = value_net(Variable(obss, volatile=True)).data
 
     """get advantage estimation from the trajectories"""
     advantages, returns = estimate_advantages(rewards, masks, values, args.gamma, args.tau, use_gpu)
 
     """perform TRPO update"""
-    trpo_step(policy_net, value_net, states, actions, returns, advantages, args.max_kl, args.damping, args.l2_reg)
+    trpo_step(policy_net, value_net, obss, actions, returns, advantages, args.max_kl, args.damping, args.l2_reg)
 
 
 def main_loop():
@@ -120,7 +120,7 @@ def main_loop():
         if args.save_model_interval > 0 and (i_iter+1) % args.save_model_interval == 0:
             if use_gpu:
                 policy_net.cpu(), value_net.cpu()
-            pickle.dump((policy_net, value_net, running_state),
+            pickle.dump((policy_net, value_net, running_obs),
                         open(os.path.join(assets_dir(), 'learned_models/{}_trpo.p'.format(args.env_name)), 'wb'))
             if use_gpu:
                 policy_net.cuda(), value_net.cuda()
