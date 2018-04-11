@@ -9,9 +9,8 @@ import time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils import *
-from models.mlp_policy import Policy
-from models.mlp_critic import Value
-from models.mlp_policy_disc import DiscretePolicy
+from models.policy import Policy
+from models.critic import Value
 from torch.autograd import Variable
 from core.a2c import a2c_step
 from core.common import estimate_advantages
@@ -64,7 +63,6 @@ if use_gpu:
 
 env_dummy = env_factory(0)
 obs_space = env_dummy.observation_space
-is_disc_action = len(env_dummy.action_space.shape) == 0
 ActionTensor = LongTensor if is_disc_action else DoubleTensor
 
 # running_obs = ZFilter((obs_dim,), clip=5)
@@ -72,10 +70,7 @@ ActionTensor = LongTensor if is_disc_action else DoubleTensor
 
 """define actor and critic"""
 if args.model_path is None:
-    if is_disc_action:
-        policy_net = DiscretePolicy(obs_space, env_dummy.action_space.n)
-    else:
-        policy_net = Policy(obs_space, env_dummy.action_space.shape[0], log_std=args.log_std)
+    policy_net = Policy(obs_space, env_dummy.action_space.n)
     value_net = Value(obs_space)
 else:
     policy_net, value_net, running_obs = pickle.load(open(args.model_path, "rb"))

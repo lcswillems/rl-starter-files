@@ -18,7 +18,6 @@ export OMP_NUM_THREADS=1
 ## Features
 
 - Support CUDA (x10 faster than CPU implementation)
-- Support discrete and continous action space
 - Support multiprocessing for agent to collect samples in multiple environments simultaneously (x8 faster than single thread)
 - Implement Fast Fisher vector product calculation
 
