@@ -3,7 +3,6 @@ from utils.memory import Memory
 from utils.general import *
 import torch
 from torch.autograd import Variable
-import math
 import time
 import numpy as np
 
@@ -79,7 +78,7 @@ class Agent:
         t_start = time.time()
         if use_gpu:
             self.policy.cpu()
-        thread_batch_size = int(math.floor(min_batch_size / self.num_threads))
+        thread_batch_size = min_batch_size // self.num_threads)
         queue = multiprocessing.Queue()
         workers = []
 
