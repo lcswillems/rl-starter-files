@@ -26,8 +26,6 @@ parser.add_argument('--discount', type=float, default=0.99, metavar='G',
                     help='discount factor (default: 0.99)')
 parser.add_argument('--tau', type=float, default=0.95, metavar='G',
                     help='gae (default: 0.95)')
-parser.add_argument('--l2-reg', type=float, default=1e-3, metavar='G',
-                    help='l2 regularization regression (default: 1e-3)')
 parser.add_argument('--learning-rate', type=float, default=3e-4, metavar='G',
                     help='learning rate (default: 3e-4)')
 parser.add_argument('--clip-epsilon', type=float, default=0.2, metavar='N',
