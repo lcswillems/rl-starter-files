@@ -3,7 +3,7 @@ from torch.autograd import Variable
 
 
 def ppo_step(policy_net, value_net, policy_optimizer, value_optimizer, optim_value_iternum, obss, actions,
-             returns, advantages, fixed_log_probs, lr_mult, lr, clip_epsilon, l2_reg):
+             returns, advantages, fixed_log_probs, lr_mult, lr, clip_epsilon):
 
     policy_optimizer.lr = lr * lr_mult
     value_optimizer.lr = lr * lr_mult
@@ -14,9 +14,6 @@ def ppo_step(policy_net, value_net, policy_optimizer, value_optimizer, optim_val
     for _ in range(optim_value_iternum):
         values_pred = value_net(Variable(obss))
         value_loss = (values_pred - values_target).pow(2).mean()
-        # weight decay
-        for param in value_net.parameters():
-            value_loss += param.pow(2).sum() * l2_reg
         value_optimizer.zero_grad()
         value_loss.backward()
         value_optimizer.step()

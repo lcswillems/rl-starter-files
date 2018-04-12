@@ -2,13 +2,10 @@ import torch
 from torch.autograd import Variable
 
 
-def a2c_step(policy_net, value_net, policy_optimizer, value_optimizer, obss, actions, returns, advantages, l2_reg):
+def a2c_step(policy_net, value_net, policy_optimizer, value_optimizer, obss, actions, returns, advantages):
 
     """update critic"""
     value_loss = value_net.get_loss(Variable(obss), Variable(returns))
-    # weight decay
-    for param in value_net.parameters():
-        value_loss += param.pow(2).sum() * l2_reg
     value_optimizer.zero_grad()
     value_loss.backward()
     value_optimizer.step()

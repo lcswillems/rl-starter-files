@@ -95,7 +95,7 @@ def update_params(batch):
     advantages, returns = estimate_advantages(rewards, masks, values, args.gamma, args.tau, use_gpu)
 
     """perform A2C update"""
-    a2c_step(policy_net, value_net, policy_optimizer, value_optimizer, obss, actions, returns, advantages, args.l2_reg)
+    a2c_step(policy_net, value_net, policy_optimizer, value_optimizer, obss, actions, returns, advantages)
 
 
 def main_loop():

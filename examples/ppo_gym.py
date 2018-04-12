@@ -124,7 +124,7 @@ def update_params(batch, i_iter):
                 obss[ind], actions[ind], advantages[ind], returns[ind], fixed_log_probs[ind]
 
             ppo_step(policy_net, value_net, policy_optimizer, value_optimizer, 1, obss_b, actions_b, returns_b,
-                     advantages_b, fixed_log_probs_b, lr_mult, args.learning_rate, args.clip_epsilon, args.l2_reg)
+                     advantages_b, fixed_log_probs_b, lr_mult, args.learning_rate, args.clip_epsilon)
 
 
 def main_loop():
