@@ -1,6 +1,5 @@
+from os import path
 import torch
-import numpy as np
-from torch.autograd import Variable
 
 use_gpu = torch.cuda.is_available()
 
@@ -11,3 +10,6 @@ def weights_initialization(m):
         m.weight.data *= 1 / torch.sqrt(m.weight.data.pow(2).sum(1, keepdim=True))
         if m.bias is not None:
             m.bias.data.fill_(0)
+
+def assets_dir():
+    return path.abspath(path.join(path.dirname(path.abspath(__file__)), '../assets'))
