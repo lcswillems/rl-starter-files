@@ -18,37 +18,35 @@ def collect_samples(pid, queue, env, policy, render, min_batch_size):
     max_reward = float('-inf')
     num_episodes = 0
 
-    obs = env.reset()
-    reward_episode = 0
-
     while num_steps < min_batch_size:
-        obs_var = Variable(torch.from_numpy(obs).float().unsqueeze(0), volatile=True)
-        action = policy.select_action(obs_var)[0].numpy()
-        next_obs, reward, done, _ = env.step(action)
-        mask = 0 if done else 1
-        memory.push(obs, action, next_obs, reward, mask)
-        obs = next_obs            
+        done = False
+        obs = env.reset()
+        reward_episode = 0
 
-        if render:
-            env.render()
+        while not(done):
+            obs_var = Variable(torch.from_numpy(obs).float().unsqueeze(0), volatile=True)
+            action = policy.select_action(obs_var)[0].numpy()
+            next_obs, reward, done, _ = env.step(action)
+            mask = 0 if done else 1
+            memory.push(obs, action, next_obs, reward, mask)
+            obs = next_obs
 
-        reward_episode += reward
-        num_steps += 1
+            if render:
+                env.render()
+
+            reward_episode += reward
+            num_steps += 1
         
-        if done:
-            num_episodes += 1
-            min_reward = min(min_reward, reward_episode)
-            max_reward = max(max_reward, reward_episode)
-            total_reward += reward_episode
-            log['num_steps'] = num_steps
-            log['num_episodes'] = num_episodes
-            log['total_reward'] = total_reward
-            log['avg_reward'] = total_reward / num_episodes
-            log['max_reward'] = max_reward
-            log['min_reward'] = min_reward
-
-            obs = env.reset()
-            reward_episode = 0
+        num_episodes += 1
+        min_reward = min(min_reward, reward_episode)
+        max_reward = max(max_reward, reward_episode)
+        total_reward += reward_episode
+        log['num_steps'] = num_steps
+        log['num_episodes'] = num_episodes
+        log['total_reward'] = total_reward
+        log['avg_reward'] = total_reward / num_episodes
+        log['max_reward'] = max_reward
+        log['min_reward'] = min_reward
 
     if queue is not None:
         queue.put([pid, memory, log])
