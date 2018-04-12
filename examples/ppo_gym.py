@@ -4,6 +4,8 @@ import os
 import sys
 import pickle
 import time
+import numpy as np
+import math
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils import *
@@ -26,20 +28,22 @@ parser.add_argument('--num-threads', type=int, default=4,
                     help='number of threads for agent (default: 4)')
 parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
-parser.add_argument('--min-batch-size', type=int, default=2048,
-                    help='minimal batch size per PPO update (default: 2048)')
-parser.add_argument('--max-iter-num', type=int, default=500,
-                    help='maximal number of main iterations (default: 500)')
+parser.add_argument('--min-agent-steps', type=int, default=2048,
+                    help='minimal agent steps per update (default: 2048)')
+parser.add_argument('--num-main-iter', type=int, default=500,
+                    help='number of main iterations (default: 500)')
 parser.add_argument('--log-interval', type=int, default=1,
                     help='interval between training status logs (default: 1)')
 parser.add_argument('--save-model-interval', type=int, default=0,
-                    help="interval between saving model (default: 0, means don't save)")
+                    help="interval between saving model (default: 0, 0 means don't save)")
 parser.add_argument('--discount', type=float, default=0.99,
                     help='discount factor (default: 0.99)')
 parser.add_argument('--lr', type=float, default=7e-4,
                     help='learning rate (default: 7e-4)')
-parser.add_argument('--tau', type=float, default=1,
-                    help='gae parameter (default: 1, means no gae)')
+parser.add_argument('--tau', type=float, default=0.95,
+                    help='gae parameter (default: 0.95, 1 means no gae)')
+parser.add_argument('--entropy-coef', type=float, default=0.01,
+                    help='entropy term coefficient (default: 0.01)')
 parser.add_argument('--clip-epsilon', type=float, default=0.2,
                     help='clipping epsilon for PPO')
 args = parser.parse_args()
@@ -95,7 +99,7 @@ def update_params(batch, i_iter):
     """get advantage estimation from the trajectories"""
     advantages, returns = estimate_advantages(rewards, masks, values, args.discount, args.tau, use_gpu)
 
-    lr_mult = max(1.0 - float(i_iter) / args.max_iter_num, 0)
+    lr_mult = max(1.0 - float(i_iter) / args.num_main_iter, 0)
 
     """perform mini-batch PPO update"""
     optim_iter_num = int(math.ceil(obss.shape[0] / optim_batch_size))
@@ -117,9 +121,9 @@ def update_params(batch, i_iter):
 
 
 def main_loop():
-    for i_iter in range(args.max_iter_num):
-        """generate multiple trajectories that reach the minimum batch_size"""
-        batch, log = agent.collect_samples(args.min_batch_size)
+    for i_iter in range(args.num_main_iter):
+        """generate trajectories for each agent"""
+        batch, log = agent.collect_samples(args.min_agent_steps)
         t0 = time.time()
         update_params(batch, i_iter)
         t1 = time.time()
