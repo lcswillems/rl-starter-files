@@ -6,7 +6,7 @@ import math
 import time
 
 
-def collect_samples(pid, queue, env, policy, custom_reward, mean_action,
+def collect_samples(pid, queue, env, policy, custom_reward,
                     tensor, render, update_rs, min_batch_size):
     torch.randn(pid, )
     log = dict()
@@ -26,10 +26,7 @@ def collect_samples(pid, queue, env, policy, custom_reward, mean_action,
 
         for t in range(10000):
             obs_var = Variable(tensor(obs).unsqueeze(0), volatile=True)
-            if mean_action:
-                action = policy(obs_var)[0].data[0].numpy()
-            else:
-                action = policy.select_action(obs_var)[0].numpy()
+            action = policy.select_action(obs_var)[0].numpy()
             next_obs, reward, done, _ = env.step(action)
             reward_episode += reward
 
@@ -94,12 +91,11 @@ def merge_log(log_list):
 
 class Agent:
 
-    def __init__(self, env_factory, policy, custom_reward=None, mean_action=False, render=False,
+    def __init__(self, env_factory, policy, custom_reward=None, render=False,
                  tensor_type=torch.DoubleTensor, num_threads=1):
         self.env_factory = env_factory
         self.policy = policy
         self.custom_reward = custom_reward
-        self.mean_action = mean_action
         self.render = render
         self.tensor = tensor_type
         self.num_threads = num_threads
@@ -116,13 +112,13 @@ class Agent:
         workers = []
 
         for i in range(self.num_threads-1):
-            worker_args = (i+1, queue, self.env_list[i + 1], self.policy, self.custom_reward, self.mean_action,
+            worker_args = (i+1, queue, self.env_list[i + 1], self.policy, self.custom_reward,
                            self.tensor, False, False, thread_batch_size)
             workers.append(multiprocessing.Process(target=collect_samples, args=worker_args))
         for worker in workers:
             worker.start()
 
-        memory, log = collect_samples(0, None, self.env_list[0], self.policy, self.custom_reward, self.mean_action,
+        memory, log = collect_samples(0, None, self.env_list[0], self.policy, self.custom_reward,
                                       self.tensor, self.render, True, thread_batch_size)
 
         worker_logs = [None] * len(workers)
