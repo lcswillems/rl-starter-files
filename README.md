@@ -25,11 +25,11 @@ export OMP_NUM_THREADS=1
 A2C:
 
 ```
-python examples/a2c_gym.py --env-name ...
+python examples/a2c_gym.py --env ...
 ```
 
 PPO:
 
 ```
-python examples/ppo_gym.py --env-name ...
+python examples/ppo_gym.py --env ...
 ```

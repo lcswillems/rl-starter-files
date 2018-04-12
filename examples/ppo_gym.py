@@ -16,7 +16,7 @@ from core.common import estimate_advantages
 from core.agent import Agent
 
 parser = argparse.ArgumentParser(description='PyTorch PPO example')
-parser.add_argument('--env-name', default="Reacher-v1", metavar='G',
+parser.add_argument('--env', required=True, metavar='G',
                     help='name of the environment to run')
 parser.add_argument('--model-path', metavar='G',
                     help='path of pre-trained model')
@@ -48,7 +48,7 @@ args = parser.parse_args()
 
 
 def env_factory(thread_id):
-    env = gym.make(args.env_name)
+    env = gym.make(args.env)
     env.seed(args.seed + thread_id)
     return env
 
@@ -134,7 +134,7 @@ def main_loop():
             if use_gpu:
                 policy_net.cpu(), value_net.cpu()
             pickle.dump((policy_net, value_net),
-                        open(os.path.join(assets_dir(), 'learned_models/{}_ppo.p'.format(args.env_name)), 'wb'))
+                        open(os.path.join(assets_dir(), 'learned_models/{}_ppo.p'.format(args.env)), 'wb'))
             if use_gpu:
                 policy_net.cuda(), value_net.cuda()
 
