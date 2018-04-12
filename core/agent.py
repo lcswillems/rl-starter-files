@@ -78,7 +78,7 @@ class Agent:
         t_start = time.time()
         if use_gpu:
             self.policy.cpu()
-        thread_batch_size = min_batch_size // self.num_threads)
+        thread_batch_size = min_batch_size // self.num_threads
         queue = multiprocessing.Queue()
         workers = []
 
