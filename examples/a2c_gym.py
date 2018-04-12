@@ -74,9 +74,9 @@ if use_gpu:
     value_net = value_net.cuda()
 del env_dummy
 
-# optimizer_policy = torch.optim.Adam(policy_net.parameters(), lr=7e-4)
-optimizer_policy = torch.optim.RMSprop(policy_net.parameters(), lr=7e-4, eps=1e-5, alpha=0.99)
-optimizer_value = torch.optim.Adam(value_net.parameters(), lr=7e-4)
+# policy_optimizer = torch.optim.Adam(policy_net.parameters(), lr=7e-4)
+policy_optimizer = torch.optim.RMSprop(policy_net.parameters(), lr=7e-4, eps=1e-5, alpha=0.99)
+value_optimizer = torch.optim.Adam(value_net.parameters(), lr=7e-4)
 
 """create agent"""
 agent = Agent(env_factory, policy_net, render=args.render, num_threads=args.num_threads)
@@ -95,7 +95,7 @@ def update_params(batch):
     advantages, returns = estimate_advantages(rewards, masks, values, args.gamma, args.tau, use_gpu)
 
     """perform A2C update"""
-    a2c_step(policy_net, value_net, optimizer_policy, optimizer_value, obss, actions, returns, advantages, args.l2_reg)
+    a2c_step(policy_net, value_net, policy_optimizer, value_optimizer, obss, actions, returns, advantages, args.l2_reg)
 
 
 def main_loop():

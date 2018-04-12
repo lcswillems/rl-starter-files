@@ -82,8 +82,8 @@ if use_gpu:
     value_net = value_net.cuda()
 del env_dummy
 
-optimizer_policy = torch.optim.Adam(policy_net.parameters(), lr=args.learning_rate)
-optimizer_value = torch.optim.Adam(value_net.parameters(), lr=args.learning_rate)
+policy_optimizer = torch.optim.Adam(policy_net.parameters(), lr=args.learning_rate)
+value_optimizer = torch.optim.Adam(value_net.parameters(), lr=args.learning_rate)
 
 # optimization epoch number and batch size for PPO
 optim_epochs = 5
@@ -123,7 +123,7 @@ def update_params(batch, i_iter):
             obss_b, actions_b, advantages_b, returns_b, fixed_log_probs_b = \
                 obss[ind], actions[ind], advantages[ind], returns[ind], fixed_log_probs[ind]
 
-            ppo_step(policy_net, value_net, optimizer_policy, optimizer_value, 1, obss_b, actions_b, returns_b,
+            ppo_step(policy_net, value_net, policy_optimizer, value_optimizer, 1, obss_b, actions_b, returns_b,
                      advantages_b, fixed_log_probs_b, lr_mult, args.learning_rate, args.clip_epsilon, args.l2_reg)
 
 

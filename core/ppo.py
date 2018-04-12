@@ -2,11 +2,11 @@ import torch
 from torch.autograd import Variable
 
 
-def ppo_step(policy_net, value_net, optimizer_policy, optimizer_value, optim_value_iternum, obss, actions,
+def ppo_step(policy_net, value_net, policy_optimizer, value_optimizer, optim_value_iternum, obss, actions,
              returns, advantages, fixed_log_probs, lr_mult, lr, clip_epsilon, l2_reg):
 
-    optimizer_policy.lr = lr * lr_mult
-    optimizer_value.lr = lr * lr_mult
+    policy_optimizer.lr = lr * lr_mult
+    value_optimizer.lr = lr * lr_mult
     clip_epsilon = clip_epsilon * lr_mult
 
     """update critic"""
@@ -17,9 +17,9 @@ def ppo_step(policy_net, value_net, optimizer_policy, optimizer_value, optim_val
         # weight decay
         for param in value_net.parameters():
             value_loss += param.pow(2).sum() * l2_reg
-        optimizer_value.zero_grad()
+        value_optimizer.zero_grad()
         value_loss.backward()
-        optimizer_value.step()
+        value_optimizer.step()
 
     """update policy"""
     advantages_var = Variable(advantages)
@@ -28,7 +28,7 @@ def ppo_step(policy_net, value_net, optimizer_policy, optimizer_value, optim_val
     surr1 = ratio * advantages_var
     surr2 = torch.clamp(ratio, 1.0 - clip_epsilon, 1.0 + clip_epsilon) * advantages_var
     policy_surr = -torch.min(surr1, surr2).mean()
-    optimizer_policy.zero_grad()
+    policy_optimizer.zero_grad()
     policy_surr.backward()
     torch.nn.utils.clip_grad_norm(policy_net.parameters(), 40)
-    optimizer_policy.step()
+    policy_optimizer.step()
