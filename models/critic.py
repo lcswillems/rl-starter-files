@@ -20,22 +20,19 @@ class Value(nn.Module):
         elif activation == 'sigmoid':
             self.activation = F.sigmoid
 
-        self.layers = nn.ModuleList()
-        self.layers.append(nn.Linear(obs_space.shape[1], 128))
-        self.layers.append(nn.Linear(128, 128))
-
-        self.value_head = nn.Linear(128, 1)
-        self.value_head.weight.data.mul_(0.1)
-        self.value_head.bias.data.mul_(0.0)
+        self.fc1 = nn.Linear(obs_space.shape[1], 128)
+        self.fc2 = nn.Linear(128, 128)
+        self.fc3 = nn.Linear(128, 1)
 
         self.apply(weights_init)
 
     def forward(self, x):
-        for affine in self.layers:
-            x = self.activation(affine(x))
-
-        value = self.value_head(x)
-        return value
+        x = self.fc1(x)
+        x = self.activation(x)
+        x = self.fc2(x)
+        x = self.activation(x)
+        x = self.fc3(x)
+        return x
 
     def get_loss(self, x, target):
         pred = self.forward(x)
