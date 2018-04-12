@@ -40,8 +40,8 @@ parser.add_argument('--discount', type=float, default=0.99, metavar='G',
                     help='discount factor (default: 0.99)')
 parser.add_argument('--lr', type=float, default=7e-4, metavar='G',
                     help='learning rate (default: 7e-4)')
-parser.add_argument('--tau', type=float, default=0.95, metavar='G',
-                    help='gae (default: 0.95)')
+parser.add_argument('--tau', type=float, default=1, metavar='G',
+                    help='gae parameter (default: 1)')
 args = parser.parse_args()
 
 
