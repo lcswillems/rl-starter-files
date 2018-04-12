@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from utils.torch import weights_initialization
+from utils.general import weights_initialization
 
 class Value(nn.Module):
     def __init__(self, obs_space, activation='tanh'):

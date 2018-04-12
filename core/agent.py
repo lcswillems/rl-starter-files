@@ -1,6 +1,6 @@
 import multiprocessing
 from utils.memory import Memory
-from utils.torch import *
+from utils.general import *
 import torch
 from torch.autograd import Variable
 import math
@@ -91,7 +91,6 @@ def merge_log(log_list):
 
 
 class Agent:
-
     def __init__(self, env_factory, policy, custom_reward=None, render=False, num_threads=1):
         self.env_factory = env_factory
         self.policy = policy
