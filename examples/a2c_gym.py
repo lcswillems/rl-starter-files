@@ -32,7 +32,7 @@ parser.add_argument('--gamma', type=float, default=0.99, metavar='G',
                     help='discount factor (default: 0.99)')
 parser.add_argument('--tau', type=float, default=0.95, metavar='G',
                     help='gae (default: 0.95)')
-parser.add_argument('--l2-reg', type=float, default=1e-3, metavar='G',
+parser.add_argument('--l2-reg', type=float, default=0., metavar='G',
                     help='l2 regularization regression (default: 1e-3)')
 parser.add_argument('--num-threads', type=int, default=4, metavar='N',
                     help='number of threads for agent (default: 4)')
@@ -62,16 +62,11 @@ if use_gpu:
     torch.cuda.manual_seed_all(args.seed)
 
 env_dummy = env_factory(0)
-obs_space = env_dummy.observation_space
-ActionTensor = LongTensor if is_disc_action else DoubleTensor
-
-# running_obs = ZFilter((obs_dim,), clip=5)
-# running_reward = ZFilter((1,), demean=False, clip=10)
 
 """define actor and critic"""
 if args.model_path is None:
-    policy_net = Policy(obs_space, env_dummy.action_space.n)
-    value_net = Value(obs_space)
+    policy_net = Policy(env_dummy.observation_space, env_dummy.action_space)
+    value_net = Value(env_dummy.observation_space)
 else:
     policy_net, value_net, running_obs = pickle.load(open(args.model_path, "rb"))
 if use_gpu:
@@ -79,17 +74,18 @@ if use_gpu:
     value_net = value_net.cuda()
 del env_dummy
 
-optimizer_policy = torch.optim.Adam(policy_net.parameters(), lr=0.01)
-optimizer_value = torch.optim.Adam(value_net.parameters(), lr=0.01)
+# optimizer_policy = torch.optim.Adam(policy_net.parameters(), lr=7e-4)
+optimizer_policy = torch.optim.RMSprop(policy_net.parameters(), lr=7e-4, eps=1e-5, alpha=0.99)
+optimizer_value = torch.optim.Adam(value_net.parameters(), lr=7e-4)
 
 """create agent"""
 agent = Agent(env_factory, policy_net, render=args.render, num_threads=args.num_threads)
 
 
 def update_params(batch):
-    obss = torch.from_numpy(np.stack(batch.obs))
+    obss = torch.from_numpy(np.stack(batch.obs).astype(np.float64))
     actions = torch.from_numpy(np.stack(batch.action))
-    rewards = torch.from_numpy(np.stack(batch.reward))
+    rewards = torch.from_numpy(np.stack(batch.reward).astype(np.float64))
     masks = torch.from_numpy(np.stack(batch.mask).astype(np.float64))
     if use_gpu:
         obss, actions, rewards, masks = obss.cuda(), actions.cuda(), rewards.cuda(), masks.cuda()
