@@ -1,5 +1,5 @@
 import multiprocessing
-from utils.replay_memory import Memory
+from utils.memory import Memory
 from utils.torch import *
 import torch
 from torch.autograd import Variable
@@ -127,7 +127,7 @@ class Agent:
             worker_memories[pid - 1] = worker_memory
             worker_logs[pid - 1] = worker_log
         for worker_memory in worker_memories:
-            memory.append(worker_memory)
+            memory.concat(worker_memory)
         batch = memory.sample()
         if self.num_threads > 1:
             log_list = [log] + worker_logs
