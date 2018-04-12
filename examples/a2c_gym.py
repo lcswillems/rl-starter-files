@@ -6,6 +6,7 @@ import os
 import sys
 import pickle
 import time
+import numpy as np
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils import *
