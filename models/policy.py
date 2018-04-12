@@ -39,9 +39,3 @@ class Policy(nn.Module):
         # print("entropy: {:.5f}".format(entropy.data[0]))
         # print("action loss: {:.5f}".format(action_loss.data[0]))
         return action_loss - 0.01 * entropy
-
-    def get_log_prob(self, x, actions):
-        raise NotImplementedError
-        action_prob = self.forward(x)
-        return torch.log(action_prob.gather(1, actions))
-
