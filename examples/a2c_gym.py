@@ -94,7 +94,7 @@ def update_params(batch):
     """get advantage estimation from the trajectories"""
     advantages, returns = estimate_advantages(rewards, masks, values, args.gamma, args.tau, use_gpu)
 
-    """perform TRPO update"""
+    """perform A2C update"""
     a2c_step(policy_net, value_net, optimizer_policy, optimizer_value, obss, actions, returns, advantages, args.l2_reg)
 
 

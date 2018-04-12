@@ -1,10 +1,9 @@
-# PyTorch A2C, PPO and TRPO
+# PyTorch A2C and PPO
 
 This is a PyTorch implementation of:
 
 - [Synchronous A3C (A2C)](https://arxiv.org/pdf/1602.01783.pdf)
 - [Proximal Policy Optimization (PPO)](https://arxiv.org/pdf/1707.06347.pdf)
-- [Trust Region Policy Optimization (TRPO)](https://arxiv.org/pdf/1502.05477.pdf)
 
 This is a fork of [this repository](https://github.com/Khrylx/PyTorch-RL).
 
@@ -33,10 +32,4 @@ PPO:
 
 ```
 python examples/ppo_gym.py --env-name ...
-```
-
-TRPO:
-
-```
-python examples/trpo_gym.py --env-name ...
 ```
