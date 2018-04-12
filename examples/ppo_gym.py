@@ -15,9 +15,6 @@ from core.ppo import ppo_step
 from core.common import estimate_advantages
 from core.agent import Agent
 
-Tensor = DoubleTensor
-torch.set_default_tensor_type('torch.DoubleTensor')
-
 parser = argparse.ArgumentParser(description='PyTorch PPO example')
 parser.add_argument('--env-name', default="Reacher-v1", metavar='G',
                     help='name of the environment to run')
@@ -66,7 +63,6 @@ if use_gpu:
 env_dummy = env_factory(0)
 obs_dim = env_dummy.observation_space.shape[0]
 is_disc_action = len(env_dummy.action_space.shape) == 0
-ActionTensor = LongTensor if is_disc_action else DoubleTensor
 
 """define actor and critic"""
 if args.model_path is None:
@@ -94,10 +90,10 @@ agent = Agent(env_factory, policy_net, render=args.render, num_threads=args.num_
 
 
 def update_params(batch, i_iter):
-    obss = torch.from_numpy(np.stack(batch.obs))
+    obss = torch.from_numpy(np.stack(batch.obs)).float()
     actions = torch.from_numpy(np.stack(batch.action))
-    rewards = torch.from_numpy(np.stack(batch.reward))
-    masks = torch.from_numpy(np.stack(batch.mask).astype(np.float64))
+    rewards = torch.from_numpy(np.stack(batch.reward)).float()
+    masks = torch.from_numpy(np.stack(batch.mask)).float()
     if use_gpu:
         obss, actions, rewards, masks = obss.cuda(), actions.cuda(), rewards.cuda(), masks.cuda()
     values = value_net(Variable(obss, volatile=True)).data
@@ -113,7 +109,7 @@ def update_params(batch, i_iter):
     for _ in range(optim_epochs):
         perm = np.arange(obss.shape[0])
         np.random.shuffle(perm)
-        perm = LongTensor(perm).cuda() if use_gpu else LongTensor(perm)
+        perm = torch.from_numpy(perm).cuda() if use_gpu else torch.from_numpy(perm)
 
         obss, actions, returns, advantages, fixed_log_probs = \
             obss[perm], actions[perm], returns[perm], advantages[perm], fixed_log_probs[perm]

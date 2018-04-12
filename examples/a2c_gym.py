@@ -16,9 +16,6 @@ from core.a2c import a2c_step
 from core.common import estimate_advantages
 from core.agent import Agent
 
-Tensor = DoubleTensor
-torch.set_default_tensor_type('torch.DoubleTensor')
-
 parser = argparse.ArgumentParser(description='PyTorch A2C example')
 parser.add_argument('--env-name', default="Hopper-v1", metavar='G',
                     help='name of the environment to run')
@@ -83,10 +80,10 @@ agent = Agent(env_factory, policy_net, render=args.render, num_threads=args.num_
 
 
 def update_params(batch):
-    obss = torch.from_numpy(np.stack(batch.obs).astype(np.float64))
+    obss = torch.from_numpy(np.stack(batch.obs)).float()
     actions = torch.from_numpy(np.stack(batch.action))
-    rewards = torch.from_numpy(np.stack(batch.reward).astype(np.float64))
-    masks = torch.from_numpy(np.stack(batch.mask).astype(np.float64))
+    rewards = torch.from_numpy(np.stack(batch.reward)).float()
+    masks = torch.from_numpy(np.stack(batch.mask)).float()
     if use_gpu:
         obss, actions, rewards, masks = obss.cuda(), actions.cuda(), rewards.cuda(), masks.cuda()
     values = value_net(Variable(obss, volatile=True)).data

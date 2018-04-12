@@ -1,13 +1,14 @@
 import multiprocessing
 from utils.replay_memory import Memory
 from utils.torch import *
+import torch
 from torch.autograd import Variable
 import math
 import time
 
 
 def collect_samples(pid, queue, env, policy, custom_reward,
-                    tensor, render, update_rs, min_batch_size):
+                    render, update_rs, min_batch_size):
     torch.randn(pid, )
     log = dict()
     memory = Memory()
@@ -25,7 +26,7 @@ def collect_samples(pid, queue, env, policy, custom_reward,
         reward_episode = 0
 
         for t in range(10000):
-            obs_var = Variable(tensor(obs).unsqueeze(0), volatile=True)
+            obs_var = Variable(torch.from_numpy(obs).float().unsqueeze(0), volatile=True)
             action = policy.select_action(obs_var)[0].numpy()
             next_obs, reward, done, _ = env.step(action)
             reward_episode += reward
@@ -91,13 +92,11 @@ def merge_log(log_list):
 
 class Agent:
 
-    def __init__(self, env_factory, policy, custom_reward=None, render=False,
-                 tensor_type=torch.DoubleTensor, num_threads=1):
+    def __init__(self, env_factory, policy, custom_reward=None, render=False, num_threads=1):
         self.env_factory = env_factory
         self.policy = policy
         self.custom_reward = custom_reward
         self.render = render
-        self.tensor = tensor_type
         self.num_threads = num_threads
         self.env_list = []
         for i in range(num_threads):
@@ -113,13 +112,13 @@ class Agent:
 
         for i in range(self.num_threads-1):
             worker_args = (i+1, queue, self.env_list[i + 1], self.policy, self.custom_reward,
-                           self.tensor, False, False, thread_batch_size)
+                           False, False, thread_batch_size)
             workers.append(multiprocessing.Process(target=collect_samples, args=worker_args))
         for worker in workers:
             worker.start()
 
         memory, log = collect_samples(0, None, self.env_list[0], self.policy, self.custom_reward,
-                                      self.tensor, self.render, True, thread_batch_size)
+                                      self.render, True, thread_batch_size)
 
         worker_logs = [None] * len(workers)
         worker_memories = [None] * len(workers)
