@@ -24,7 +24,7 @@ parser.add_argument('--render', action='store_true', default=False,
                     help='render the environment')
 parser.add_argument('--log-std', type=float, default=0, metavar='G',
                     help='log std for the policy (default: 0)')
-parser.add_argument('--gamma', type=float, default=0.99, metavar='G',
+parser.add_argument('--discount', type=float, default=0.99, metavar='G',
                     help='discount factor (default: 0.99)')
 parser.add_argument('--tau', type=float, default=0.95, metavar='G',
                     help='gae (default: 0.95)')
@@ -100,7 +100,7 @@ def update_params(batch, i_iter):
     fixed_log_probs = policy_net.get_log_prob(Variable(obss, volatile=True), Variable(actions)).data
 
     """get advantage estimation from the trajectories"""
-    advantages, returns = estimate_advantages(rewards, masks, values, args.gamma, args.tau, use_gpu)
+    advantages, returns = estimate_advantages(rewards, masks, values, args.discount, args.tau, use_gpu)
 
     lr_mult = max(1.0 - float(i_iter) / args.max_iter_num, 0)
 
