@@ -7,7 +7,6 @@ import random
 Transition = namedtuple('Transition',
                         ('obs', 'action', 'mask', 'next_obs', 'reward'))
 
-
 class Memory(object):
     def __init__(self):
         self.memory = []
