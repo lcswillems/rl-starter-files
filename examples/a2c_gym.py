@@ -18,29 +18,29 @@ from core.common import estimate_advantages
 from core.agent import Agent
 
 parser = argparse.ArgumentParser(description='PyTorch A2C example')
-parser.add_argument('--env', required=True, metavar='G',
+parser.add_argument('--env', required=True,
                     help='name of the environment to run')
-parser.add_argument('--model-path', metavar='G',
+parser.add_argument('--model-path',
                     help='path of pre-trained model')
 parser.add_argument('--render', action='store_true', default=False,
                     help='render the environment')
-parser.add_argument('--num-threads', type=int, default=4, metavar='N',
+parser.add_argument('--num-threads', type=int, default=4,
                     help='number of threads for agent (default: 4)')
-parser.add_argument('--seed', type=int, default=1, metavar='N',
+parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
-parser.add_argument('--min-batch-size', type=int, default=2048, metavar='N',
+parser.add_argument('--min-batch-size', type=int, default=2048,
                     help='minimal batch size per A2C update (default: 2048)')
-parser.add_argument('--max-iter-num', type=int, default=500, metavar='N',
+parser.add_argument('--max-iter-num', type=int, default=500,
                     help='maximal number of main iterations (default: 500)')
-parser.add_argument('--log-interval', type=int, default=1, metavar='N',
+parser.add_argument('--log-interval', type=int, default=1,
                     help='interval between training status logs (default: 1)')
-parser.add_argument('--save-model-interval', type=int, default=0, metavar='N',
+parser.add_argument('--save-model-interval', type=int, default=0,
                     help="interval between saving model (default: 0, means don't save)")
-parser.add_argument('--discount', type=float, default=0.99, metavar='G',
+parser.add_argument('--discount', type=float, default=0.99,
                     help='discount factor (default: 0.99)')
-parser.add_argument('--lr', type=float, default=7e-4, metavar='G',
+parser.add_argument('--lr', type=float, default=7e-4,
                     help='learning rate (default: 7e-4)')
-parser.add_argument('--tau', type=float, default=1, metavar='G',
+parser.add_argument('--tau', type=float, default=1,
                     help='gae parameter (default: 1)')
 args = parser.parse_args()
 
