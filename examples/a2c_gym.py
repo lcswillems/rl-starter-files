@@ -68,7 +68,7 @@ if args.model_path is None:
     policy_net = Policy(env_dummy.observation_space, env_dummy.action_space)
     value_net = Value(env_dummy.observation_space)
 else:
-    policy_net, value_net, running_obs = pickle.load(open(args.model_path, "rb"))
+    policy_net, value_net = pickle.load(open(args.model_path, "rb"))
 if use_gpu:
     policy_net = policy_net.cuda()
     value_net = value_net.cuda()
@@ -113,7 +113,7 @@ def main_loop():
         if args.save_model_interval > 0 and (i_iter+1) % args.save_model_interval == 0:
             if use_gpu:
                 policy_net.cpu(), value_net.cpu()
-            pickle.dump((policy_net, value_net, running_obs),
+            pickle.dump((policy_net, value_net),
                         open(os.path.join(assets_dir(), 'learned_models/{}_a2c.p'.format(args.env_name)), 'wb'))
             if use_gpu:
                 policy_net.cuda(), value_net.cuda()

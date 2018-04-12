@@ -7,7 +7,7 @@ import time
 
 
 def collect_samples(pid, queue, env, policy, custom_reward, mean_action,
-                    tensor, render, running_obs, update_rs, min_batch_size):
+                    tensor, render, update_rs, min_batch_size):
     torch.randn(pid, )
     log = dict()
     memory = Memory()
@@ -22,8 +22,6 @@ def collect_samples(pid, queue, env, policy, custom_reward, mean_action,
 
     while num_steps < min_batch_size:
         obs = env.reset()
-        if running_obs is not None:
-            obs = running_obs(obs, update=update_rs)
         reward_episode = 0
 
         for t in range(10000):
@@ -34,8 +32,6 @@ def collect_samples(pid, queue, env, policy, custom_reward, mean_action,
                 action = policy.select_action(obs_var)[0].numpy()
             next_obs, reward, done, _ = env.step(action)
             reward_episode += reward
-            if running_obs is not None:
-                next_obs = running_obs(next_obs, update=update_rs)
 
             if custom_reward is not None:
                 reward = custom_reward(obs, action)
@@ -99,12 +95,11 @@ def merge_log(log_list):
 class Agent:
 
     def __init__(self, env_factory, policy, custom_reward=None, mean_action=False, render=False,
-                 tensor_type=torch.DoubleTensor, running_obs=None, num_threads=1):
+                 tensor_type=torch.DoubleTensor, num_threads=1):
         self.env_factory = env_factory
         self.policy = policy
         self.custom_reward = custom_reward
         self.mean_action = mean_action
-        self.running_obs = running_obs
         self.render = render
         self.tensor = tensor_type
         self.num_threads = num_threads
@@ -122,13 +117,13 @@ class Agent:
 
         for i in range(self.num_threads-1):
             worker_args = (i+1, queue, self.env_list[i + 1], self.policy, self.custom_reward, self.mean_action,
-                           self.tensor, False, self.running_obs, False, thread_batch_size)
+                           self.tensor, False, False, thread_batch_size)
             workers.append(multiprocessing.Process(target=collect_samples, args=worker_args))
         for worker in workers:
             worker.start()
 
         memory, log = collect_samples(0, None, self.env_list[0], self.policy, self.custom_reward, self.mean_action,
-                                      self.tensor, self.render, self.running_obs, True, thread_batch_size)
+                                      self.tensor, self.render, True, thread_batch_size)
 
         worker_logs = [None] * len(workers)
         worker_memories = [None] * len(workers)

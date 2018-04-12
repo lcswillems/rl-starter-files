@@ -1,7 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
-from utils.math import *
 
 class Policy(nn.Module):
     def __init__(self, obs_space, action_space, activation='tanh'):

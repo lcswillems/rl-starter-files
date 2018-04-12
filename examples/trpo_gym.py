@@ -68,9 +68,6 @@ obs_dim = env_dummy.observation_space.shape[0]
 is_disc_action = len(env_dummy.action_space.shape) == 0
 ActionTensor = LongTensor if is_disc_action else DoubleTensor
 
-running_obs = ZFilter((obs_dim,), clip=5)
-# running_reward = ZFilter((1,), demean=False, clip=10)
-
 """define actor and critic"""
 if args.model_path is None:
     if is_disc_action:
@@ -79,14 +76,14 @@ if args.model_path is None:
         policy_net = Policy(obs_dim, env_dummy.action_space.shape[0], log_std=args.log_std)
     value_net = Value(obs_dim)
 else:
-    policy_net, value_net, running_obs = pickle.load(open(args.model_path, "rb"))
+    policy_net, value_net = pickle.load(open(args.model_path, "rb"))
 if use_gpu:
     policy_net = policy_net.cuda()
     value_net = value_net.cuda()
 del env_dummy
 
 """create agent"""
-agent = Agent(env_factory, policy_net, running_obs=running_obs, render=args.render, num_threads=args.num_threads)
+agent = Agent(env_factory, policy_net, render=args.render, num_threads=args.num_threads)
 
 
 def update_params(batch):
@@ -120,7 +117,7 @@ def main_loop():
         if args.save_model_interval > 0 and (i_iter+1) % args.save_model_interval == 0:
             if use_gpu:
                 policy_net.cpu(), value_net.cpu()
-            pickle.dump((policy_net, value_net, running_obs),
+            pickle.dump((policy_net, value_net),
                         open(os.path.join(assets_dir(), 'learned_models/{}_trpo.p'.format(args.env_name)), 'wb'))
             if use_gpu:
                 policy_net.cuda(), value_net.cuda()
