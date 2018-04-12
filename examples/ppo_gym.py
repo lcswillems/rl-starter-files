@@ -22,8 +22,6 @@ parser.add_argument('--model-path', metavar='G',
                     help='path of pre-trained model')
 parser.add_argument('--render', action='store_true', default=False,
                     help='render the environment')
-parser.add_argument('--log-std', type=float, default=0, metavar='G',
-                    help='log std for the policy (default: 0)')
 parser.add_argument('--discount', type=float, default=0.99, metavar='G',
                     help='discount factor (default: 0.99)')
 parser.add_argument('--tau', type=float, default=0.95, metavar='G',
@@ -66,10 +64,7 @@ is_disc_action = len(env_dummy.action_space.shape) == 0
 
 """define actor and critic"""
 if args.model_path is None:
-    if is_disc_action:
-        policy_net = DiscretePolicy(obs_dim, env_dummy.action_space.n)
-    else:
-        policy_net = Policy(obs_dim, env_dummy.action_space.shape[0], log_std=args.log_std)
+    policy_net = Policy(obs_dim, env_dummy.action_space.shape[0])
     value_net = Value(obs_dim)
 else:
     policy_net, value_net = pickle.load(open(args.model_path, "rb"))
