@@ -24,10 +24,6 @@ parser.add_argument('--model-path', metavar='G',
                     help='path of pre-trained model')
 parser.add_argument('--render', action='store_true', default=False,
                     help='render the environment')
-parser.add_argument('--discount', type=float, default=0.99, metavar='G',
-                    help='discount factor (default: 0.99)')
-parser.add_argument('--tau', type=float, default=0.95, metavar='G',
-                    help='gae (default: 0.95)')
 parser.add_argument('--num-threads', type=int, default=4, metavar='N',
                     help='number of threads for agent (default: 4)')
 parser.add_argument('--seed', type=int, default=1, metavar='N',
@@ -40,6 +36,12 @@ parser.add_argument('--log-interval', type=int, default=1, metavar='N',
                     help='interval between training status logs (default: 1)')
 parser.add_argument('--save-model-interval', type=int, default=0, metavar='N',
                     help="interval between saving model (default: 0, means don't save)")
+parser.add_argument('--discount', type=float, default=0.99, metavar='G',
+                    help='discount factor (default: 0.99)')
+parser.add_argument('--lr', type=float, default=7e-4, metavar='G',
+                    help='learning rate (default: 7e-4)')
+parser.add_argument('--tau', type=float, default=0.95, metavar='G',
+                    help='gae (default: 0.95)')
 args = parser.parse_args()
 
 
@@ -68,9 +70,8 @@ if use_gpu:
     value_net = value_net.cuda()
 del env_dummy
 
-# policy_optimizer = torch.optim.Adam(policy_net.parameters(), lr=7e-4)
-policy_optimizer = torch.optim.RMSprop(policy_net.parameters(), lr=7e-4, eps=1e-5, alpha=0.99)
-value_optimizer = torch.optim.Adam(value_net.parameters(), lr=7e-4)
+policy_optimizer = torch.optim.Adam(policy_net.parameters(), lr=args.lr)
+value_optimizer = torch.optim.Adam(value_net.parameters(), lr=args.lr)
 
 """create agent"""
 agent = Agent(env_factory, policy_net, render=args.render, num_threads=args.num_threads)

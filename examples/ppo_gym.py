@@ -22,14 +22,6 @@ parser.add_argument('--model-path', metavar='G',
                     help='path of pre-trained model')
 parser.add_argument('--render', action='store_true', default=False,
                     help='render the environment')
-parser.add_argument('--discount', type=float, default=0.99, metavar='G',
-                    help='discount factor (default: 0.99)')
-parser.add_argument('--tau', type=float, default=0.95, metavar='G',
-                    help='gae (default: 0.95)')
-parser.add_argument('--learning-rate', type=float, default=3e-4, metavar='G',
-                    help='learning rate (default: 3e-4)')
-parser.add_argument('--clip-epsilon', type=float, default=0.2, metavar='N',
-                    help='clipping epsilon for PPO')
 parser.add_argument('--num-threads', type=int, default=4, metavar='N',
                     help='number of threads for agent (default: 4)')
 parser.add_argument('--seed', type=int, default=1, metavar='N',
@@ -39,9 +31,17 @@ parser.add_argument('--min-batch-size', type=int, default=2048, metavar='N',
 parser.add_argument('--max-iter-num', type=int, default=500, metavar='N',
                     help='maximal number of main iterations (default: 500)')
 parser.add_argument('--log-interval', type=int, default=1, metavar='N',
-                    help='interval between training status logs (default: 10)')
+                    help='interval between training status logs (default: 1)')
 parser.add_argument('--save-model-interval', type=int, default=0, metavar='N',
                     help="interval between saving model (default: 0, means don't save)")
+parser.add_argument('--discount', type=float, default=0.99, metavar='G',
+                    help='discount factor (default: 0.99)')
+parser.add_argument('--lr', type=float, default=7e-4, metavar='G',
+                    help='learning rate (default: 7e-4)')
+parser.add_argument('--tau', type=float, default=0.95, metavar='G',
+                    help='gae (default: 0.95)')
+parser.add_argument('--clip-epsilon', type=float, default=0.2, metavar='N',
+                    help='clipping epsilon for PPO')
 args = parser.parse_args()
 
 
@@ -71,8 +71,8 @@ if use_gpu:
     value_net = value_net.cuda()
 del env_dummy
 
-policy_optimizer = torch.optim.Adam(policy_net.parameters(), lr=args.learning_rate)
-value_optimizer = torch.optim.Adam(value_net.parameters(), lr=args.learning_rate)
+policy_optimizer = torch.optim.Adam(policy_net.parameters(), lr=args.lr)
+value_optimizer = torch.optim.Adam(value_net.parameters(), lr=args.lr)
 
 # optimization epoch number and batch size for PPO
 optim_epochs = 5
@@ -113,7 +113,7 @@ def update_params(batch, i_iter):
                 obss[ind], actions[ind], advantages[ind], returns[ind], fixed_log_probs[ind]
 
             ppo_step(policy_net, value_net, policy_optimizer, value_optimizer, 1, obss_b, actions_b, returns_b,
-                     advantages_b, fixed_log_probs_b, lr_mult, args.learning_rate, args.clip_epsilon)
+                     advantages_b, fixed_log_probs_b, lr_mult, args.lr, args.clip_epsilon)
 
 
 def main_loop():
