@@ -40,26 +40,8 @@ class Policy(nn.Module):
         # print("action loss: {:.5f}".format(action_loss.data[0]))
         return action_loss - 0.01 * entropy
 
-    def get_kl(self, x):
-        raise NotImplementedError
-        action_prob1 = self.forward(x)
-        action_prob0 = Variable(action_prob1.data)
-        kl = action_prob0 * (torch.log(action_prob0) - torch.log(action_prob1))
-        return kl.sum(1, keepdim=True)
-
     def get_log_prob(self, x, actions):
         raise NotImplementedError
         action_prob = self.forward(x)
         return torch.log(action_prob.gather(1, actions))
-    
-    def get_entropy(self, x):
-        raise NotImplementedError
-        action_prob = self.forward(x)
-        return -(torch.log(action_prob) * action_prob).sum(-1).mean()
-
-    def get_fim(self, x):
-        raise NotImplementedError
-        action_prob = self.forward(x)
-        M = action_prob.pow(-1).view(-1).data
-        return M, action_prob, {}
 
