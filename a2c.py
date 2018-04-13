@@ -15,7 +15,7 @@ from ac_rl.utils import use_gpu
 
 parser = argparse.ArgumentParser(description='PyTorch A2C example')
 parser.add_argument('--env', required=True,
-                    help='name of the environment to run')
+                    help='name of the environment to be run')
 parser.add_argument('--model-path',
                     help='path of pre-trained model'),
 parser.add_argument('--processes', type=int, default=16,
@@ -23,21 +23,21 @@ parser.add_argument('--processes', type=int, default=16,
 parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
 parser.add_argument('--episodes', type=int, default=16,
-                    help='number of episodes per update (default: 16)')
+                    help='number of episodes before update (default: 16)')
 parser.add_argument('--train-iters', type=int, default=500,
                     help='number of train iterations (default: 500)')
 parser.add_argument('--log-interval', type=int, default=10,
                     help='interval between training status logs (default: 10)')
 parser.add_argument('--save-model-interval', type=int, default=0,
-                    help="interval between saving model (default: 0, 0 means no saving)")
+                    help="interval between model saving (default: 0, 0 means no saving)")
 parser.add_argument('--discount', type=float, default=0.99,
                     help='discount factor (default: 0.99)')
 parser.add_argument('--lr', type=float, default=7e-4,
                     help='learning rate (default: 7e-4)')
 parser.add_argument('--gae-coef', type=float, default=0.95,
-                    help='gae parameter (default: 0.95, 1 means no gae)')
+                    help='gae coefficient (default: 0.95, 1 means no gae)')
 parser.add_argument('--entropy-reg', type=float, default=0.01,
-                    help='entropy term coefficient (default: 0.01)')
+                    help='entropy regularization factor (default: 0.01)')
 args = parser.parse_args()
 
 """set numpy and pytorch seeds"""
