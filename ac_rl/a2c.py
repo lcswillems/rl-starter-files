@@ -49,7 +49,7 @@ def train(envs, num_episodes, discount, gae_coef, entropy_reg,
     policy_optimizer.step()
 
     log["value_loss"] = value_loss.data[0]
-    log["policy_loss"] = policy_loss.data[0]
+    log["action_loss"] = action_loss.data[0]
     log["entropy"] = entropy.data[0]
 
     return log

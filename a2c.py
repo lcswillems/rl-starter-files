@@ -80,7 +80,7 @@ for i in range(args.train_iters):
         timestep += total_num_steps
         duration = time.time() - start_time
 
-        print("Update {}, {} steps, {:.0f} FPS, min/max/median/mean returns {:.2f}/{:.2f}/{:.2f}/{:.2f}, entropy {:.3f}, value loss {:.3f}, policy loss {:.3f}".
+        print("Update {}, {} steps, {:.0f} FPS, min/max/median/mean returns {:.2f}/{:.2f}/{:.2f}/{:.2f}, entropy {:.3f}, value loss {:.3f}, action loss {:.3f}".
             format(i,
                    timestep,
                    total_num_steps/duration,
@@ -90,7 +90,7 @@ for i in range(args.train_iters):
                    np.mean(log["return"]),
                    log["entropy"],
                    log["value_loss"],
-                   log["policy_loss"]))
+                   log["action_loss"]))
 
     """save networks"""
     if args.save_model_interval > 0 and i > 0 and i % args.save_model_interval == 0:
