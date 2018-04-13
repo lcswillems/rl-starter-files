@@ -26,8 +26,8 @@ parser.add_argument('--episodes', type=int, default=16,
                     help='number of episodes per update (default: 16)')
 parser.add_argument('--train-iters', type=int, default=500,
                     help='number of train iterations (default: 500)')
-parser.add_argument('--log-interval', type=int, default=1,
-                    help='interval between training status logs (default: 1)')
+parser.add_argument('--log-interval', type=int, default=10,
+                    help='interval between training status logs (default: 10)')
 parser.add_argument('--save-model-interval', type=int, default=0,
                     help="interval between saving model (default: 0, 0 means no saving)")
 parser.add_argument('--discount', type=float, default=0.99,
