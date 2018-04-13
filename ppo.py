@@ -17,23 +17,23 @@ from core.ppo import ppo_step
 from core.common import estimate_advantages
 from core.agent import Agent
 
-parser = argparse.ArgumentParser(description='PyTorch PPO example')
+parser = argparse.ArgumentParser(description='PyTorch A2C example')
 parser.add_argument('--env', required=True,
                     help='name of the environment to run')
 parser.add_argument('--model-path',
-                    help='path of pre-trained model')
-parser.add_argument('--num-threads', type=int, default=4,
+                    help='path of pre-trained model'),
+parser.add_argument('--threads', type=int, default=4,
                     help='number of threads (default: 4)')
 parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
-parser.add_argument('--num-episodes', type=int, default=4,
+parser.add_argument('--episodes', type=int, default=4,
                     help='number of episodes per update (default: 4)')
-parser.add_argument('--num-main-iter', type=int, default=500,
-                    help='number of main iterations (default: 500)')
+parser.add_argument('--train-iters', type=int, default=500,
+                    help='number of train iterations (default: 500)')
 parser.add_argument('--log-interval', type=int, default=1,
                     help='interval between training status logs (default: 1)')
 parser.add_argument('--save-model-interval', type=int, default=0,
-                    help="interval between saving model (default: 0, 0 means don't save)")
+                    help="interval between saving model (default: 0, 0 means no saving)")
 parser.add_argument('--discount', type=float, default=0.99,
                     help='discount factor (default: 0.99)')
 parser.add_argument('--lr', type=float, default=7e-4,
