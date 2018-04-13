@@ -38,8 +38,8 @@ parser.add_argument('--discount', type=float, default=0.99,
                     help='discount factor (default: 0.99)')
 parser.add_argument('--lr', type=float, default=7e-4,
                     help='learning rate (default: 7e-4)')
-parser.add_argument('--gae-coef', type=float, default=0.95,
-                    help='gae coefficient (default: 0.95, 1 means no gae)')
+parser.add_argument('--gae-coef', type=float, default=1,
+                    help='gae coefficient (default: 1, 1 means no gae)')
 parser.add_argument('--entropy-reg', type=float, default=0.01,
                     help='entropy regularization factor (default: 0.01)')
 parser.add_argument('--clip-epsilon', type=float, default=0.2,
