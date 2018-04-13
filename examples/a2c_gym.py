@@ -69,22 +69,24 @@ policy_optimizer = torch.optim.Adam(policy_net.parameters(), lr=args.lr)
 value_optimizer = torch.optim.Adam(value_net.parameters(), lr=args.lr)
 
 timestep = 0
-start_time = time.time()
 
 for i in range(args.num_main_iter):
     """train networks"""
+    start_time = time.time()
     log = train(envs, args.num_episodes, args.discount, args.gae_coef, args.entropy_reg,
                 policy_net, value_net, policy_optimizer, value_optimizer)
+    end_time = time.time()
 
     """print logs"""
     if i % args.log_interval == 0:
-        timestep += sum(log["num_steps"])
+        total_num_steps = sum(log["num_steps"])
+        timestep += total_num_steps
         duration = time.time() - start_time
 
-        print("Update {}, {} steps, {:.2f}s, min/max/median returns {:.2f}/{:.2f}/{:.2f}, entropy {:.3f}, value loss {:.3f}, policy loss {:.3f}".
+        print("Update {}, {} steps, {:.0f} FPS, min/max/median returns {:.2f}/{:.2f}/{:.2f}, entropy {:.3f}, value loss {:.3f}, policy loss {:.3f}".
             format(i,
                    timestep,
-                   duration,
+                   total_num_steps/duration,
                    min(log["return"]),
                    max(log["return"]),
                    np.median(log["return"]),
