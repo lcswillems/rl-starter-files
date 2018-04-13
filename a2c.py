@@ -80,7 +80,7 @@ for i in range(args.train_iters):
         timestep += total_num_steps
         duration = time.time() - start_time
 
-        print("Update {}, {} steps, {:.0f} FPS, min/max/median/mean returns {:.2f}/{:.2f}/{:.2f}/{:.2f}, entropy {:.3f}, value loss {:.3f}, action loss {:.3f}".
+        print("Update {}, {} steps, {:.0f} FPS, min/max/median/mean returns {:.1f}/{:.1f}/{:.1f}/{:.1f}, entropy {:.3f}, value loss {:.3f}, action loss {:.3f}".
             format(i,
                    timestep,
                    total_num_steps/duration,
