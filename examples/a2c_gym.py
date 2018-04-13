@@ -27,8 +27,8 @@ parser.add_argument('--num-threads', type=int, default=4,
                     help='number of threads (default: 4)')
 parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
-parser.add_argument('--num-episodes', type=int, default=1,
-                    help='number of episodes per update (default: 1)')
+parser.add_argument('--num-episodes', type=int, default=4,
+                    help='number of episodes per update (default: 4)')
 parser.add_argument('--num-main-iter', type=int, default=500,
                     help='number of main iterations (default: 500)')
 parser.add_argument('--log-interval', type=int, default=1,
@@ -90,7 +90,7 @@ for i in range(args.num_main_iter):
                    log["policy_loss"]))
 
     """save networks"""
-    if args.save_model_interval > 0 and (i+1) % args.save_model_interval == 0:
+    if args.save_model_interval > 0 and i > 0 and i % args.save_model_interval == 0:
         if use_gpu:
             policy_net.cpu(), value_net.cpu()
         pickle.dump((policy_net, value_net),

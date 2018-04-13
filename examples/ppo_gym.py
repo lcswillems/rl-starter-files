@@ -24,12 +24,12 @@ parser.add_argument('--model-path',
                     help='path of pre-trained model')
 parser.add_argument('--render', action='store_true', default=False,
                     help='render the environment')
-parser.add_argument('--num-agents', type=int, default=4,
-                    help='number of agents run in multiple threads (default: 4)')
+parser.add_argument('--num-threads', type=int, default=4,
+                    help='number of threads (default: 4)')
 parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
-parser.add_argument('--num-episodes', type=int, default=1,
-                    help='number of episodes per update (default: 1)')
+parser.add_argument('--num-episodes', type=int, default=4,
+                    help='number of episodes per update (default: 4)')
 parser.add_argument('--num-main-iter', type=int, default=500,
                     help='number of main iterations (default: 500)')
 parser.add_argument('--log-interval', type=int, default=1,
@@ -126,7 +126,7 @@ def main_loop():
             print('{}\tT_sample {:.4f}\tT_update {:.4f}\tR_min {:.2f}\tR_max {:.2f}\tR_avg {:.2f}'.format(
                 i_iter, log['sample_time'], t1-t0, log['min_reward'], log['max_reward'], log['avg_reward']))
 
-        if args.save_model_interval > 0 and (i_iter+1) % args.save_model_interval == 0:
+        if args.save_model_interval > 0 and i_iter > 0 and i_iter % args.save_model_interval == 0:
             if use_gpu:
                 policy_net.cpu(), value_net.cpu()
             pickle.dump((policy_net, value_net),
