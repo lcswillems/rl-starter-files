@@ -24,12 +24,12 @@ parser.add_argument('--model-path',
                     help='path of pre-trained model')
 parser.add_argument('--render', action='store_true', default=False,
                     help='render the environment')
-parser.add_argument('--num-threads', type=int, default=4,
-                    help='number of threads for agent (default: 4)')
+parser.add_argument('--num-agents', type=int, default=4,
+                    help='number of agents run in multiple threads (default: 4)')
 parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
-parser.add_argument('--min-agent-steps', type=int, default=2048,
-                    help='minimal agent steps per update (default: 2048)')
+parser.add_argument('--num-episodes', type=int, default=1,
+                    help='number of episodes per update (default: 1)')
 parser.add_argument('--num-main-iter', type=int, default=500,
                     help='number of main iterations (default: 500)')
 parser.add_argument('--log-interval', type=int, default=1,
@@ -40,19 +40,13 @@ parser.add_argument('--discount', type=float, default=0.99,
                     help='discount factor (default: 0.99)')
 parser.add_argument('--lr', type=float, default=7e-4,
                     help='learning rate (default: 7e-4)')
-parser.add_argument('--tau', type=float, default=0.95,
+parser.add_argument('--gae-coef', type=float, default=0.95,
                     help='gae parameter (default: 0.95, 1 means no gae)')
-parser.add_argument('--entropy-coef', type=float, default=0.01,
+parser.add_argument('--entropy-reg', type=float, default=0.01,
                     help='entropy term coefficient (default: 0.01)')
 parser.add_argument('--clip-epsilon', type=float, default=0.2,
                     help='clipping epsilon for PPO')
 args = parser.parse_args()
-
-
-def env_factory(thread_id):
-    env = gym.make(args.env)
-    env.seed(args.seed + thread_id)
-    return env
 
 
 np.random.seed(args.seed)
