@@ -21,7 +21,3 @@ class Value(nn.Module):
         x = F.tanh(x)
         x = self.fc3(x)
         return x
-
-    def get_loss(self, x, target):
-        pred = self(x)
-        return (pred - target).pow(2).mean()
