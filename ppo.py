@@ -22,12 +22,12 @@ parser.add_argument('--env', required=True,
                     help='name of the environment to run')
 parser.add_argument('--model-path',
                     help='path of pre-trained model'),
-parser.add_argument('--threads', type=int, default=4,
-                    help='number of threads (default: 4)')
+parser.add_argument('--processes', type=int, default=16,
+                    help='number of processes (default: 16)')
 parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
-parser.add_argument('--episodes', type=int, default=4,
-                    help='number of episodes per update (default: 4)')
+parser.add_argument('--episodes', type=int, default=16,
+                    help='number of episodes per update (default: 16)')
 parser.add_argument('--train-iters', type=int, default=500,
                     help='number of train iterations (default: 500)')
 parser.add_argument('--log-interval', type=int, default=1,

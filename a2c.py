@@ -18,12 +18,12 @@ parser.add_argument('--env', required=True,
                     help='name of the environment to run')
 parser.add_argument('--model-path',
                     help='path of pre-trained model'),
-parser.add_argument('--threads', type=int, default=4,
-                    help='number of threads (default: 4)')
+parser.add_argument('--processes', type=int, default=16,
+                    help='number of processes (default: 16)')
 parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
-parser.add_argument('--episodes', type=int, default=4,
-                    help='number of episodes per update (default: 4)')
+parser.add_argument('--episodes', type=int, default=16,
+                    help='number of episodes per update (default: 16)')
 parser.add_argument('--train-iters', type=int, default=500,
                     help='number of train iterations (default: 500)')
 parser.add_argument('--log-interval', type=int, default=1,
@@ -47,7 +47,7 @@ if use_gpu:
     torch.cuda.manual_seed_all(args.seed)
 
 """generate environments"""
-envs = get_envs(args.env, args.seed, args.threads)
+envs = get_envs(args.env, args.seed, args.processes)
 
 """define policy and value networks"""
 if args.model_path is None:
@@ -60,8 +60,10 @@ if use_gpu:
     value_net = value_net.cuda()
 
 """define policy and value optimizers"""
-policy_optimizer = torch.optim.Adam(policy_net.parameters(), lr=args.lr)
-value_optimizer = torch.optim.Adam(value_net.parameters(), lr=args.lr)
+# policy_optimizer = torch.optim.Adam(policy_net.parameters(), lr=args.lr)
+# value_optimizer = torch.optim.Adam(value_net.parameters(), lr=args.lr)
+policy_optimizer = torch.optim.RMSprop(policy_net.parameters(), args.lr, eps=1e-5, alpha=0.99)
+value_optimizer = torch.optim.RMSprop(value_net.parameters(), args.lr, eps=1e-5, alpha=0.99)
 
 timestep = 0
 
