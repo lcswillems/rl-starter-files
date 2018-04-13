@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from core.common import use_gpu, collect_trajectories, estimate_advantages
+from .common import use_gpu, collect_trajectories, estimate_advantages
 
 def train(envs, num_episodes, discount, gae_coef, entropy_reg,
           policy_net, value_net, policy_optimizer, value_optimizer):

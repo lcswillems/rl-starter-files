@@ -22,8 +22,6 @@ parser.add_argument('--env', required=True,
                     help='name of the environment to run')
 parser.add_argument('--model-path',
                     help='path of pre-trained model')
-parser.add_argument('--render', action='store_true', default=False,
-                    help='render the environment')
 parser.add_argument('--num-threads', type=int, default=4,
                     help='number of threads (default: 4)')
 parser.add_argument('--seed', type=int, default=1,

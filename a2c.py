@@ -1,28 +1,23 @@
 import argparse
 import gym
 import gym_minigrid
-from gym_minigrid.wrappers import *
 import os
-import sys
 import pickle
 import time
 import numpy as np
-import math
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import torch
 
-from utils import *
+from utils import get_envs, assets_dir
 from models.policy import Policy
 from models.value import Value
-from core.a2c import train
-from core.common import use_gpu, estimate_advantages
+from ac_rl.a2c import train
+from ac_rl.utils import use_gpu
 
 parser = argparse.ArgumentParser(description='PyTorch A2C example')
 parser.add_argument('--env', required=True,
                     help='name of the environment to run')
 parser.add_argument('--model-path',
                     help='path of pre-trained model'),
-parser.add_argument('--render', action='store_true', default=False,
-                    help='render the environment')
 parser.add_argument('--num-threads', type=int, default=4,
                     help='number of threads (default: 4)')
 parser.add_argument('--seed', type=int, default=1,

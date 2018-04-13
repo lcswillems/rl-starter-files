@@ -1,10 +1,9 @@
 from multiprocessing import Queue, Process
-from utils.inrl import *
 import torch
 from torch.autograd import Variable
 import numpy as np
 
-use_gpu = torch.cuda.is_available()
+from .utils import use_gpu, concat_to_dict, append_to_dict
 
 def collect_trajectories(envs, policy_net, num_episodes):
     if use_gpu:

@@ -1,3 +1,7 @@
+import torch
+
+use_gpu = torch.cuda.is_available()
+
 def concat_to_dict(d_to_concat, d):
     for key in d.keys():
         if not(key in d_to_concat.keys()):
