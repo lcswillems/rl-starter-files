@@ -9,10 +9,8 @@ from models.value import Value
 def storage_dir():
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'storage')
 
-def get_model_path(env, algo, name=None):
-    if name == None:
-        name = env+"_"+algo
-    return os.path.join(storage_dir(), 'models', name+".pt")
+def get_model_path(model_name):
+    return os.path.join(storage_dir(), 'models', model_name+".pt")
 
 def load_model(observation_space, action_space, from_path):
     if from_path == None or not(os.path.exists(from_path)):

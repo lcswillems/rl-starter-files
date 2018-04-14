@@ -6,8 +6,8 @@ import time
 import numpy as np
 import torch
 
-from utils import get_model_path, load_model, save_model
 import ac_rl
+from utils import get_model_path, load_model, save_model
 
 parser = argparse.ArgumentParser(description='PyTorch RL example')
 parser.add_argument('--algo', required=True,
@@ -60,7 +60,8 @@ for i in range(args.processes):
     envs.append(env)
 
 """define model path"""
-model_path = get_model_path(args.env, args.algo, args.model)
+model_name = args.model if args.model != None else args.env+"_"+args.algo
+model_path = get_model_path(model_name)
 
 """define policy and value networks"""
 from_path = None if args.reset else model_path
