@@ -49,7 +49,7 @@ def collect_trajectory(pid, queue, env, policy_net):
 
     while not(done):
         obs_var = Variable(torch.from_numpy(obs).float().unsqueeze(0), volatile=True)
-        action = policy_net.get_sampled_action(obs_var)[0].numpy()
+        action = policy_net.get_action(obs_var)[0].numpy()
         next_obs, reward, done, _ = env.step(action)
         mask = 0 if done else 1
 
