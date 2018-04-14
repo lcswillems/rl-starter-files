@@ -3,12 +3,12 @@ import torch
 from torch.autograd import Variable
 import numpy as np
 
-from .utils import use_gpu, concat_to_dict, append_to_dict
+from ac_rl.utils import use_gpu, seed, dotdict, concat_to_dict, append_to_dict
 
 def collect_trajectories(envs, policy_net, num_episodes):
     if use_gpu:
         policy_net.cpu()
-    
+
     queue = Queue()
 
     def start(pid):
@@ -18,8 +18,8 @@ def collect_trajectories(envs, policy_net, num_episodes):
             p = Process(target=collect_trajectory, args=(pid, queue, envs[pid], policy_net))
             p.start()
 
-    transs = {}
-    log = {}
+    transs = dotdict({})
+    log = dotdict({})
 
     for i in range(min(len(envs), num_episodes)):
         start(i)
@@ -31,14 +31,14 @@ def collect_trajectories(envs, policy_net, num_episodes):
         if i+1 < num_episodes:
             start(pid)
             i += 1
-    
+
     if use_gpu:
         policy_net.cuda()
-    
+
     return transs, log
 
 def collect_trajectory(pid, queue, env, policy_net):
-    torch.randn(pid+1, )
+    seed(np.random.randint(0, 0xFFFFFF) + pid)
 
     done = False
     obs = env.reset()
@@ -52,16 +52,16 @@ def collect_trajectory(pid, queue, env, policy_net):
         action = policy_net.get_sampled_action(obs_var)[0].numpy()
         next_obs, reward, done, _ = env.step(action)
         mask = 0 if done else 1
-        
-        trans = {"obs": obs, "action": action, "next_obs": next_obs, "reward": reward, "mask": mask}
+
+        trans = {"obs": obs, "action": action, "reward": reward, "mask": mask}
         append_to_dict(transs, trans)
         
         obs = next_obs
 
         num_steps += 1
         returnn += reward
-        
-    log = {"num_steps": num_steps, "return": returnn}
+
+    log = {"num_steps": num_steps, "returnn": returnn}
 
     queue.put([pid, transs, log])
 
@@ -85,5 +85,5 @@ def estimate_advantages(rewards, masks, values, discount, gae_coef):
 
     if use_gpu:
         advantages, returns = advantages.cuda(), returns.cuda()
-        
+
     return advantages, returns
