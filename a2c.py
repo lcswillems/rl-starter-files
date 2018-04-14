@@ -60,10 +60,8 @@ if use_gpu:
     value_net = value_net.cuda()
 
 """define policy and value optimizers"""
-# policy_optimizer = torch.optim.Adam(policy_net.parameters(), lr=args.lr)
-# value_optimizer = torch.optim.Adam(value_net.parameters(), lr=args.lr)
-policy_optimizer = torch.optim.RMSprop(policy_net.parameters(), args.lr, eps=1e-5, alpha=0.99)
-value_optimizer = torch.optim.RMSprop(value_net.parameters(), args.lr, eps=1e-5, alpha=0.99)
+policy_optimizer = torch.optim.Adam(policy_net.parameters(), lr=args.lr)
+value_optimizer = torch.optim.Adam(value_net.parameters(), lr=args.lr)
 
 timestep = 0
 
@@ -80,14 +78,14 @@ for i in range(args.train_iters):
         timestep += total_num_steps
         duration = time.time() - start_time
 
-        print("Update {}, {} steps, {:.0f} FPS, min/max/median/mean returns {:.1f}/{:.1f}/{:.1f}/{:.1f}, entropy {:.3f}, value loss {:.3f}, action loss {:.3f}".
+        print("Update {}, {} steps, {:.0f} FPS, mean/median returns {:.1f}/{:.1f}, min/max returns {:.1f}/{:.1f}, entropy {:.3f}, value loss {:.3f}, action loss {:.3f}".
             format(i,
                    timestep,
                    total_num_steps/duration,
+                   np.mean(log["return"]),
+                   np.median(log["return"]),
                    min(log["return"]),
                    max(log["return"]),
-                   np.median(log["return"]),
-                   np.mean(log["return"]),
                    log["entropy"],
                    log["value_loss"],
                    log["action_loss"]))
