@@ -1,7 +1,6 @@
 import os
 import torch
 import pickle
-from gym_minigrid.wrappers import *
 
 import ac_rl
 from models.policy import Policy
@@ -40,12 +39,3 @@ def save_model(policy_net, value_net, to_path):
 
     if ac_rl.use_gpu:
         policy_net.cuda(), value_net.cuda()
-
-def get_envs(env_name, seed, nbs):
-    envs = []
-    for i in range(nbs):
-        env = gym.make(env_name)
-        env.seed(seed + i)
-        env = FlatObsWrapper(env)
-        envs.append(env)
-    return envs

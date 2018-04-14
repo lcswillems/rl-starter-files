@@ -1,12 +1,12 @@
 import argparse
 import gym
 import gym_minigrid
-import os
+from gym_minigrid.wrappers import *
 import time
 import numpy as np
 import torch
 
-from utils import get_model_path, load_model, save_model, get_envs
+from utils import get_model_path, load_model, save_model
 import ac_rl
 
 parser = argparse.ArgumentParser(description='PyTorch RL example')
@@ -52,7 +52,12 @@ assert args.algo in ["a2c", "ppo"]
 ac_rl.seed(args.seed)
 
 """generate environments"""
-envs = get_envs(args.env, args.seed, args.processes)
+envs = []
+for i in range(args.processes):
+    env = gym.make(args.env)
+    env.seed(args.seed + i)
+    env = FlatObsWrapper(env)
+    envs.append(env)
 
 """define model path"""
 model_path = get_model_path(args.env, args.algo, args.model)
