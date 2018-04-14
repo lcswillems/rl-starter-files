@@ -2,8 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models.utils import initialize_parameters
-
 class Value(nn.Module):
     def __init__(self, obs_space):
         super().__init__()

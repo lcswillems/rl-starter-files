@@ -3,8 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
-from models.utils import initialize_parameters
-
 class Policy(nn.Module):
     def __init__(self, obs_space, action_space):
         super().__init__()
