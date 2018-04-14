@@ -28,12 +28,6 @@ def train(envs, num_episodes, discount, gae_coef, entropy_reg,
     pred_values = value_net(Variable(obss))
     value_loss = (pred_values - Variable(returns)).pow(2).mean()
 
-    """update value"""
-    value_loss = value_net.get_loss(Variable(obss), Variable(returns))
-    value_optimizer.zero_grad()
-    value_loss.backward()
-    value_optimizer.step()
-
     """compute policy loss"""
     raw_dists = policy_net(Variable(obss))
     log_dists = F.log_softmax(raw_dists, dim=1)
@@ -42,6 +36,11 @@ def train(envs, num_episodes, discount, gae_coef, entropy_reg,
     action_log_probs = log_dists.gather(1, Variable(actions))
     action_loss = -(action_log_probs * Variable(advantages)).mean()
     policy_loss = action_loss - entropy_reg * entropy
+
+    """update value"""
+    value_optimizer.zero_grad()
+    value_loss.backward()
+    value_optimizer.step()
 
     """update policy"""
     policy_optimizer.zero_grad()
