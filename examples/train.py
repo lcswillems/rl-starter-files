@@ -10,7 +10,7 @@ import torch
 from utils import get_envs, assets_dir
 from models.policy import Policy
 from models.value import Value
-from ac_rl import a2c_step, ppo_step, use_gpu, seed
+import ac_rl
 
 parser = argparse.ArgumentParser(description='PyTorch RL example')
 parser.add_argument('--algo', required=True,
@@ -48,7 +48,7 @@ parser.add_argument('--batch-size', type=int, default=32,
 args = parser.parse_args()
 
 """set numpy and pytorch seeds"""
-seed(args.seed)
+ac_rl.seed(args.seed)
 
 """generate environments"""
 envs = get_envs(args.env, args.seed, args.processes)
@@ -59,7 +59,7 @@ if args.model_path is None:
     value_net = Value(envs[0].observation_space)
 else:
     policy_net, value_net = pickle.load(open(args.model_path, "rb"))
-if use_gpu:
+if ac_rl.use_gpu:
     policy_net = policy_net.cuda()
     value_net = value_net.cuda()
 
@@ -73,10 +73,10 @@ for i in range(args.steps):
     """train networks"""
     start_time = time.time()
     if args.algo == "a2c":
-        log = a2c_step(envs, args.episodes, args.discount, args.gae_tau, args.entropy_coef,
+        log = ac_rl.a2c_step(envs, args.episodes, args.discount, args.gae_tau, args.entropy_coef,
                        policy_net, value_net, policy_optimizer, value_optimizer)
     elif args.algo == "ppo":
-        log = ppo_step(envs, args.episodes, args.discount, args.gae_tau, args.entropy_coef,
+        log = ac_rl.ppo_step(envs, args.episodes, args.discount, args.gae_tau, args.entropy_coef,
                        args.clip_eps, args.epochs, args.batch_size,
                        policy_net, value_net, policy_optimizer, value_optimizer)
     else:
@@ -96,9 +96,9 @@ for i in range(args.steps):
 
     """save models"""
     if args.save_model_interval > 0 and i > 0 and i % args.save_model_interval == 0:
-        if use_gpu:
+        if ac_rl.use_gpu:
             policy_net.cpu(), value_net.cpu()
         pickle.dump((policy_net, value_net),
                     open(os.path.join(assets_dir(), 'learned_models/{}_{}.pt'.format(args.env, args.algo)), 'wb'))
-        if use_gpu:
+        if ac_rl.use_gpu:
             policy_net.cuda(), value_net.cuda()
