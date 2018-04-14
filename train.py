@@ -2,14 +2,11 @@ import argparse
 import gym
 import gym_minigrid
 import os
-import pickle
 import time
 import numpy as np
 import torch
 
-from utils import get_envs, assets_dir
-from models.policy import Policy
-from models.value import Value
+from utils import get_model_path, load_model, save_model, get_envs
 import ac_rl
 
 parser = argparse.ArgumentParser(description='PyTorch RL example')
@@ -17,8 +14,10 @@ parser.add_argument('--algo', required=True,
                     help='algorithm to use: a2c | ppo')
 parser.add_argument('--env', required=True,
                     help='name of the environment to be run')
-parser.add_argument('--model-path',
-                    help='path of pre-trained model'),
+parser.add_argument('--model', default=None,
+                    help='name of the pre-trained model'),
+parser.add_argument('--reset', action='store_true', default=False,
+                    help='start from a new model')
 parser.add_argument('--processes', type=int, default=16,
                     help='number of processes (default: 16)')
 parser.add_argument('--seed', type=int, default=1,
@@ -47,21 +46,20 @@ parser.add_argument('--batch-size', type=int, default=32,
                     help='batch size for PPO (default: 32, 0 means all)')
 args = parser.parse_args()
 
+assert args.algo in ["a2c", "ppo"]
+
 """set numpy and pytorch seeds"""
 ac_rl.seed(args.seed)
 
 """generate environments"""
 envs = get_envs(args.env, args.seed, args.processes)
 
+"""define model path"""
+model_path = get_model_path(args.env, args.algo, args.model)
+
 """define policy and value networks"""
-if args.model_path is None:
-    policy_net = Policy(envs[0].observation_space, envs[0].action_space)
-    value_net = Value(envs[0].observation_space)
-else:
-    policy_net, value_net = pickle.load(open(args.model_path, "rb"))
-if ac_rl.use_gpu:
-    policy_net = policy_net.cuda()
-    value_net = value_net.cuda()
+from_path = None if args.reset else model_path
+policy_net, value_net = load_model(envs[0].observation_space, envs[0].action_space, from_path)
 
 """define policy and value optimizers"""
 policy_optimizer = torch.optim.Adam(policy_net.parameters(), lr=args.lr)
@@ -79,8 +77,6 @@ for i in range(args.steps):
         log = ac_rl.ppo_step(envs, args.episodes, args.discount, args.gae_tau, args.entropy_coef,
                        args.clip_eps, args.epochs, args.batch_size,
                        policy_net, value_net, policy_optimizer, value_optimizer)
-    else:
-        raise ValueError("Invalid algorithm")
     end_time = time.time()
 
     """print logs"""
@@ -96,9 +92,4 @@ for i in range(args.steps):
 
     """save models"""
     if args.save_model_interval > 0 and i > 0 and i % args.save_model_interval == 0:
-        if ac_rl.use_gpu:
-            policy_net.cpu(), value_net.cpu()
-        pickle.dump((policy_net, value_net),
-                    open(os.path.join(assets_dir(), 'learned_models/{}_{}.pt'.format(args.env, args.algo)), 'wb'))
-        if ac_rl.use_gpu:
-            policy_net.cuda(), value_net.cuda()
+        save_model(policy_net, value_net, model_path)
