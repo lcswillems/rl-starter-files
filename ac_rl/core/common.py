@@ -16,6 +16,7 @@ def collect_trajectories(envs, policy_net, num_episodes):
             collect_trajectory(pid, queue, envs[pid], policy_net)
         else:
             p = Process(target=collect_trajectory, args=(pid, queue, envs[pid], policy_net))
+            p.daemon = True
             p.start()
 
     transs = dotdict({})
