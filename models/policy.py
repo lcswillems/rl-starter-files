@@ -25,8 +25,5 @@ class Policy(nn.Module):
     def get_dist(self, x):
         return F.softmax(self(x), dim=1)
 
-    def get_sampled_action(self, x):
+    def get_action(self, x):
         return self.get_dist(x).multinomial().data
-    
-    def get_best_action(self, x):
-        return np.argmax(self.get_dist(x).data)
