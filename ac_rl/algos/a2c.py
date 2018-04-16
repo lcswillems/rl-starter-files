@@ -15,6 +15,7 @@ class A2CAlgo(BaseAlgo):
                                              alpha=rmsprop_alpha, eps=rmsprop_eps)
     
     def step(self):
+        
         """collect transitions"""
         ts, log = self.collect_transitions()
 
