@@ -101,7 +101,7 @@ else:
 num_updates = args.total_frames // args.processes // args.update_frames
 num_frames = 0
 
-for update in range(num_updates):
+for update in range(1, num_updates+1):
     # Update parameters
 
     start_time = time.time()
@@ -122,5 +122,5 @@ for update in range(num_updates):
 
     # Save model
 
-    if args.save_interval > 0 and update > 0 and update % args.save_interval == 0:
+    if args.save_interval > 0 and update % args.save_interval == 0:
         save_model(acmodel, model_path)
