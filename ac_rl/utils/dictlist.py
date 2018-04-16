@@ -1,9 +1,9 @@
-class dictlist(dict):
+class DictList(dict):
     """A dictionnary of lists of same size. Dictionnary items can be
     accessed using `.` notation and list items using `[]` notation.
 
     Example:
-        >>> d = dictlist({'a': [[1, 2], [3, 4]], 'b': [[5], [6]]})
+        >>> d = DictList({'a': [[1, 2], [3, 4]], 'b': [[5], [6]]})
         >>> d.a
         [[1, 2], [3, 4]]
         >>> d[0]
@@ -17,7 +17,7 @@ class dictlist(dict):
         return len(next(iter(dict.values(self))))
 
     def __getitem__(self, index):
-        return dictlist({key: value[index] for key, value in dict.items(self)})
+        return DictList({key: value[index] for key, value in dict.items(self)})
     
     def __setitem__(self, index, d):
         for key, value in d.items():
