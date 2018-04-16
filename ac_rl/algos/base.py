@@ -22,7 +22,7 @@ class BaseAlgo(ABC):
         self.next_obs = self.env.reset()
     
     def collect_transitions(self):
-        ts = dictlist()
+        ts = DictList()
 
         # Add obs, action, reward, mask and value to transitions
 
