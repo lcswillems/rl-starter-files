@@ -104,7 +104,7 @@ for step in range(num_steps):
         num_frames += step_num_frames
         fps = step_num_frames/(end_time - start_time)
 
-        print("Step {}, {} frames, {:.0f} FPS, mean/median returns {:.1f}/{:.1f}, min/max returns {:.1f}/{:.1f}, entropy {:.3f}, value loss {:.3f}, action loss {:.3f}".
+        print("Step {}, {} frames, {:.0f} FPS, mean/median return {:.1f}/{:.1f}, min/max return {:.1f}/{:.1f}, entropy {:.3f}, value loss {:.3f}, action loss {:.3f}".
             format(step, num_frames, fps,
                    np.mean(log["return"]), np.median(log["return"]), np.amin(log["return"]), np.amax(log["return"]),
                    log["entropy"], log["value_loss"], log["action_loss"]))
