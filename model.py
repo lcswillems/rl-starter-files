@@ -18,21 +18,19 @@ class ACModel(ac_rl.ACModel):
         self.a_head.weight.data.mul_(0.1)
         self.a_head.bias.data.mul_(0.0)
 
-    def forward(self, obs, compute_rdist, compute_value):
+    def forward(self, obs):
         rdist, value = None, None
 
-        if compute_rdist:
-            x = self.a_fc1(obs)
-            x = F.tanh(x)
-            x = self.a_fc2(x)
-            x = F.tanh(x)
-            rdist = self.a_head(x)
+        x = self.a_fc1(obs)
+        x = F.tanh(x)
+        x = self.a_fc2(x)
+        x = F.tanh(x)
+        rdist = self.a_head(x)
 
-        if compute_value:
-            x = self.c_fc1(obs)
-            x = F.tanh(x)
-            x = self.c_fc2(x)
-            x = F.tanh(x)
-            value = self.c_head(x)
+        x = self.c_fc1(obs)
+        x = F.tanh(x)
+        x = self.c_fc2(x)
+        x = F.tanh(x)
+        value = self.c_head(x)
 
         return rdist, value
