@@ -1,6 +1,6 @@
 # PyTorch A2C and PPO
 
-This is a fast, robust and readable PyTorch implementation of:
+A fast, robust, readable and multi-processes PyTorch implementation of:
 
 - [Synchronous A3C (A2C)](https://arxiv.org/pdf/1602.01783.pdf)
 - [Proximal Policy Optimization (PPO)](https://arxiv.org/pdf/1707.06347.pdf)
