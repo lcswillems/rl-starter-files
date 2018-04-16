@@ -43,7 +43,7 @@ while True:
     obs, reward, done, _ = env.step(action)
 
     env.render('human')
-    time.sleep(0.01)
+    time.sleep(0.05)
 
     if done:
         env.reset()
