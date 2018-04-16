@@ -5,10 +5,10 @@ import torch.nn.functional as F
 from ac_rl.algos.base import BaseAlgo
 
 class PPOAlgo(BaseAlgo):
-    def __init__(self, envs, num_step_frames, acmodel,
+    def __init__(self, envs, num_update_frames, acmodel,
                  discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm,
                  adam_eps, clip_eps, epochs, batch_size):
-        super().__init__(envs, num_step_frames, acmodel,
+        super().__init__(envs, num_update_frames, acmodel,
                          discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm)
 
         self.clip_eps = clip_eps
@@ -17,7 +17,7 @@ class PPOAlgo(BaseAlgo):
 
         self.optimizer = torch.optim.Adam(self.acmodel.parameters(), lr, eps=adam_eps)
     
-    def step(self):
+    def update_parameters(self):
         # Collect transitions
 
         ts, log = self.collect_transitions()
@@ -63,7 +63,7 @@ class PPOAlgo(BaseAlgo):
                 self.optimizer.step()
         
         # Log some values
-        
+
         log["value_loss"] = value_loss.data[0]
         log["action_loss"] = action_loss.data[0]
         log["entropy"] = entropy.data[0]

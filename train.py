@@ -30,8 +30,8 @@ parser.add_argument('--log-interval', type=int, default=10,
                     help='interval between log display (default: 10)')
 parser.add_argument('--save-interval', type=int, default=0,
                     help="interval between model saving (default: 0, 0 means no saving)")
-parser.add_argument('--step-frames', type=int, default=5,
-                    help='number of frames per agent during a training step (default: 5)')
+parser.add_argument('--update-frames', type=int, default=5,
+                    help='number of frames per agent during before updating parameters (default: 5)')
 parser.add_argument('--discount', type=float, default=0.99,
                     help='discount factor (default: 0.99)')
 parser.add_argument('--lr', type=float, default=7e-4,
@@ -84,11 +84,11 @@ if ac_rl.use_gpu:
 # Define actor-critic algo
 
 if args.algo == "a2c":
-    algo = ac_rl.A2CAlgo(envs, args.step_frames, acmodel, args.discount, args.lr,
+    algo = ac_rl.A2CAlgo(envs, args.update_frames, acmodel, args.discount, args.lr,
                          args.gae_tau, args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
                          args.optim_alpha, args.optim_eps)
 elif args.algo == "ppo":
-    algo = ac_rl.PPOAlgo(envs, args.step_frames, acmodel, args.discount, args.lr,
+    algo = ac_rl.PPOAlgo(envs, args.update_frames, acmodel, args.discount, args.lr,
                          args.gae_tau, args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
                          args.optim_eps, args.clip_eps, args.epochs, args.batch_size)
 else:
@@ -96,29 +96,29 @@ else:
 
 # Train model
 
-num_steps = args.total_frames // args.processes // args.step_frames
+num_updates = args.total_frames // args.processes // args.update_frames
 num_frames = 0
 
-for step in range(num_steps):
-    # Train model for one step
+for update in range(num_updates):
+    # Update parameters
 
     start_time = time.time()
-    log = algo.step()
+    log = algo.update_parameters()
     end_time = time.time()
 
     # Print log
 
-    if step % args.log_interval == 0:
-        step_num_frames = args.processes * args.step_frames
-        num_frames += step_num_frames
-        fps = step_num_frames/(end_time - start_time)
+    if update % args.log_interval == 0:
+        update_num_frames = args.processes * args.update_frames
+        num_frames += update_num_frames
+        fps = update_num_frames/(end_time - start_time)
 
-        print("Step {}, {} frames, {:.0f} FPS, mean/median return {:.1f}/{:.1f}, min/max return {:.1f}/{:.1f}, entropy {:.3f}, value loss {:.3f}, action loss {:.3f}".
-            format(step, num_frames, fps,
+        print("Update {}, {} frames, {:.0f} FPS, mean/median return {:.1f}/{:.1f}, min/max return {:.1f}/{:.1f}, entropy {:.3f}, value loss {:.3f}, action loss {:.3f}".
+            format(update, num_frames, fps,
                    np.mean(log["return"]), np.median(log["return"]), np.amin(log["return"]), np.amax(log["return"]),
                    log["entropy"], log["value_loss"], log["action_loss"]))
 
     # Save model
-    
-    if args.save_interval > 0 and step > 0 and step % args.save_interval == 0:
+
+    if args.save_interval > 0 and update > 0 and update % args.save_interval == 0:
         save_model(acmodel, model_path)

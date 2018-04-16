@@ -5,16 +5,16 @@ import torch.nn.functional as F
 from ac_rl.algos.base import BaseAlgo
 
 class A2CAlgo(BaseAlgo):
-    def __init__(self, envs, num_step_frames, acmodel,
+    def __init__(self, envs, num_update_frames, acmodel,
                  discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm,
                  rmsprop_alpha, rmsprop_eps):
-        super().__init__(envs, num_step_frames, acmodel,
+        super().__init__(envs, num_update_frames, acmodel,
                          discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm)
 
         self.optimizer = torch.optim.RMSprop(self.acmodel.parameters(), lr,
                                              alpha=rmsprop_alpha, eps=rmsprop_eps)
     
-    def step(self):
+    def update_parameters(self):
         # Collect transitions
 
         ts, log = self.collect_transitions()
@@ -42,7 +42,7 @@ class A2CAlgo(BaseAlgo):
         self.optimizer.step()
 
         # Log some values
-        
+
         log["value_loss"] = value_loss.data[0]
         log["action_loss"] = action_loss.data[0]
         log["entropy"] = entropy.data[0]

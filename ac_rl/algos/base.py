@@ -6,10 +6,10 @@ import numpy as np
 from ac_rl.utils import use_gpu, dictlist, MultiEnv
 
 class BaseAlgo(ABC):
-    def __init__(self, envs, num_step_frames, acmodel,
+    def __init__(self, envs, num_update_frames, acmodel,
                  discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm):
         self.env = MultiEnv(envs)
-        self.num_step_frames = num_step_frames
+        self.num_update_frames = num_update_frames
         self.acmodel = acmodel
         self.discount = discount
         self.lr = lr
@@ -29,7 +29,7 @@ class BaseAlgo(ABC):
         log_episode_return = np.zeros(self.num_processes)
         log_return = np.zeros(self.num_processes)
 
-        for _ in range(self.num_step_frames):
+        for _ in range(self.num_update_frames):
             obs = torch.from_numpy(np.array(self.next_obs)).float()
             action, value = self.acmodel.get_action_n_value(Variable(obs, volatile=True))
             action = action.data.squeeze(1).cpu().numpy()
@@ -68,9 +68,9 @@ class BaseAlgo(ABC):
         obs = torch.from_numpy(np.array(self.next_obs)).float()
         next_value = self.acmodel.get_value(Variable(obs, volatile=True)).data.squeeze(1)
 
-        for i in reversed(range(self.num_step_frames)):
-            next_value = ts.value[i+1] if i < self.num_step_frames - 1 else next_value
-            next_advantage = ts.advantage[i+1] if i < self.num_step_frames - 1 else 0
+        for i in reversed(range(self.num_update_frames)):
+            next_value = ts.value[i+1] if i < self.num_update_frames - 1 else next_value
+            next_advantage = ts.advantage[i+1] if i < self.num_update_frames - 1 else 0
             
             delta = ts.reward[i] + self.discount * next_value * ts.mask[i] - ts.value[i]
             ts.advantage[i] = delta + self.discount * self.gae_tau * next_advantage * ts.mask[i]
@@ -88,11 +88,11 @@ class BaseAlgo(ABC):
         ts.returnn = ts.returnn.view(-1, *ts.returnn.shape[2:]).unsqueeze(1)
 
         # Log some values
-        
+
         log = {"return": log_return}
 
         return ts, log
 
     @abstractmethod
-    def step(self):
+    def update_parameters(self):
         pass
