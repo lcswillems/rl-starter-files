@@ -101,7 +101,7 @@ else:
 num_updates = args.total_frames // args.processes // args.update_frames
 num_frames = 0
 
-for update in range(1, num_updates+1):
+for i in range(1, num_updates+1):
     # Update parameters
 
     start_time = time.time()
@@ -110,17 +110,17 @@ for update in range(1, num_updates+1):
 
     # Print log
 
-    if update % args.log_interval == 0:
+    if i % args.log_interval == 0:
         update_num_frames = args.processes * args.update_frames
         num_frames += update_num_frames
         fps = update_num_frames/(end_time - start_time)
 
         print("Update {}, {} frames, {:.0f} FPS, mean/median return {:.1f}/{:.1f}, min/max return {:.1f}/{:.1f}, entropy {:.3f}, value loss {:.3f}, action loss {:.3f}".
-            format(update, num_frames, fps,
+            format(i, num_frames, fps,
                    np.mean(log["return"]), np.median(log["return"]), np.amin(log["return"]), np.amax(log["return"]),
                    log["entropy"], log["value_loss"], log["action_loss"]))
 
     # Save model
 
-    if args.save_interval > 0 and update % args.save_interval == 0:
+    if args.save_interval > 0 and i % args.save_interval == 0:
         save_model(acmodel, model_path)
