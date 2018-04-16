@@ -6,7 +6,7 @@ import torch
 from torch.autograd import Variable
 import time
 
-import ac_rl
+import torch_ac
 from utils import get_model_path, load_model, save_model
 
 # Parse arguments
@@ -22,7 +22,7 @@ args = parser.parse_args()
 
 # Set numpy and pytorch seeds
 
-ac_rl.seed(args.seed)
+torch_ac.seed(args.seed)
 
 # Generate environment
 

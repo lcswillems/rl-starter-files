@@ -6,7 +6,7 @@ import time
 import numpy as np
 import torch
 
-import ac_rl
+import torch_ac
 from utils import get_model_path, load_model, save_model
 
 # Parse arguments
@@ -58,7 +58,7 @@ args = parser.parse_args()
 
 # Set numpy and pytorch seeds
 
-ac_rl.seed(args.seed)
+torch_ac.seed(args.seed)
 
 # Generate environments
 
@@ -78,17 +78,17 @@ model_path = get_model_path(model_name)
 
 from_path = None if args.reset else model_path
 acmodel = load_model(envs[0].observation_space, envs[0].action_space, from_path)
-if ac_rl.use_gpu:
+if torch_ac.use_gpu:
     acmodel = acmodel.cuda()
 
 # Define actor-critic algo
 
 if args.algo == "a2c":
-    algo = ac_rl.A2CAlgo(envs, args.update_frames, acmodel, args.discount, args.lr,
+    algo = torch_ac.A2CAlgo(envs, args.update_frames, acmodel, args.discount, args.lr,
                          args.gae_tau, args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
                          args.optim_alpha, args.optim_eps)
 elif args.algo == "ppo":
-    algo = ac_rl.PPOAlgo(envs, args.update_frames, acmodel, args.discount, args.lr,
+    algo = torch_ac.PPOAlgo(envs, args.update_frames, acmodel, args.discount, args.lr,
                          args.gae_tau, args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
                          args.optim_eps, args.clip_eps, args.epochs, args.batch_size)
 else:

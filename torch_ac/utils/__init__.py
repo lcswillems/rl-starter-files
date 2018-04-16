@@ -1,8 +1,8 @@
 import numpy as np
 import torch
 
-from ac_rl.utils.dictlist import DictList
-from ac_rl.utils.multienv import MultiEnv
+from torch_ac.utils.dictlist import DictList
+from torch_ac.utils.multienv import MultiEnv
 
 use_gpu = torch.cuda.is_available()
 

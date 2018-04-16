@@ -2,7 +2,7 @@ import torch
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-from ac_rl.algos.base import BaseAlgo
+from torch_ac.algos.base import BaseAlgo
 
 class PPOAlgo(BaseAlgo):
     def __init__(self, envs, num_update_frames, acmodel,

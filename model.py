@@ -1,9 +1,9 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-import ac_rl
+import torch_ac
 
-class ACModel(ac_rl.ACModel):
+class ACModel(torch_ac.ACModel):
     def __init__(self, obs_space, action_space):
         super().__init__()
 
