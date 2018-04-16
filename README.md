@@ -59,7 +59,7 @@ python3 train.py --algo a2c --env MiniGrid-DoorKey-5x5-v0 --seed 12 --processes 
 - `--env ENV`: the environment name to act on.
 - `--model MODEL`: the trained model name.
 
-and several optional arguments are available (see more in `test.py`).
+and several optional arguments are available (see more in `enjoy.py`).
 
 Here is an example of command:
 ```
