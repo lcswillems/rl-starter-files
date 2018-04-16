@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(description='PyTorch RL example')
 parser.add_argument('--env', required=True,
                     help='name of the environment to be run')
 parser.add_argument('--model', required=True,
-                    help='name of the pre-trained model'),
+                    help='name of the pre-trained model')
 parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
 args = parser.parse_args()

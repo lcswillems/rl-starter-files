@@ -19,7 +19,7 @@ parser.add_argument('--algo', required=True,
 parser.add_argument('--env', required=True,
                     help='name of the environment to train on')
 parser.add_argument('--model', default=None,
-                    help='name of the pre-trained model'),
+                    help='name of the pre-trained model')
 parser.add_argument('--reset', action='store_true', default=False,
                     help='initialize model with random parameters')
 parser.add_argument('--seed', type=int, default=1,
