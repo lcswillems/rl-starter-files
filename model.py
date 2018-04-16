@@ -18,17 +18,16 @@ class ACModel(torch_ac.ACModel):
         self.a_head.weight.data.mul_(0.1)
         self.a_head.bias.data.mul_(0.0)
 
-    def forward(self, obs):
+    def get_rdist(self, obs):
         x = self.a_fc1(obs)
         x = F.tanh(x)
         x = self.a_fc2(x)
         x = F.tanh(x)
-        rdist = self.a_head(x)
+        return self.a_head(x)
 
+    def get_value(self, obs):
         x = self.c_fc1(obs)
         x = F.tanh(x)
         x = self.c_fc2(x)
         x = F.tanh(x)
-        value = self.c_head(x)
-
-        return rdist, value
+        return self.c_head(x)

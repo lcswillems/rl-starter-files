@@ -38,7 +38,8 @@ class PPOAlgo(BaseAlgo):
 
                 # Compute loss
 
-                rdist, value = self.acmodel.get_rdist_n_value(Variable(b.obs))
+                rdist = self.acmodel.get_rdist(Variable(b.obs))
+                value = self.acmodel.get_value(Variable(b.obs))
 
                 log_dist = F.log_softmax(rdist, dim=1)
                 dist = F.softmax(rdist, dim=1)

@@ -31,7 +31,8 @@ class BaseAlgo(ABC):
 
         for _ in range(self.num_update_frames):
             obs = torch.from_numpy(np.array(self.next_obs)).float()
-            action, value = self.acmodel.get_action_n_value(Variable(obs, volatile=True))
+            action = self.acmodel.get_action(Variable(obs, volatile=True))
+            value = self.acmodel.get_value(Variable(obs, volatile=True))
             action = action.data.squeeze(1).cpu().numpy()
             value = value.data.squeeze(1).cpu().numpy()
             next_obs, reward, done, _ = self.env.step(action)

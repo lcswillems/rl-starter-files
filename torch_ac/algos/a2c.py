@@ -21,7 +21,8 @@ class A2CAlgo(BaseAlgo):
 
         # Compute loss
 
-        rdist, value = self.acmodel.get_rdist_n_value(Variable(ts.obs))
+        rdist = self.acmodel.get_rdist(Variable(ts.obs))
+        value = self.acmodel.get_value(Variable(ts.obs))
 
         log_dist = F.log_softmax(rdist, dim=1)
         dist = F.softmax(rdist, dim=1)
