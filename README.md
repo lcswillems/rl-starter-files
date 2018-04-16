@@ -1,6 +1,6 @@
 # PyTorch A2C and PPO
 
-This is a very fast, robust, clean and readable PyTorch implementation of:
+This is a fast, robust and readable PyTorch implementation of:
 
 - [Synchronous A3C (A2C)](https://arxiv.org/pdf/1602.01783.pdf)
 - [Proximal Policy Optimization (PPO)](https://arxiv.org/pdf/1707.06347.pdf)
@@ -11,14 +11,6 @@ inspered from 3 repositories:
 2. [Pytorch RL](https://github.com/Khrylx/PyTorch-RL)
 3. [OpenAI Baselines](https://github.com/openai/baselines)
 
-## Important note
-
-If you have a GPU, PyTorch will create additional threads when performing computations which can damage the performance of multiprocessing. This problem is most serious with Linux, where multiprocessing can be even slower than a single thread. You may have to set the OMP_NUM_THREADS to 1:
-
-```
-export OMP_NUM_THREADS=1
-```
-
 ## Features
 
 - Discrete action space
@@ -26,6 +18,24 @@ export OMP_NUM_THREADS=1
 - Very fast (2400 FPS for A2C against 2100 for repo 1 and 1700 for repo 2)
 - CUDA (x10 faster than CPU implementation)
 - Multiprocessing for collecting agent's trajectories in multiple environments simultaneously (x8 faster than single thread)
+
+## Installation
+
+Clone this repository and install the other dependencies with pip3:
+
+```
+git clone https://github.com/lcswillems/pytorch-a2c-ppo
+cd pytorch-a2c-ppo
+pip3 install -e .
+```
+
+## Important note before using
+
+If you have a GPU, PyTorch will create additional threads when performing computations which can damage the performance of multiprocessing. This problem is most serious with Linux, where multiprocessing can be even slower than a single thread. You may have to set the OMP_NUM_THREADS to 1:
+
+```
+export OMP_NUM_THREADS=1
+```
 
 ## Uses
 
@@ -48,8 +58,6 @@ Here is an example of command:
 ```
 python3 train.py --algo a2c --env MiniGrid-DoorKey-5x5-v0 --seed 12 --processes 8 --save-interval 10 --step-frames 50
 ```
-
-<p align="center"><img src="README-images/train-log.png"></p>
 
 ### Enjoying
 
