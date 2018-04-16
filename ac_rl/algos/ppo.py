@@ -18,14 +18,16 @@ class PPOAlgo(BaseAlgo):
         self.optimizer = torch.optim.Adam(self.acmodel.parameters(), lr, eps=adam_eps)
     
     def step(self):
-        
-        """collect transitions"""
+        # Collect transitions
+
         ts, log = self.collect_transitions()
 
-        """normalize advantages"""
+        # Normalize advantages
+
         ts.advantage = (ts.advantage - ts.advantage.mean()) / (ts.advantage.std() + 1e-5)        
 
-        """add old action log probs to transitions"""
+        # Add old action log probs to transitions
+
         rdist = self.acmodel.get_rdist(Variable(ts.obs, volatile=True))
         log_dist = F.log_softmax(rdist, dim=1)
         ts.old_action_log_prob = log_dist.gather(1, Variable(ts.action, volatile=True)).data
@@ -34,7 +36,8 @@ class PPOAlgo(BaseAlgo):
             for i in range(0, len(ts), self.batch_size):
                 b = ts[i:i+self.batch_size]
 
-                """compute loss"""
+                # Compute loss
+
                 rdist, value = self.acmodel.get_rdist_n_value(Variable(b.obs))
 
                 log_dist = F.log_softmax(rdist, dim=1)
@@ -52,13 +55,15 @@ class PPOAlgo(BaseAlgo):
 
                 loss = action_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
 
-                """update actor-critic"""
+                # Update actor-critic
+
                 self.optimizer.zero_grad()
                 loss.backward()
                 torch.nn.utils.clip_grad_norm(self.acmodel.parameters(), self.max_grad_norm)
                 self.optimizer.step()
         
-        """log some values"""
+        # Log some values
+        
         log["value_loss"] = value_loss.data[0]
         log["action_loss"] = action_loss.data[0]
         log["entropy"] = entropy.data[0]

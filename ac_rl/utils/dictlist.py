@@ -1,7 +1,6 @@
 class dictlist(dict):
-    """
-    A dictionnary of lists of same size. Dictionnary items can be accessed
-    using `.` notation and list items using `[..]` notation.
+    """A dictionnary of lists of same size. Dictionnary items can be
+    accessed using `.` notation and list items using `[]` notation.
 
     Example:
         >>> d = dictlist({'a': [[1, 2], [3, 4]], 'b': [[5], [6]]})

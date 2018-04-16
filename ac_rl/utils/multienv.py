@@ -16,9 +16,7 @@ def worker(conn, env):
             raise NotImplementedError
 
 class MultiEnv(gym.Env):
-    """
-    An asynchronous multi-environment.
-    """
+    """An asynchronous multi-environment."""
 
     def __init__(self, envs):
         self.envs = envs

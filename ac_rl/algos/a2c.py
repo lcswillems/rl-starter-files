@@ -15,11 +15,12 @@ class A2CAlgo(BaseAlgo):
                                              alpha=rmsprop_alpha, eps=rmsprop_eps)
     
     def step(self):
-        
-        """collect transitions"""
+        # Collect transitions
+
         ts, log = self.collect_transitions()
 
-        """compute loss"""
+        # Compute loss
+
         rdist, value = self.acmodel.get_rdist_n_value(Variable(ts.obs))
 
         log_dist = F.log_softmax(rdist, dim=1)
@@ -33,13 +34,15 @@ class A2CAlgo(BaseAlgo):
         
         loss = action_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
 
-        """update actor-critic"""
+        # Update actor-critic
+
         self.optimizer.zero_grad()
         loss.backward()
         torch.nn.utils.clip_grad_norm(self.acmodel.parameters(), self.max_grad_norm)
         self.optimizer.step()
 
-        """log some values"""
+        # Log some values
+        
         log["value_loss"] = value_loss.data[0]
         log["action_loss"] = action_loss.data[0]
         log["entropy"] = entropy.data[0]

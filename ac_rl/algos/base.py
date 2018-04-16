@@ -24,7 +24,8 @@ class BaseAlgo(ABC):
     def collect_transitions(self):
         ts = dictlist()
 
-        """add obs, action, reward, mask and value to transitions"""
+        # Add obs, action, reward, mask and value to transitions
+
         log_episode_return = np.zeros(self.num_processes)
         log_return = np.zeros(self.num_processes)
 
@@ -58,7 +59,8 @@ class BaseAlgo(ABC):
             ts.mask = ts.mask.cuda()
             ts.value = ts.value.cuda()
         
-        """add advantage and return to transitions"""
+        # Add advantage and return to transitions
+
         ts.advantage = torch.zeros(*ts.reward.shape).float()
         if use_gpu:
             ts.advantage = ts.advantage.cuda()
@@ -75,7 +77,8 @@ class BaseAlgo(ABC):
 
         ts.returnn = ts.advantage + ts.value
 
-        """reshape each transitions attribute"""
+        # Reshape each transitions attribute
+
         ts.obs = ts.obs.view(-1, *ts.obs.shape[2:])
         ts.action = ts.action.view(-1, *ts.action.shape[2:]).unsqueeze(1)
         ts.reward = ts.reward.view(-1, *ts.reward.shape[2:]).unsqueeze(1)
@@ -84,7 +87,8 @@ class BaseAlgo(ABC):
         ts.advantage = ts.advantage.view(-1, *ts.advantage.shape[2:]).unsqueeze(1)
         ts.returnn = ts.returnn.view(-1, *ts.returnn.shape[2:]).unsqueeze(1)
 
-        """log some values"""
+        # Log some values
+        
         log = {"return": log_return}
 
         return ts, log

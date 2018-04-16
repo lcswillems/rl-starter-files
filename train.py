@@ -9,7 +9,8 @@ import torch
 import ac_rl
 from utils import get_model_path, load_model, save_model
 
-"""parse arguments"""
+# Parse arguments
+
 parser = argparse.ArgumentParser(description='PyTorch RL example')
 parser.add_argument('--algo', required=True,
                     help='algorithm to use: a2c | ppo')
@@ -55,10 +56,12 @@ parser.add_argument('--batch-size', type=int, default=32,
                     help='batch size for PPO (default: 32, 0 means all)')
 args = parser.parse_args()
 
-"""set numpy and pytorch seeds"""
+# Set numpy and pytorch seeds
+
 ac_rl.seed(args.seed)
 
-"""generate environments"""
+# Generate environments
+
 envs = []
 for i in range(args.processes):
     env = gym.make(args.env)
@@ -66,17 +69,20 @@ for i in range(args.processes):
     env = FlatObsWrapper(env)
     envs.append(env)
 
-"""define model path"""
+# Define model path
+
 model_name = args.model if args.model != None else args.env+"_"+args.algo
 model_path = get_model_path(model_name)
 
-"""define actor-critic model"""
+# Define actor-critic model
+
 from_path = None if args.reset else model_path
 acmodel = load_model(envs[0].observation_space, envs[0].action_space, from_path)
 if ac_rl.use_gpu:
     acmodel = acmodel.cuda()
 
-"""define actor-critic algo"""
+# Define actor-critic algo
+
 if args.algo == "a2c":
     algo = ac_rl.A2CAlgo(envs, args.step_frames, acmodel, args.discount, args.lr,
                          args.gae_tau, args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
@@ -88,17 +94,20 @@ elif args.algo == "ppo":
 else:
     raise ValueError
 
-"""train model"""
+# Train model
+
 num_steps = args.total_frames // args.processes // args.step_frames
 num_frames = 0
 
 for step in range(num_steps):
-    """train model for one step"""
+    # Train model for one step
+
     start_time = time.time()
     log = algo.step()
     end_time = time.time()
 
-    """print log"""
+    # Print log
+
     if step % args.log_interval == 0:
         step_num_frames = args.processes * args.step_frames
         num_frames += step_num_frames
@@ -109,6 +118,7 @@ for step in range(num_steps):
                    np.mean(log["return"]), np.median(log["return"]), np.amin(log["return"]), np.amax(log["return"]),
                    log["entropy"], log["value_loss"], log["action_loss"]))
 
-    """save model"""
+    # Save model
+    
     if args.save_interval > 0 and step > 0 and step % args.save_interval == 0:
         save_model(acmodel, model_path)
