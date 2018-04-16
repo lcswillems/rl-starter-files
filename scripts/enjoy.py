@@ -47,7 +47,7 @@ obs = env.reset()
 
 while True:
     obs = torch.from_numpy(obs).float().unsqueeze(0)
-    action = acmodel.get_action(Variable(obs, volatile=True), deterministic=True).data[0].numpy()
+    action = acmodel.get_action(Variable(obs, volatile=True), deterministic=True).data[0,0]
     obs, reward, done, _ = env.step(action)
 
     env.render('human')
