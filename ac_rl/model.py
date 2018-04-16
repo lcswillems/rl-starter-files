@@ -12,7 +12,7 @@ class ACModel(nn.Module):
         pass
 
     def get_rdist_n_value(self, obs):
-        return self(obs, True, True)
+        return self(obs)
 
     def get_action_n_value(self, obs):
         rdist, value = self(obs)

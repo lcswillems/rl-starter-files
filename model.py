@@ -19,8 +19,6 @@ class ACModel(ac_rl.ACModel):
         self.a_head.bias.data.mul_(0.0)
 
     def forward(self, obs):
-        rdist, value = None, None
-
         x = self.a_fc1(obs)
         x = F.tanh(x)
         x = self.a_fc2(x)
