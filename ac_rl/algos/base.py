@@ -73,7 +73,6 @@ class BaseAlgo(ABC):
             delta = ts.reward[i] + self.discount * next_value * ts.mask[i] - ts.value[i]
             ts.advantage[i] = delta + self.discount * self.gae_tau * next_advantage * ts.mask[i]
 
-        ts.advantage = (ts.advantage - ts.advantage.mean()) / (ts.advantage.std() + 1e-5)
         ts.returnn = ts.advantage + ts.value
 
         """reshape each transitions attribute"""

@@ -18,8 +18,12 @@ class PPOAlgo(BaseAlgo):
         self.optimizer = torch.optim.Adam(self.acmodel.parameters(), lr, eps=adam_eps)
     
     def step(self):
+        
         """collect transitions"""
         ts, log = self.collect_transitions()
+
+        """normalize advantages"""
+        ts.advantage = (ts.advantage - ts.advantage.mean()) / (ts.advantage.std() + 1e-5)        
 
         """add old action log probs to transitions"""
         rdist = self.acmodel.get_rdist(Variable(ts.obs, volatile=True))

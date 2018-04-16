@@ -9,6 +9,7 @@ import torch
 import ac_rl
 from utils import get_model_path, load_model, save_model
 
+"""parse arguments"""
 parser = argparse.ArgumentParser(description='PyTorch RL example')
 parser.add_argument('--algo', required=True,
                     help='algorithm to use: a2c | ppo')
@@ -54,8 +55,6 @@ parser.add_argument('--batch-size', type=int, default=32,
                     help='batch size for PPO (default: 32, 0 means all)')
 args = parser.parse_args()
 
-assert args.algo in ["a2c", "ppo"]
-
 """set numpy and pytorch seeds"""
 ac_rl.seed(args.seed)
 
@@ -86,6 +85,8 @@ elif args.algo == "ppo":
     algo = ac_rl.PPOAlgo(envs, args.step_frames, acmodel, args.discount, args.lr,
                          args.gae_tau, args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
                          args.optim_eps, args.clip_eps, args.epochs, args.batch_size)
+else:
+    raise ValueError
 
 """train model"""
 num_steps = args.total_frames // args.processes // args.step_frames
