@@ -3,7 +3,7 @@ import torch
 from torch.autograd import Variable
 import numpy as np
 
-from ac_rl.utils import use_gpu, dictlist, MultiEnv
+from ac_rl.utils import use_gpu, DictList, MultiEnv
 
 class BaseAlgo(ABC):
     def __init__(self, envs, num_update_frames, acmodel,
