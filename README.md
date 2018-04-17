@@ -5,7 +5,7 @@ A fast, robust, readable and multi-process PyTorch implementation of:
 - [Synchronous A3C (A2C)](https://arxiv.org/pdf/1602.01783.pdf)
 - [Proximal Policy Optimization (PPO)](https://arxiv.org/pdf/1707.06347.pdf)
 
-inspered from 3 repositories:
+inspired from 3 repositories:
 
 1. [pytorch-a2c-ppo-acktr](https://github.com/ikostrikov/pytorch-a2c-ppo-acktr)
 2. [Pytorch RL](https://github.com/Khrylx/PyTorch-RL)
@@ -17,7 +17,7 @@ inspered from 3 repositories:
 - Entropy regularization
 - Very fast (2400 FPS for A2C against 2100 for repo 1 and 1700 for repo 2)
 - CUDA (x10 faster than CPU implementation)
-- Multiprocessing for collecting agent's trajectories in multiple environments simultaneously (x8 faster than single thread)
+- Multiprocessing for collecting agent's trajectories in multiple environments simultaneously
 
 ## Installation
 
@@ -43,40 +43,40 @@ export OMP_NUM_THREADS=1
 
 ### Training
 
-`python3 train.py` enable you to load a model, train it with the actor-critic algorithms and save it.
+`./scripts/train.py` enable you to load a model, train it with the actor-critic algorithms and save it.
 
 2 arguments are required:
-- `--algo ALGO`: the actor-critic algorithm name.
-- `--env ENV`: the environment name to train on.
+- `--algo ALGO`: name of the actor-critic algorithm.
+- `--env ENV`: name of the environment to train on.
 
 and a bunch of optional arguments are available among which:
-- `--model MODEL`: the name of model, used for saving and loading it. If not specified, it is the `_`-concatenation of the environment name and algorithm name.
+- `--model MODEL`: name of the model, used for loading and saving it. If not specified, it is the `_`-concatenation of the environment name and algorithm name.
 - `--update-frames UPDATE_FRAMES`: number of frames per agent before updating parameters.
 - ... (see more in `train.py`)
 
 Here is an example of command:
 ```
-python3 train.py --algo a2c --env MiniGrid-DoorKey-5x5-v0 --seed 12 --processes 8 --save-interval 10 --update-frames 50
+./scripts/train.py --algo a2c --env MiniGrid-DoorKey-5x5-v0 --seed 12 --processes 8 --save-interval 10 --update-frames 50
 ```
 
 ### Enjoying
 
-`python3 enjoy.py` enable you to visualize your trained model acting.
+`./scripts/enjoy.py` enable you to visualize your trained model acting.
 
 2 arguments are required:
-- `--env ENV`: the environment name to act on.
-- `--model MODEL`: the trained model name.
+- `--env ENV`: name of the environment to act on.
+- `--model MODEL`: name of the trained model.
 
 and several optional arguments are available (see more in `enjoy.py`).
 
 Here is an example of command:
 ```
-python3 enjoy.py --env MiniGrid-DoorKey-8x8-v0 --model DoorKey
+./scripts/enjoy.py --env MiniGrid-DoorKey-8x8-v0 --model DoorKey
 ```
 
 <p align="center"><img src="README-images/enjoy-doorkey.gif"></p>
 
-## Todo
+## Todo (will be realised in next few days)
 
 - Dictionnary observations
 - Recurrent policy
