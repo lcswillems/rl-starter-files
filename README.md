@@ -43,7 +43,7 @@ export OMP_NUM_THREADS=1
 
 ### Training
 
-`./scripts/train.py` enable you to load a model, train it with the actor-critic algorithms and save it.
+`scripts/train.py` enables you to load a model, train it with the actor-critic algorithms and save it.
 
 2 arguments are required:
 - `--algo ALGO`: name of the actor-critic algorithm.
@@ -51,17 +51,17 @@ export OMP_NUM_THREADS=1
 
 and a bunch of optional arguments are available among which:
 - `--model MODEL`: name of the model, used for loading and saving it. If not specified, it is the `_`-concatenation of the environment name and algorithm name.
-- `--update-frames UPDATE_FRAMES`: number of frames per agent before updating parameters.
+- `--frames-per-update FRAMES_PER_UPDATE`: number of frames per agent before updating parameters.
 - ... (see more in `train.py`)
 
 Here is an example of command:
 ```
-./scripts/train.py --algo a2c --env MiniGrid-DoorKey-5x5-v0 --seed 12 --processes 8 --save-interval 10 --update-frames 50
+scripts/train.py --algo a2c --env MiniGrid-DoorKey-5x5-v0 --seed 12 --processes 8 --save-interval 10 --update-frames 50
 ```
 
 ### Enjoying
 
-`./scripts/enjoy.py` enable you to visualize your trained model acting.
+`scripts/enjoy.py` enables you to visualize your trained model acting.
 
 2 arguments are required:
 - `--env ENV`: name of the environment to act on.
@@ -71,7 +71,7 @@ and several optional arguments are available (see more in `enjoy.py`).
 
 Here is an example of command:
 ```
-./scripts/enjoy.py --env MiniGrid-DoorKey-8x8-v0 --model DoorKey
+scripts/enjoy.py --env MiniGrid-DoorKey-8x8-v0 --model DoorKey
 ```
 
 <p align="center"><img src="README-images/enjoy-doorkey.gif"></p>

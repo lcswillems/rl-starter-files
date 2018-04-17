@@ -86,11 +86,11 @@ if torch_ac.use_gpu:
 # Define actor-critic algo
 
 if args.algo == "a2c":
-    algo = torch_ac.A2CAlgo(envs, args.update_frames, acmodel, args.discount, args.lr,
+    algo = torch_ac.A2CAlgo(envs, args.frames_per_update, acmodel, args.discount, args.lr,
                          args.gae_tau, args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
                          args.optim_alpha, args.optim_eps)
 elif args.algo == "ppo":
-    algo = torch_ac.PPOAlgo(envs, args.update_frames, acmodel, args.discount, args.lr,
+    algo = torch_ac.PPOAlgo(envs, args.frames_per_update, acmodel, args.discount, args.lr,
                          args.gae_tau, args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
                          args.optim_eps, args.clip_eps, args.epochs, args.batch_size)
 else:
@@ -98,7 +98,7 @@ else:
 
 # Train model
 
-num_updates = args.total_frames // args.processes // args.update_frames
+num_updates = args.total_frames // args.processes // args.frames_per_update
 num_frames = 0
 
 for i in range(1, num_updates+1):
@@ -111,7 +111,7 @@ for i in range(1, num_updates+1):
     # Print log
 
     if i % args.log_interval == 0:
-        update_num_frames = args.processes * args.update_frames
+        update_num_frames = args.processes * args.frames_per_update
         num_frames += update_num_frames
         fps = update_num_frames/(end_time - start_time)
 

@@ -5,10 +5,10 @@ import torch.nn.functional as F
 from torch_ac.algos.base import BaseAlgo
 
 class A2CAlgo(BaseAlgo):
-    def __init__(self, envs, num_update_frames, acmodel,
+    def __init__(self, envs, frames_per_update, acmodel,
                  discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm,
                  rmsprop_alpha, rmsprop_eps):
-        super().__init__(envs, num_update_frames, acmodel,
+        super().__init__(envs, frames_per_update, acmodel,
                          discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm)
 
         self.optimizer = torch.optim.RMSprop(self.acmodel.parameters(), lr,
