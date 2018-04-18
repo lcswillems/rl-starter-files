@@ -31,8 +31,8 @@ parser.add_argument('--log-interval', type=int, default=1,
                     help='interval between log display (default: 1)')
 parser.add_argument('--save-interval', type=int, default=0,
                     help="interval between model saving (default: 0, 0 means no saving)")
-parser.add_argument('--frames-per-update', type=int, default=5,
-                    help='number of frames per agent during before updating parameters (default: 5)')
+parser.add_argument('--frames-per-update', type=int, default=50,
+                    help='number of frames per agent during before updating parameters (default: 50)')
 parser.add_argument('--discount', type=float, default=0.99,
                     help='discount factor (default: 0.99)')
 parser.add_argument('--lr', type=float, default=7e-4,
@@ -85,15 +85,14 @@ if torch_ac.use_gpu:
 # Define actor-critic algo
 
 if args.algo == "a2c":
-    algo = torch_ac.A2CAlgo(envs, args.frames_per_update, acmodel, utils.preprocess_obss,
-                            utils.preprocess_reward, args.discount, args.lr, args.gae_tau,
-                            args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
-                            args.optim_alpha, args.optim_eps)
+    algo = torch_ac.A2CAlgo(envs, acmodel, args.frames_per_update, args.discount, args.lr, args.gae_tau,
+                            args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.optim_alpha,
+                            args.optim_eps, utils.preprocess_obss, utils.preprocess_reward)
 elif args.algo == "ppo":
-    algo = torch_ac.PPOAlgo(envs, args.frames_per_update, acmodel, utils.preprocess_obss,
-                            utils.preprocess_reward, args.discount, args.lr, args.gae_tau,
-                            args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
-                            args.optim_eps, args.clip_eps, args.epochs, args.batch_size)
+    algo = torch_ac.PPOAlgo(envs, acmodel, args.frames_per_update, args.discount, args.lr, args.gae_tau,
+                            args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.optim_eps,
+                            args.clip_eps, args.epochs, args.batch_size, utils.preprocess_obss,
+                            utils.preprocess_reward)
 else:
     raise ValueError
 

@@ -3,22 +3,23 @@ import torch
 from torch.autograd import Variable
 import numpy as np
 
+from torch_ac.preprocess import default_preprocess_obss, default_preprocess_reward
 from torch_ac.utils import use_gpu, DictList, MultiEnv
 
 class BaseAlgo(ABC):
-    def __init__(self, envs, frames_per_update, acmodel, preprocess_obss, preprocess_reward,
-                 discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm):
+    def __init__(self, envs, acmodel, frames_per_update, discount, lr, gae_tau, entropy_coef,
+                 value_loss_coef, max_grad_norm, preprocess_obss=None, preprocess_reward=None):
         self.env = MultiEnv(envs)
-        self.frames_per_update = frames_per_update
         self.acmodel = acmodel
-        self.preprocess_obss = preprocess_obss
-        self.preprocess_reward = preprocess_reward
+        self.frames_per_update = frames_per_update
         self.discount = discount
         self.lr = lr
         self.gae_tau = gae_tau
         self.entropy_coef = entropy_coef
         self.value_loss_coef = value_loss_coef
         self.max_grad_norm = max_grad_norm
+        self.preprocess_obss = preprocess_obss if preprocess_obss != None else default_preprocess_obss
+        self.preprocess_reward = preprocess_reward if preprocess_reward != None else default_preprocess_reward
 
         self.num_processes = len(envs)
         self.obs = self.env.reset()
