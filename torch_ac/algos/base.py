@@ -30,7 +30,9 @@ class BaseAlgo(ABC):
         # Add obs, action, reward, mask and value to transitions
 
         log_episode_return = np.zeros(self.num_processes)
+        log_episode_reshaped_return = np.zeros(self.num_processes)
         log_return = np.zeros(self.num_processes)
+        log_reshaped_return = np.zeros(self.num_processes)
 
         for _ in range(self.frames_per_update):
             obs = self.preprocess_obss(self.obs, volatile=True)
@@ -39,21 +41,26 @@ class BaseAlgo(ABC):
             action = action.data.squeeze(1).cpu().numpy()
             value = value.data.squeeze(1).cpu().numpy()
             obs, reward, done, _ = self.env.step(action)
-            reward = [
+            reshaped_reward = [
                 self.preprocess_reward(obs_, action_, reward_)
                 for obs_, action_, reward_ in zip(obs, action, reward)
             ]
             mask = [0 if done_ else 1 for done_ in done]
-            ts.append({"obs": self.obs, "action": action, "reward": reward, "mask": mask, "value": value})
+            ts.append({"obs": self.obs, "action": action, "reward": reshaped_reward, "mask": mask, "value": value})
             
             self.obs = obs
 
-            reward = np.array(reward)
             mask = np.array(mask)
+            reward = np.array(reward)
+            reshaped_reward = np.array(reshaped_reward)
             log_episode_return += reward
+            log_episode_reshaped_return += reshaped_reward
             log_return *= mask
             log_return += (1 - mask) * log_episode_return
+            log_reshaped_return *= mask
+            log_reshaped_return += (1 - mask) * log_episode_reshaped_return
             log_episode_return *= mask
+            log_episode_reshaped_return *= mask
 
         ts.action = torch.from_numpy(np.array(ts.action))
         ts.reward = torch.from_numpy(np.array(ts.reward)).float()
@@ -95,7 +102,7 @@ class BaseAlgo(ABC):
 
         # Log some values
 
-        log = {"return": log_return}
+        log = {"return": log_return, "reshaped_return": log_reshaped_return}
 
         return ts, log
 
