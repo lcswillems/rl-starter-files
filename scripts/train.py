@@ -27,8 +27,8 @@ parser.add_argument('--processes', type=int, default=16,
                     help='number of processes (default: 16)')
 parser.add_argument('--total-frames', type=int, default=10**7,
                     help='number of frames during full training (default: 10e6)')
-parser.add_argument('--log-interval', type=int, default=10,
-                    help='interval between log display (default: 10)')
+parser.add_argument('--log-interval', type=int, default=1,
+                    help='interval between log display (default: 1)')
 parser.add_argument('--save-interval', type=int, default=0,
                     help="interval between model saving (default: 0, 0 means no saving)")
 parser.add_argument('--frames-per-update', type=int, default=5,
