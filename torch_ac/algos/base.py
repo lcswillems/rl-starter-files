@@ -3,12 +3,12 @@ import torch
 from torch.autograd import Variable
 import numpy as np
 
-from torch_ac.preprocess import default_preprocess_obss, default_preprocess_reward
+from torch_ac.format import default_preprocess_obss, default_reshape_reward
 from torch_ac.utils import use_gpu, DictList, MultiEnv
 
 class BaseAlgo(ABC):
     def __init__(self, envs, acmodel, frames_per_update, discount, lr, gae_tau, entropy_coef,
-                 value_loss_coef, max_grad_norm, preprocess_obss=None, preprocess_reward=None):
+                 value_loss_coef, max_grad_norm, preprocess_obss=None, reshape_reward=None):
         self.env = MultiEnv(envs)
         self.acmodel = acmodel
         self.frames_per_update = frames_per_update
@@ -19,7 +19,7 @@ class BaseAlgo(ABC):
         self.value_loss_coef = value_loss_coef
         self.max_grad_norm = max_grad_norm
         self.preprocess_obss = preprocess_obss if preprocess_obss != None else default_preprocess_obss
-        self.preprocess_reward = preprocess_reward if preprocess_reward != None else default_preprocess_reward
+        self.reshape_reward = reshape_reward if reshape_reward != None else default_reshape_reward
 
         self.num_processes = len(envs)
         self.obs = self.env.reset()
@@ -42,7 +42,7 @@ class BaseAlgo(ABC):
             value = value.data.squeeze(1).cpu().numpy()
             obs, reward, done, _ = self.env.step(action)
             reshaped_reward = [
-                self.preprocess_reward(obs_, action_, reward_)
+                self.reshape_reward(obs_, action_, reward_)
                 for obs_, action_, reward_ in zip(obs, action, reward)
             ]
             mask = [0 if done_ else 1 for done_ in done]

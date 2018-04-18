@@ -6,5 +6,5 @@ def default_preprocess_obss(obss, volatile):
     obss = torch.from_numpy(np.array(obss)).float()
     return Variable(obss, volatile=volatile)
 
-def default_preprocess_reward(obs, action, reward):
+def default_reshape_reward(obs, action, reward):
     return reward
