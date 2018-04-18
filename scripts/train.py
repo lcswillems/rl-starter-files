@@ -3,13 +3,12 @@
 import argparse
 import gym
 import gym_minigrid
-from gym_minigrid.wrappers import *
 import time
 import numpy as np
 import torch
 
 import torch_ac
-from utils import get_model_path, load_model, save_model
+import utils
 
 # Parse arguments
 
@@ -32,7 +31,7 @@ parser.add_argument('--log-interval', type=int, default=10,
                     help='interval between log display (default: 10)')
 parser.add_argument('--save-interval', type=int, default=0,
                     help="interval between model saving (default: 0, 0 means no saving)")
-parser.add_argument('--update-frames', type=int, default=5,
+parser.add_argument('--frames-per-update', type=int, default=5,
                     help='number of frames per agent during before updating parameters (default: 5)')
 parser.add_argument('--discount', type=float, default=0.99,
                     help='discount factor (default: 0.99)')
@@ -68,31 +67,33 @@ envs = []
 for i in range(args.processes):
     env = gym.make(args.env)
     env.seed(args.seed + i)
-    env = FlatObsWrapper(env)
     envs.append(env)
 
 # Define model path
 
 model_name = args.model if args.model != None else args.env+"_"+args.algo
-model_path = get_model_path(model_name)
+model_path = utils.get_model_path(model_name)
 
 # Define actor-critic model
 
 from_path = None if args.reset else model_path
-acmodel = load_model(envs[0].observation_space, envs[0].action_space, from_path)
+obs_space = utils.preprocess_obs_space(envs[0].observation_space)
+acmodel = utils.load_model(obs_space, envs[0].action_space, from_path)
 if torch_ac.use_gpu:
     acmodel = acmodel.cuda()
 
 # Define actor-critic algo
 
 if args.algo == "a2c":
-    algo = torch_ac.A2CAlgo(envs, args.frames_per_update, acmodel, args.discount, args.lr,
-                         args.gae_tau, args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
-                         args.optim_alpha, args.optim_eps)
+    algo = torch_ac.A2CAlgo(envs, args.frames_per_update, acmodel, utils.preprocess_obss,
+                            args.discount, args.lr, args.gae_tau, args.entropy_coef,
+                            args.value_loss_coef, args.max_grad_norm, args.optim_alpha,
+                            args.optim_eps)
 elif args.algo == "ppo":
-    algo = torch_ac.PPOAlgo(envs, args.frames_per_update, acmodel, args.discount, args.lr,
-                         args.gae_tau, args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
-                         args.optim_eps, args.clip_eps, args.epochs, args.batch_size)
+    algo = torch_ac.PPOAlgo(envs, args.frames_per_update, acmodel, utils.preprocess_obss,
+                            args.discount, args.lr, args.gae_tau, args.entropy_coef,
+                            args.value_loss_coef, args.max_grad_norm, args.optim_eps,
+                            args.clip_eps, args.epochs, args.batch_size)
 else:
     raise ValueError
 
@@ -107,12 +108,13 @@ for i in range(1, num_updates+1):
     start_time = time.time()
     log = algo.update_parameters()
     end_time = time.time()
+    
+    update_num_frames = args.processes * args.frames_per_update
+    num_frames += update_num_frames
 
     # Print log
 
     if i % args.log_interval == 0:
-        update_num_frames = args.processes * args.frames_per_update
-        num_frames += update_num_frames
         fps = update_num_frames/(end_time - start_time)
 
         print("Update {}, {} frames, {:.0f} FPS, mean/median return {:.1f}/{:.1f}, min/max return {:.1f}/{:.1f}, entropy {:.3f}, value loss {:.3f}, action loss {:.3f}".
@@ -123,4 +125,4 @@ for i in range(1, num_updates+1):
     # Save model
 
     if args.save_interval > 0 and i % args.save_interval == 0:
-        save_model(acmodel, model_path)
+        utils.save_model(acmodel, model_path)

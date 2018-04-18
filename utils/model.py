@@ -2,12 +2,10 @@ import os
 import torch
 
 from model import ACModel
-
-def storage_dir():
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'storage')
+import utils
 
 def get_model_path(model_name):
-    return os.path.join(storage_dir(), 'models', model_name+".pt")
+    return os.path.join(utils.storage_dir(), "models", model_name+".pt")
 
 def load_model(observation_space, action_space, from_path):
     acmodel = ACModel(observation_space, action_space)

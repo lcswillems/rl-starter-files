@@ -5,10 +5,10 @@ import torch.nn.functional as F
 from torch_ac.algos.base import BaseAlgo
 
 class PPOAlgo(BaseAlgo):
-    def __init__(self, envs, frames_per_update, acmodel,
+    def __init__(self, envs, frames_per_update, acmodel, preprocess_obss,
                  discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm,
                  adam_eps, clip_eps, epochs, batch_size):
-        super().__init__(envs, frames_per_update, acmodel,
+        super().__init__(envs, frames_per_update, acmodel, preprocess_obss,
                          discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm)
 
         self.clip_eps = clip_eps
@@ -24,11 +24,11 @@ class PPOAlgo(BaseAlgo):
 
         # Normalize advantages
 
-        ts.advantage = (ts.advantage - ts.advantage.mean()) / (ts.advantage.std() + 1e-5)        
+        # ts.advantage = (ts.advantage - ts.advantage.mean()) / (ts.advantage.std() + 1e-5)        
 
         # Add old action log probs to transitions
 
-        rdist = self.acmodel.get_rdist(Variable(ts.obs, volatile=True))
+        rdist = self.acmodel.get_rdist(self.preprocess_obss(ts.obs, volatile=True))
         log_dist = F.log_softmax(rdist, dim=1)
         ts.old_action_log_prob = log_dist.gather(1, Variable(ts.action, volatile=True)).data
 
@@ -38,8 +38,9 @@ class PPOAlgo(BaseAlgo):
 
                 # Compute loss
 
-                rdist = self.acmodel.get_rdist(Variable(b.obs))
-                value = self.acmodel.get_value(Variable(b.obs))
+                obs = self.preprocess_obss(b.obs)
+                rdist = self.acmodel.get_rdist(obs)
+                value = self.acmodel.get_value(obs)
 
                 log_dist = F.log_softmax(rdist, dim=1)
                 dist = F.softmax(rdist, dim=1)

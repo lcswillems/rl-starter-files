@@ -3,13 +3,12 @@
 import argparse
 import gym
 import gym_minigrid
-from gym_minigrid.wrappers import *
 import torch
 from torch.autograd import Variable
 import time
 
 import torch_ac
-from utils import get_model_path, load_model, save_model
+import utils
 
 # Parse arguments
 
@@ -30,30 +29,30 @@ torch_ac.seed(args.seed)
 
 env = gym.make(args.env)
 env.seed(args.seed)
-env = FlatObsWrapper(env)
 
 # Define model path
 
-model_path = get_model_path(args.model)
+model_path = utils.get_model_path(args.model)
 
 # Define actor-critic model
 
-acmodel = load_model(env.observation_space, env.action_space, model_path)
+obs_space = utils.preprocess_obs_space(env.observation_space)
+acmodel = utils.load_model(obs_space, env.action_space, model_path)
 
 # Run the agent
 
-renderer = env.render('human')
 obs = env.reset()
 
 while True:
-    obs = torch.from_numpy(obs).float().unsqueeze(0)
-    action = acmodel.get_action(Variable(obs, volatile=True), deterministic=True).data[0,0]
+    time.sleep(0.5)
+    renderer = env.render("human")
+    print("Mission:", obs["mission"])
+
+    obs = utils.preprocess_obss([obs], volatile=True)
+    action = acmodel.get_action(obs, deterministic=True).data[0,0]
     obs, reward, done, _ = env.step(action)
 
-    env.render('human')
-    time.sleep(0.1)
-
     if done:
-        env.reset()
+        obs = env.reset()
     if renderer.window == None:
         break

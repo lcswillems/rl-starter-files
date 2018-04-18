@@ -6,11 +6,12 @@ import numpy as np
 from torch_ac.utils import use_gpu, DictList, MultiEnv
 
 class BaseAlgo(ABC):
-    def __init__(self, envs, frames_per_update, acmodel,
+    def __init__(self, envs, frames_per_update, acmodel, preprocess_obss,
                  discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm):
         self.env = MultiEnv(envs)
         self.frames_per_update = frames_per_update
         self.acmodel = acmodel
+        self.preprocess_obss = preprocess_obss
         self.discount = discount
         self.lr = lr
         self.gae_tau = gae_tau
@@ -30,9 +31,9 @@ class BaseAlgo(ABC):
         log_return = np.zeros(self.num_processes)
 
         for _ in range(self.frames_per_update):
-            obs = torch.from_numpy(np.array(self.next_obs)).float()
-            action = self.acmodel.get_action(Variable(obs, volatile=True))
-            value = self.acmodel.get_value(Variable(obs, volatile=True))
+            obs = self.preprocess_obss(self.next_obs, volatile=True)
+            action = self.acmodel.get_action(obs)
+            value = self.acmodel.get_value(obs)
             action = action.data.squeeze(1).cpu().numpy()
             value = value.data.squeeze(1).cpu().numpy()
             next_obs, reward, done, _ = self.env.step(action)
@@ -48,13 +49,11 @@ class BaseAlgo(ABC):
             log_return += (1 - mask) * log_episode_return
             log_episode_return *= mask
 
-        ts.obs = torch.from_numpy(np.array(ts.obs)).float()
         ts.action = torch.from_numpy(np.array(ts.action))
         ts.reward = torch.from_numpy(np.array(ts.reward)).float()
         ts.mask = torch.from_numpy(np.array(ts.mask)).float()
         ts.value = torch.from_numpy(np.array(ts.value)).float()
         if use_gpu:
-            ts.obs = ts.obs.cuda()
             ts.action = ts.action.cuda()
             ts.reward = ts.reward.cuda()
             ts.mask = ts.mask.cuda()
@@ -66,8 +65,8 @@ class BaseAlgo(ABC):
         if use_gpu:
             ts.advantage = ts.advantage.cuda()
 
-        obs = torch.from_numpy(np.array(self.next_obs)).float()
-        next_value = self.acmodel.get_value(Variable(obs, volatile=True)).data.squeeze(1)
+        obs = self.preprocess_obss(self.next_obs, volatile=True)
+        next_value = self.acmodel.get_value(obs).data.squeeze(1)
 
         for i in reversed(range(self.frames_per_update)):
             next_value = ts.value[i+1] if i < self.frames_per_update - 1 else next_value
@@ -80,7 +79,7 @@ class BaseAlgo(ABC):
 
         # Reshape each transitions attribute
 
-        ts.obs = ts.obs.view(-1, *ts.obs.shape[2:])
+        ts.obs = [obs for obss in ts.obs for obs in obss]
         ts.action = ts.action.view(-1, *ts.action.shape[2:]).unsqueeze(1)
         ts.reward = ts.reward.view(-1, *ts.reward.shape[2:]).unsqueeze(1)
         ts.mask = ts.mask.view(-1, *ts.mask.shape[2:]).unsqueeze(1)
