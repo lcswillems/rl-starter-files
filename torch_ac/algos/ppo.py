@@ -20,11 +20,7 @@ class PPOAlgo(BaseAlgo):
     def update_parameters(self):
         # Collect transitions
 
-        ts, log = self.collect_transitions()
-
-        # Normalize advantages
-
-        # ts.advantage = (ts.advantage - ts.advantage.mean()) / (ts.advantage.std() + 1e-5)        
+        ts, log = self.collect_transitions()       
 
         # Add old action log probs to transitions
 
