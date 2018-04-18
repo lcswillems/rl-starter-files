@@ -30,8 +30,8 @@ class PPOAlgo(BaseAlgo):
         ts.old_action_log_prob = log_dist.gather(1, Variable(ts.action, volatile=True)).data
 
         for _ in range(self.epochs):
-            random.shuffle(ts)
-            
+            # random.shuffle(ts)
+
             for i in range(0, len(ts), self.batch_size):
                 b = ts[i:i+self.batch_size]
 
