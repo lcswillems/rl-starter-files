@@ -116,9 +116,10 @@ for i in range(1, num_updates+1):
     if i % args.log_interval == 0:
         fps = update_num_frames/(end_time - start_time)
 
-        print("Update {}, {} frames, {:.0f} FPS, mean/median return {:.1f}/{:.1f}, min/max return {:.1f}/{:.1f}, entropy {:.3f}, value loss {:.3f}, action loss {:.3f}".
+        print("U {:03} | F {:06} | FPS {:.0f} | R~rR (x̄ σ m M) {: .1f} {: .1f} {: .1f} {: .1f}  ~  {: .1f} {: .1f} {: .1f} {: .1f} | H {:.3f} | vL {:.3f} | aL {: .3f}".
             format(i, num_frames, fps,
-                   np.mean(log["return"]), np.median(log["return"]), np.amin(log["return"]), np.amax(log["return"]),
+                   np.mean(log["return"]), np.std(log["return"]), np.amin(log["return"]), np.amax(log["return"]),
+                   np.mean(log["reshaped_return"]), np.std(log["reshaped_return"]), np.amin(log["reshaped_return"]), np.amax(log["reshaped_return"]),
                    log["entropy"], log["value_loss"], log["action_loss"]))
 
     # Save model
