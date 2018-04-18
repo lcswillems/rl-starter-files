@@ -18,7 +18,8 @@ class ACModel(torch_ac.ACModel):
             self.obs_embedding_size += self.instr_embedding_size
 
         # Define instruction embedding model
-        self.instr_gru = nn.GRU(obs_space["instr"], self.instr_embedding_size)
+        if not(self.forget_instr):
+            self.instr_gru = nn.GRU(obs_space["instr"], self.instr_embedding_size)
 
         # Define actor's model
         self.a_fc1 = nn.Linear(self.obs_embedding_size, 128)
