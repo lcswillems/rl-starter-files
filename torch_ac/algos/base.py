@@ -6,12 +6,13 @@ import numpy as np
 from torch_ac.utils import use_gpu, DictList, MultiEnv
 
 class BaseAlgo(ABC):
-    def __init__(self, envs, frames_per_update, acmodel, preprocess_obss,
+    def __init__(self, envs, frames_per_update, acmodel, preprocess_obss, preprocess_reward,
                  discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm):
         self.env = MultiEnv(envs)
         self.frames_per_update = frames_per_update
         self.acmodel = acmodel
         self.preprocess_obss = preprocess_obss
+        self.preprocess_reward = preprocess_reward
         self.discount = discount
         self.lr = lr
         self.gae_tau = gae_tau
@@ -20,7 +21,7 @@ class BaseAlgo(ABC):
         self.max_grad_norm = max_grad_norm
 
         self.num_processes = len(envs)
-        self.next_obs = self.env.reset()
+        self.obs = self.env.reset()
     
     def collect_transitions(self):
         ts = DictList()
@@ -31,16 +32,20 @@ class BaseAlgo(ABC):
         log_return = np.zeros(self.num_processes)
 
         for _ in range(self.frames_per_update):
-            obs = self.preprocess_obss(self.next_obs, volatile=True)
+            obs = self.preprocess_obss(self.obs, volatile=True)
             action = self.acmodel.get_action(obs)
             value = self.acmodel.get_value(obs)
             action = action.data.squeeze(1).cpu().numpy()
             value = value.data.squeeze(1).cpu().numpy()
-            next_obs, reward, done, _ = self.env.step(action)
+            obs, reward, done, _ = self.env.step(action)
+            reward = [
+                self.preprocess_reward(obs_, action_, reward_)
+                for obs_, action_, reward_ in zip(obs, action, reward)
+            ]
             mask = [0 if done_ else 1 for done_ in done]
-            ts.append({"obs": self.next_obs, "action": action, "reward": reward, "mask": mask, "value": value})
+            ts.append({"obs": self.obs, "action": action, "reward": reward, "mask": mask, "value": value})
             
-            self.next_obs = next_obs
+            self.obs = obs
 
             reward = np.array(reward)
             mask = np.array(mask)
@@ -65,7 +70,7 @@ class BaseAlgo(ABC):
         if use_gpu:
             ts.advantage = ts.advantage.cuda()
 
-        obs = self.preprocess_obss(self.next_obs, volatile=True)
+        obs = self.preprocess_obss(self.obs, volatile=True)
         next_value = self.acmodel.get_value(obs).data.squeeze(1)
 
         for i in reversed(range(self.frames_per_update)):

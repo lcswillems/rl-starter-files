@@ -46,7 +46,7 @@ def preprocess_instr(instr, vocab):
         
     return instr, vocab
 
-def preprocess_obss(obss, volatile=False):
+def preprocess_obss(obss, volatile):
     # Preprocessing images
 
     np_image = np.array([np.array(obs["image"]).reshape(-1) for obs in obss])
@@ -85,3 +85,8 @@ def preprocess_obss(obss, volatile=False):
     }
 
     return obs
+
+def preprocess_reward(obs, action, reward):
+    if reward > 0:
+        return reward*10
+    return -0.1

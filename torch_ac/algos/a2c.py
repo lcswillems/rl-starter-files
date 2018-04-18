@@ -5,10 +5,10 @@ import torch.nn.functional as F
 from torch_ac.algos.base import BaseAlgo
 
 class A2CAlgo(BaseAlgo):
-    def __init__(self, envs, frames_per_update, acmodel, preprocess_obss,
+    def __init__(self, envs, frames_per_update, acmodel, preprocess_obss, preprocess_reward,
                  discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm,
                  rmsprop_alpha, rmsprop_eps):
-        super().__init__(envs, frames_per_update, acmodel, preprocess_obss,
+        super().__init__(envs, frames_per_update, acmodel, preprocess_obss, preprocess_reward,
                          discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm)
 
         self.optimizer = torch.optim.RMSprop(self.acmodel.parameters(), lr,
@@ -21,7 +21,7 @@ class A2CAlgo(BaseAlgo):
 
         # Compute loss
 
-        obs = self.preprocess_obss(ts.obs)
+        obs = self.preprocess_obss(ts.obs, volatile=False)
         rdist = self.acmodel.get_rdist(obs)
         value = self.acmodel.get_value(obs)
 

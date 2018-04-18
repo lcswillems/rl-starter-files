@@ -86,14 +86,14 @@ if torch_ac.use_gpu:
 
 if args.algo == "a2c":
     algo = torch_ac.A2CAlgo(envs, args.frames_per_update, acmodel, utils.preprocess_obss,
-                            args.discount, args.lr, args.gae_tau, args.entropy_coef,
-                            args.value_loss_coef, args.max_grad_norm, args.optim_alpha,
-                            args.optim_eps)
+                            utils.preprocess_reward, args.discount, args.lr, args.gae_tau,
+                            args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
+                            args.optim_alpha, args.optim_eps)
 elif args.algo == "ppo":
     algo = torch_ac.PPOAlgo(envs, args.frames_per_update, acmodel, utils.preprocess_obss,
-                            args.discount, args.lr, args.gae_tau, args.entropy_coef,
-                            args.value_loss_coef, args.max_grad_norm, args.optim_eps,
-                            args.clip_eps, args.epochs, args.batch_size)
+                            utils.preprocess_reward, args.discount, args.lr, args.gae_tau,
+                            args.entropy_coef, args.value_loss_coef, args.max_grad_norm,
+                            args.optim_eps, args.clip_eps, args.epochs, args.batch_size)
 else:
     raise ValueError
 

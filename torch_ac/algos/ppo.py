@@ -5,10 +5,10 @@ import torch.nn.functional as F
 from torch_ac.algos.base import BaseAlgo
 
 class PPOAlgo(BaseAlgo):
-    def __init__(self, envs, frames_per_update, acmodel, preprocess_obss,
+    def __init__(self, envs, frames_per_update, acmodel, preprocess_obss, preprocess_reward,
                  discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm,
                  adam_eps, clip_eps, epochs, batch_size):
-        super().__init__(envs, frames_per_update, acmodel, preprocess_obss,
+        super().__init__(envs, frames_per_update, acmodel, preprocess_obss, preprocess_reward,
                          discount, lr, gae_tau, entropy_coef, value_loss_coef, max_grad_norm)
 
         self.clip_eps = clip_eps
@@ -38,7 +38,7 @@ class PPOAlgo(BaseAlgo):
 
                 # Compute loss
 
-                obs = self.preprocess_obss(b.obs)
+                obs = self.preprocess_obss(b.obs, volatile=False)
                 rdist = self.acmodel.get_rdist(obs)
                 value = self.acmodel.get_value(obs)
 
