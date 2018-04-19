@@ -18,8 +18,8 @@ class BaseAlgo(ABC):
         self.entropy_coef = entropy_coef
         self.value_loss_coef = value_loss_coef
         self.max_grad_norm = max_grad_norm
-        self.preprocess_obss = preprocess_obss if preprocess_obss != None else default_preprocess_obss
-        self.reshape_reward = reshape_reward if reshape_reward != None else default_reshape_reward
+        self.preprocess_obss = preprocess_obss or default_preprocess_obss
+        self.reshape_reward = reshape_reward or default_reshape_reward
 
         self.num_processes = len(envs)
         self.obs = self.env.reset()

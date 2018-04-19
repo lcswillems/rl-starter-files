@@ -49,5 +49,5 @@ while True:
     if done:
         obs = env.reset()
 
-    if renderer.window == None:
+    if renderer.window is None:
         break

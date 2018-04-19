@@ -9,7 +9,7 @@ def get_model_path(model_name):
 
 def load_model(observation_space, action_space, from_path):
     acmodel = ACModel(observation_space, action_space)
-    if from_path != None and os.path.exists(from_path):
+    if from_path is not None and os.path.exists(from_path):
         acmodel.load_state_dict(torch.load(from_path))
     return acmodel
 
