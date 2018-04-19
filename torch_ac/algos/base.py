@@ -37,33 +37,46 @@ class BaseAlgo(ABC):
         log_num_frames = np.zeros(self.num_processes)
 
         for _ in range(self.frames_per_update):
-            obs = self.preprocess_obss(self.obs, volatile=True)
-            action = self.acmodel.get_action(obs)
-            value = self.acmodel.get_value(obs)
+            # Do one agent-environment interaction
+
+            preprocessed_obs = self.preprocess_obss(self.obs, volatile=True)
+            action = self.acmodel.get_action(preprocessed_obs)
             action = action.data.squeeze(1).cpu().numpy()
-            value = value.data.squeeze(1).cpu().numpy()
             obs, reward, done, _ = self.env.step(action)
+            
+            # Add a transition
+
             reshaped_reward = [
                 self.reshape_reward(obs_, action_, reward_)
                 for obs_, action_, reward_ in zip(obs, action, reward)
             ]
             mask = [0 if done_ else 1 for done_ in done]
+            value = self.acmodel.get_value(preprocessed_obs)
+            value = value.data.squeeze(1).cpu().numpy()
+
             ts.append({"obs": self.obs, "action": action, "reward": reshaped_reward, "mask": mask, "value": value})
             
+            # Update the observation
+
             self.obs = obs
+
+            # Update log values
 
             mask = np.array(mask)
             reward = np.array(reward)
             reshaped_reward = np.array(reshaped_reward)
+
             log_episode_return += reward
             log_episode_reshaped_return += reshaped_reward
             log_episode_num_frames += np.ones(self.num_processes)
+
             log_return *= mask
             log_return += (1 - mask) * log_episode_return
             log_reshaped_return *= mask
             log_reshaped_return += (1 - mask) * log_episode_reshaped_return
             log_num_frames *= mask
             log_num_frames += (1 - mask) * log_episode_num_frames
+
             log_episode_return *= mask
             log_episode_reshaped_return *= mask
             log_episode_num_frames *= mask
@@ -84,8 +97,8 @@ class BaseAlgo(ABC):
         if use_gpu:
             ts.advantage = ts.advantage.cuda()
 
-        obs = self.preprocess_obss(self.obs, volatile=True)
-        next_value = self.acmodel.get_value(obs).data.squeeze(1)
+        preprocessed_obs = self.preprocess_obss(self.obs, volatile=True)
+        next_value = self.acmodel.get_value(preprocessed_obs).data.squeeze(1)
 
         for i in reversed(range(self.frames_per_update)):
             next_value = ts.value[i+1] if i < self.frames_per_update - 1 else next_value
