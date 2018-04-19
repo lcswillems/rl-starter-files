@@ -4,12 +4,12 @@ import gym
 def worker(conn, env):
     while True:
         cmd, data = conn.recv()
-        if cmd == 'step':
+        if cmd == "step":
             obs, reward, done, info = env.step(data)
             if done:
                 obs = env.reset()
             conn.send((obs, reward, done, info))
-        elif cmd == 'reset':
+        elif cmd == "reset":
             obs = env.reset()
             conn.send(obs)
         else:
@@ -34,13 +34,13 @@ class MultiEnv(gym.Env):
 
     def reset(self):
         for local in self.locals:
-            local.send(('reset', None))
+            local.send(("reset", None))
         obss = [local.recv() for local in self.locals]
         return obss
 
     def step(self, actions):
         for local, action in zip(self.locals, actions):
-            local.send(('step', action))
+            local.send(("step", action))
         results = [local.recv() for local in self.locals]
         obss, rewards, dones, infos = zip(*results)
         return obss, rewards, dones, infos

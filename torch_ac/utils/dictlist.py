@@ -3,11 +3,11 @@ class DictList(dict):
     accessed using `.` notation and list items using `[]` notation.
 
     Example:
-        >>> d = DictList({'a': [[1, 2], [3, 4]], 'b': [[5], [6]]})
+        >>> d = DictList({"a": [[1, 2], [3, 4]], "b": [[5], [6]]})
         >>> d.a
         [[1, 2], [3, 4]]
         >>> d[0]
-        dictlist({'a': [1, 2], 'b': [5]})
+        dictlist({"a": [1, 2], "b": [5]})
     """
 
     __getattr__ = dict.__getitem__
