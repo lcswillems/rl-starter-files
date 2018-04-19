@@ -29,6 +29,10 @@ class PPOAlgo(BaseAlgo):
         log_dist = F.log_softmax(rdist, dim=1)
         ts.old_action_log_prob = log_dist.gather(1, Variable(ts.action, volatile=True)).data
 
+        # Add old values to transitions
+        value = self.acmodel.get_value(self.preprocess_obss(ts.obs, volatile=True))
+        ts.old_value = value.data
+
         for _ in range(self.epochs):
             # random.shuffle(ts)
 
@@ -52,7 +56,12 @@ class PPOAlgo(BaseAlgo):
                 surr2 = torch.clamp(ratio, 1.0 - self.clip_eps, 1.0 + self.clip_eps) * advantage_var
                 action_loss = -torch.min(surr1, surr2).mean()
 
-                value_loss = (value - Variable(b.returnn)).pow(2).mean()
+                old_value_var = Variable(b.old_value)
+                value_clipped = old_value_var + torch.clamp(value - old_value_var, -self.clip_eps, self.clip_eps)
+                return_var = Variable(b.returnn)
+                surr1 = (value - return_var).pow(2)
+                surr2 = (value_clipped - return_var).pow(2)
+                value_loss = torch.max(surr1, surr2).mean()
 
                 loss = action_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
 
