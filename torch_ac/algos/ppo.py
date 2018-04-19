@@ -36,7 +36,7 @@ class PPOAlgo(BaseAlgo):
         ts.old_value = value.data
 
         for _ in range(self.epochs):
-            # random.shuffle(ts)
+            ts.shuffle()
 
             for i in range(0, len(ts), self.batch_size):
                 b = ts[i:i+self.batch_size]
