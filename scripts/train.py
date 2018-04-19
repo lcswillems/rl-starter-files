@@ -97,18 +97,19 @@ else:
 
 # Train model
 
-num_updates = args.total_frames // args.processes // args.frames_per_update
 total_num_frames = 0
+i = 0
 
-for i in range(1, num_updates+1):
+while total_num_frames < args.total_frames:
     # Update parameters
 
     start_time = time.time()
     log = algo.update_parameters()
     end_time = time.time()
     
-    update_num_frames = args.processes * args.frames_per_update
+    update_num_frames = log["total_num_frames"]
     total_num_frames += update_num_frames
+    i += 1
 
     # Print logs
 
