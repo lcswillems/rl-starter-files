@@ -5,7 +5,6 @@ import gym
 import gym_minigrid
 import time
 import numpy as np
-import torch
 
 import torch_ac
 import utils
@@ -26,7 +25,7 @@ parser.add_argument('--seed', type=int, default=1,
 parser.add_argument('--processes', type=int, default=16,
                     help='number of processes (default: 16)')
 parser.add_argument('--total-frames', type=int, default=10**7,
-                    help='number of frames during full training (default: 10e6)')
+                    help='number of frames of training (default: 10e6)')
 parser.add_argument('--log-interval', type=int, default=1,
                     help='interval between log display (default: 1)')
 parser.add_argument('--save-interval', type=int, default=0,
@@ -99,7 +98,7 @@ else:
 # Train model
 
 num_updates = args.total_frames // args.processes // args.frames_per_update
-num_frames = 0
+total_num_frames = 0
 
 for i in range(1, num_updates+1):
     # Update parameters
@@ -109,17 +108,17 @@ for i in range(1, num_updates+1):
     end_time = time.time()
     
     update_num_frames = args.processes * args.frames_per_update
-    num_frames += update_num_frames
+    total_num_frames += update_num_frames
 
-    # Print log
+    # Print logs
 
     if i % args.log_interval == 0:
         fps = update_num_frames/(end_time - start_time)
 
-        print("U {:03} | F {:06} | FPS {:.0f} | R~rR (x̄ σ m M) {: .1f} {: .1f} {: .1f} {: .1f}  ~  {: .1f} {: .1f} {: .1f} {: .1f} | H {:.3f} | vL {:.3f} | aL {: .3f}".
-            format(i, num_frames, fps,
-                   np.mean(log["return"]), np.std(log["return"]), np.amin(log["return"]), np.amax(log["return"]),
-                   np.mean(log["reshaped_return"]), np.std(log["reshaped_return"]), np.amin(log["reshaped_return"]), np.amax(log["reshaped_return"]),
+        print("tF {:06} | FPS {:.0f} | rR:x̄σmM {: .1f} {: .1f} {: .1f} {: .1f} | F:x̄σmM {:.1f} {:.1f} {:.1f} {:.1f} | H {:.3f} | vL {:.3f} | aL {: .3f}".
+            format(total_num_frames, fps,
+                   *utils.synthesize(log["reshaped_return"]),
+                   *utils.synthesize(log["num_frames"]),
                    log["entropy"], log["value_loss"], log["action_loss"]))
 
     # Save model
