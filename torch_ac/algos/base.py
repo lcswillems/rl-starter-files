@@ -11,6 +11,7 @@ class BaseAlgo(ABC):
                  value_loss_coef, max_grad_norm, preprocess_obss, reshape_reward):
         self.env = MultiEnv(envs)
         self.acmodel = acmodel
+        self.acmodel.train()
         self.frames_per_update = frames_per_update
         self.discount = discount
         self.lr = lr
