@@ -8,7 +8,7 @@ from torch_ac.utils import use_gpu, DictList, MultiEnv
 
 class BaseAlgo(ABC):
     def __init__(self, envs, acmodel, frames_per_update, discount, lr, gae_tau, entropy_coef,
-                 value_loss_coef, max_grad_norm, preprocess_obss=None, reshape_reward=None):
+                 value_loss_coef, max_grad_norm, preprocess_obss, reshape_reward):
         self.env = MultiEnv(envs)
         self.acmodel = acmodel
         self.frames_per_update = frames_per_update
@@ -122,6 +122,7 @@ class BaseAlgo(ABC):
         log = {
             "return": self.log_return,
             "reshaped_return": self.log_reshaped_return,
+            "total_num_frames": self.frames_per_update*self.num_processes,
             "num_frames": self.log_num_frames
         }
 

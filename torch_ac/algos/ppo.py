@@ -9,7 +9,7 @@ class PPOAlgo(BaseAlgo):
     def __init__(self, envs, acmodel, frames_per_update=None, discount=0.99, lr=7e-4, gae_tau=0.95,
                  entropy_coef=0.01, value_loss_coef=0.5, max_grad_norm=0.5, adam_eps=1e-5, clip_eps=0.2,
                  epochs=4, batch_size=64, preprocess_obss=None, reshape_reward=None):
-        frames_per_update = frames_per_update or 64
+        frames_per_update = frames_per_update or 128
 
         super().__init__(envs, acmodel, frames_per_update, discount, lr, gae_tau, entropy_coef,
                          value_loss_coef, max_grad_norm, preprocess_obss, reshape_reward)
