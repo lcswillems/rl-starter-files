@@ -21,9 +21,9 @@ class A2CAlgo(BaseAlgo):
 
         # Compute loss
 
-        obs = self.preprocess_obss(ts.obs, volatile=False)
-        rdist = self.acmodel.get_rdist(obs)
-        value = self.acmodel.get_value(obs)
+        preprocessed_obs = self.preprocess_obss(ts.obs, volatile=False)
+        rdist = self.acmodel.get_rdist(preprocessed_obs)
+        value = self.acmodel.get_value(preprocessed_obs)
 
         log_dist = F.log_softmax(rdist, dim=1)
         dist = F.softmax(rdist, dim=1)

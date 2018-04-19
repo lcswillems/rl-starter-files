@@ -53,8 +53,8 @@ for _ in range(args.episodes):
     returnn = 0
 
     while not(done):
-        obs = utils.preprocess_obss([obs], volatile=True)
-        action = acmodel.get_action(obs, deterministic=True).data[0,0]
+        preprocessed_obs = utils.preprocess_obss([obs], volatile=True)
+        action = acmodel.get_action(preprocessed_obs, deterministic=True).data[0,0]
         obs, reward, done, _ = env.step(action)
         
         num_frames += 1

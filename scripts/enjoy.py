@@ -43,11 +43,11 @@ while True:
     renderer = env.render("human")
     print("Mission:", obs["mission"])
 
-    obs = utils.preprocess_obss([obs], volatile=True)
-    action = acmodel.get_action(obs, deterministic=True).data[0,0]
+    preprocessed_obs = utils.preprocess_obss([obs], volatile=True)
+    action = acmodel.get_action(preprocessed_obs, deterministic=True).data[0,0]
     obs, _, done, _ = env.step(action)
-
     if done:
         obs = env.reset()
+
     if renderer.window == None:
         break
