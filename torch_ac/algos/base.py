@@ -31,8 +31,10 @@ class BaseAlgo(ABC):
 
         log_episode_return = np.zeros(self.num_processes)
         log_episode_reshaped_return = np.zeros(self.num_processes)
+        log_episode_num_frames = np.zeros(self.num_processes)
         log_return = np.zeros(self.num_processes)
         log_reshaped_return = np.zeros(self.num_processes)
+        log_num_frames = np.zeros(self.num_processes)
 
         for _ in range(self.frames_per_update):
             obs = self.preprocess_obss(self.obs, volatile=True)
@@ -55,12 +57,16 @@ class BaseAlgo(ABC):
             reshaped_reward = np.array(reshaped_reward)
             log_episode_return += reward
             log_episode_reshaped_return += reshaped_reward
+            log_episode_num_frames += np.ones(self.num_processes)
             log_return *= mask
             log_return += (1 - mask) * log_episode_return
             log_reshaped_return *= mask
             log_reshaped_return += (1 - mask) * log_episode_reshaped_return
+            log_num_frames *= mask
+            log_num_frames += (1 - mask) * log_episode_num_frames
             log_episode_return *= mask
             log_episode_reshaped_return *= mask
+            log_episode_num_frames *= mask
 
         ts.action = torch.from_numpy(np.array(ts.action))
         ts.reward = torch.from_numpy(np.array(ts.reward)).float()
@@ -102,7 +108,11 @@ class BaseAlgo(ABC):
 
         # Log some values
 
-        log = {"return": log_return, "reshaped_return": log_reshaped_return}
+        log = {
+            "return": log_return,
+            "reshaped_return": log_reshaped_return,
+            "num_frames": log_num_frames
+        }
 
         return ts, log
 
