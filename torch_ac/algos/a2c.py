@@ -5,9 +5,11 @@ import torch.nn.functional as F
 from torch_ac.algos.base import BaseAlgo
 
 class A2CAlgo(BaseAlgo):
-    def __init__(self, envs, acmodel, frames_per_update=50, discount=0.99, lr=7e-4, gae_tau=0.95,
+    def __init__(self, envs, acmodel, frames_per_update=None, discount=0.99, lr=7e-4, gae_tau=0.95,
                  entropy_coef=0.01, value_loss_coef=0.5, max_grad_norm=0.5, rmsprop_alpha=0.99,
                  rmsprop_eps=1e-5, preprocess_obss=None, reshape_reward=None):
+        frames_per_update = frames_per_update or 5
+
         super().__init__(envs, acmodel, frames_per_update, discount, lr, gae_tau, entropy_coef,
                          value_loss_coef, max_grad_norm, preprocess_obss, reshape_reward)
 

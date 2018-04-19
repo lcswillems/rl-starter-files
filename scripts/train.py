@@ -30,8 +30,8 @@ parser.add_argument("--log-interval", type=int, default=1,
                     help="interval between log display (default: 1)")
 parser.add_argument("--save-interval", type=int, default=0,
                     help="interval between model saving (default: 0, 0 means no saving)")
-parser.add_argument("--frames-per-update", type=int, default=50,
-                    help="number of frames per agent during before updating parameters (default: 50)")
+parser.add_argument("--frames-per-update", type=int, default=None,
+                    help="number of frames per agent during before updating parameters (default: 64)")
 parser.add_argument("--discount", type=float, default=0.99,
                     help="discount factor (default: 0.99)")
 parser.add_argument("--lr", type=float, default=7e-4,
@@ -52,8 +52,8 @@ parser.add_argument("--clip-eps", type=float, default=0.2,
                     help="clipping epsilon for PPO")
 parser.add_argument("--epochs", type=int, default=4,
                     help="number of epochs for PPO (default: 4)")
-parser.add_argument("--batch-size", type=int, default=32,
-                    help="batch size for PPO (default: 32, 0 means all)")
+parser.add_argument("--batch-size", type=int, default=64,
+                    help="batch size for PPO (default: 64, 0 means all)")
 args = parser.parse_args()
 
 # Set numpy and pytorch seeds
@@ -70,7 +70,7 @@ for i in range(args.processes):
 
 # Define model path
 
-model_name = args.model if args.model != None else args.env+"_"+args.algo
+model_name = args.model or args.env+"_"+args.algo
 model_path = utils.get_model_path(model_name)
 
 # Define actor-critic model
