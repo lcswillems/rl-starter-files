@@ -3,8 +3,6 @@
 import argparse
 import gym
 import gym_minigrid
-import torch
-from torch.autograd import Variable
 import time
 
 import torch_ac
@@ -16,7 +14,7 @@ parser = argparse.ArgumentParser(description='PyTorch RL example')
 parser.add_argument('--env', required=True,
                     help='name of the environment to be run')
 parser.add_argument('--model', required=True,
-                    help='name of the pre-trained model')
+                    help='name of the trained model')
 parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
 args = parser.parse_args()
@@ -30,13 +28,10 @@ torch_ac.seed(args.seed)
 env = gym.make(args.env)
 env.seed(args.seed)
 
-# Define model path
-
-model_path = utils.get_model_path(args.model)
-
 # Define actor-critic model
 
 obs_space = utils.preprocess_obs_space(env.observation_space)
+model_path = utils.get_model_path(args.model)
 acmodel = utils.load_model(obs_space, env.action_space, model_path)
 
 # Run the agent
@@ -50,8 +45,7 @@ while True:
 
     obs = utils.preprocess_obss([obs], volatile=True)
     action = acmodel.get_action(obs, deterministic=True).data[0,0]
-    obs, reward, done, _ = env.step(action)
-    reward = utils.reshape_reward(obs, action, reward)
+    obs, _, done, _ = env.step(action)
 
     if done:
         obs = env.reset()
