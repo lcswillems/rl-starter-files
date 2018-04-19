@@ -23,18 +23,18 @@ class BaseAlgo(ABC):
 
         self.num_processes = len(envs)
         self.obs = self.env.reset()
+
+        self.log_episode_return = np.zeros(self.num_processes)
+        self.log_episode_reshaped_return = np.zeros(self.num_processes)
+        self.log_episode_num_frames = np.zeros(self.num_processes)
+        self.log_return = np.zeros(self.num_processes)
+        self.log_reshaped_return = np.zeros(self.num_processes)
+        self.log_num_frames = np.zeros(self.num_processes)
     
     def collect_transitions(self):
         ts = DictList()
 
         # Add obs, action, reward, mask and value to transitions
-
-        log_episode_return = np.zeros(self.num_processes)
-        log_episode_reshaped_return = np.zeros(self.num_processes)
-        log_episode_num_frames = np.zeros(self.num_processes)
-        log_return = np.zeros(self.num_processes)
-        log_reshaped_return = np.zeros(self.num_processes)
-        log_num_frames = np.zeros(self.num_processes)
 
         for _ in range(self.frames_per_update):
             # Do one agent-environment interaction
@@ -63,23 +63,21 @@ class BaseAlgo(ABC):
             # Update log values
 
             mask = np.array(mask)
-            reward = np.array(reward)
-            reshaped_reward = np.array(reshaped_reward)
 
-            log_episode_return += reward
-            log_episode_reshaped_return += reshaped_reward
-            log_episode_num_frames += np.ones(self.num_processes)
+            self.log_episode_return += np.array(reward)
+            self.log_episode_reshaped_return += np.array(reshaped_reward)
+            self.log_episode_num_frames += np.ones(self.num_processes)
 
-            log_return *= mask
-            log_return += (1 - mask) * log_episode_return
-            log_reshaped_return *= mask
-            log_reshaped_return += (1 - mask) * log_episode_reshaped_return
-            log_num_frames *= mask
-            log_num_frames += (1 - mask) * log_episode_num_frames
+            self.log_return *= mask
+            self.log_return += (1 - mask) * self.log_episode_return
+            self.log_reshaped_return *= mask
+            self.log_reshaped_return += (1 - mask) * self.log_episode_reshaped_return
+            self.log_num_frames *= mask
+            self.log_num_frames += (1 - mask) * self.log_episode_num_frames
 
-            log_episode_return *= mask
-            log_episode_reshaped_return *= mask
-            log_episode_num_frames *= mask
+            self.log_episode_return *= mask
+            self.log_episode_reshaped_return *= mask
+            self.log_episode_num_frames *= mask
 
         ts.action = torch.from_numpy(np.array(ts.action))
         ts.reward = torch.from_numpy(np.array(ts.reward)).float()
@@ -122,9 +120,9 @@ class BaseAlgo(ABC):
         # Log some values
 
         log = {
-            "return": log_return,
-            "reshaped_return": log_reshaped_return,
-            "num_frames": log_num_frames
+            "return": self.log_return,
+            "reshaped_return": self.log_reshaped_return,
+            "num_frames": self.log_num_frames
         }
 
         return ts, log
