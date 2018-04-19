@@ -35,6 +35,9 @@ class PPOAlgo(BaseAlgo):
         value = self.acmodel.get_value(self.preprocess_obss(ts.obs, volatile=True))
         ts.old_value = value.data
 
+        if self.batch_size == 0:
+            self.batch_size = len(ts)
+
         for _ in range(self.epochs):
             ts.shuffle()
 
