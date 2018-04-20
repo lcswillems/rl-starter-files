@@ -31,7 +31,7 @@ parser.add_argument("--log-interval", type=int, default=1,
 parser.add_argument("--save-interval", type=int, default=0,
                     help="interval between model saving (default: 0, 0 means no saving)")
 parser.add_argument("--frames-per-update", type=int, default=None,
-                    help="number of frames per agent during before updating parameters (default: 64)")
+                    help="number of frames per agent before updating parameters (default: 64)")
 parser.add_argument("--discount", type=float, default=0.99,
                     help="discount factor (default: 0.99)")
 parser.add_argument("--lr", type=float, default=7e-4,
