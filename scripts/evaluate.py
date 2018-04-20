@@ -20,6 +20,8 @@ parser.add_argument("--episodes", type=int, default=50,
                     help="number of episodes of evaluation (default: 50)")
 parser.add_argument("--seed", type=int, default=1,
                     help="random seed (default: 1)")
+parser.add_argument("--deterministic", action="store_true", default=False,
+                    help="action with highest probability is selected")
 args = parser.parse_args()
 
 # Set numpy and pytorch seeds
@@ -54,7 +56,7 @@ for _ in range(args.episodes):
 
     while not(done):
         preprocessed_obs = utils.preprocess_obss([obs], volatile=True)
-        action = acmodel.get_action(preprocessed_obs, deterministic=True).data[0,0]
+        action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).data[0,0]
         obs, reward, done, _ = env.step(action)
         
         num_frames += 1

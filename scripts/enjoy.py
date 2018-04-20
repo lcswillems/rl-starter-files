@@ -17,6 +17,8 @@ parser.add_argument("--model", required=True,
                     help="name of the trained model")
 parser.add_argument("--seed", type=int, default=1,
                     help="random seed (default: 1)")
+parser.add_argument("--deterministic", action="store_true", default=False,
+                    help="action with highest probability is selected")
 args = parser.parse_args()
 
 # Set numpy and pytorch seeds
@@ -44,7 +46,7 @@ while True:
     print("Mission:", obs["mission"])
 
     preprocessed_obs = utils.preprocess_obss([obs], volatile=True)
-    action = acmodel.get_action(preprocessed_obs, deterministic=True).data[0,0]
+    action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).data[0,0]
     obs, _, done, _ = env.step(action)
     if done:
         obs = env.reset()
