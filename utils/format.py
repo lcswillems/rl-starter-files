@@ -18,7 +18,9 @@ def load_vocab():
     return {}
 
 def save_vocab(vocab):
-    json.dump(vocab, open(get_vocab_path(), "w"))
+    path = get_vocab_path()
+    utils.create_folders_if_necessary(path)
+    json.dump(vocab, open(path, "w"))
 
 vocab = load_vocab()
 vocab_has_changed = False
