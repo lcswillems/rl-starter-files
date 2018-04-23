@@ -47,7 +47,7 @@ while True:
 
     preprocessed_obs = utils.preprocess_obss([obs], volatile=True)
     action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).data[0,0]
-    obs, _, done, _ = env.step(action)
+    obs, reward, done, _ = env.step(action)
     if done:
         obs = env.reset()
 
