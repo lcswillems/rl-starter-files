@@ -4,7 +4,9 @@ import argparse
 import gym
 import gym_minigrid
 import time
+import datetime
 import numpy as np
+import sys
 
 import torch_ac
 import utils
@@ -95,32 +97,45 @@ elif args.algo == "ppo":
 else:
     raise ValueError
 
+# Initialize logger, log command and model
+
+logger = utils.Logger(model_name+"_"+str(int(time.time())))
+logger.log(" ".join(sys.argv), to_print=False)
+logger.log(acmodel)
+
 # Train model
 
 total_num_frames = 0
+total_start_time = time.time()
 i = 0
 
 while total_num_frames < args.total_frames:
     # Update parameters
 
-    start_time = time.time()
+    update_start_time = time.time()
     log = algo.update_parameters()
-    end_time = time.time()
+    update_end_time = time.time()
     
     update_num_frames = log["total_num_frames"]
     total_num_frames += update_num_frames
     i += 1
 
+    total_end_time = time.time()
+
     # Print logs
 
     if i % args.log_interval == 0:
-        fps = update_num_frames/(end_time - start_time)
+        total_ellapsed_time = int(total_end_time - total_start_time)
+        fps = update_num_frames/(update_end_time - update_start_time)
 
-        print("tF {:06} | FPS {:.0f} | rR:x̄σmM {: .1f} {: .1f} {: .1f} {: .1f} | F:x̄σmM {:.1f} {:.1f} {:.1f} {:.1f} | H {:.3f} | vL {:.3f} | aL {: .3f}".
-            format(total_num_frames, fps,
-                   *utils.synthesize(log["reshaped_return"]),
-                   *utils.synthesize(log["num_frames"]),
-                   log["entropy"], log["value_loss"], log["action_loss"]))
+        logger.log(
+            "tF {:06} | D {} | FPS {:04.0f} | rR:x̄σmM {: .1f} {: .1f} {: .1f} {: .1f} | F:x̄σmM {:.1f} {:.1f} {:.1f} {:.1f} | H {:.3f} | vL {:.3f} | aL {: .3f}"
+            .format(total_num_frames,
+                    datetime.timedelta(seconds=total_ellapsed_time),
+                    fps,
+                    *utils.synthesize(log["reshaped_return"]),
+                    *utils.synthesize(log["num_frames"]),
+                    log["entropy"], log["value_loss"], log["action_loss"]))
 
     # Save model
 

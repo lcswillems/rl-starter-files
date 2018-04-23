@@ -9,5 +9,5 @@ def create_folders_if_necessary(path):
         os.makedirs(dirname)
 
 from utils.format import preprocess_obs_space, preprocess_obss, reshape_reward
-from utils.log import synthesize
+from utils.log import Logger, synthesize
 from utils.model import get_model_path, load_model, save_model
