@@ -129,7 +129,7 @@ while total_num_frames < args.total_frames:
         fps = update_num_frames/(update_end_time - update_start_time)
 
         logger.log(
-            "U {} | tF {:06} | FPS {:04.0f} | D {} | rR:x̄σmM {: .1f} {: .1f} {: .1f} {: .1f} | F:x̄σmM {:.1f} {:.1f} {:.1f} {:.1f} | H {:.3f} | vL {:.3f} | aL {: .3f}"
+            "U {} | tF {:06} | FPS {:04.0f} | D {} | rR:x̄σmM {: .2f} {: .2f} {: .2f} {: .2f} | F:x̄σmM {:.1f} {:.1f} {:.1f} {:.1f} | H {:.3f} | vL {:.3f} | aL {: .3f}"
             .format(i, total_num_frames, fps,
                     datetime.timedelta(seconds=total_ellapsed_time),
                     *utils.synthesize(log["reshaped_return"]),
