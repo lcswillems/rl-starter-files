@@ -98,7 +98,8 @@ else:
 
 # Initialize logger, log command and model
 
-logger = utils.Logger(model_name+"_"+str(int(time.time())))
+suffix = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+logger = utils.Logger(model_name+"_"+suffix)
 logger.log(" ".join(sys.argv), to_print=False)
 logger.log(acmodel)
 
