@@ -96,4 +96,4 @@ def preprocess_obss(obss, volatile):
 def reshape_reward(obs, action, reward):
     if reward > 0:
         return reward*10
-    return -0.1
+    return 0
