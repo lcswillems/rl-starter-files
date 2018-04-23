@@ -81,7 +81,7 @@ from_path = None if args.reset else model_path
 obs_space = utils.preprocess_obs_space(envs[0].observation_space)
 acmodel = utils.load_model(obs_space, envs[0].action_space, from_path)
 if torch_ac.use_gpu:
-    acmodel = acmodel.cuda()
+    acmodel.cuda()
 
 # Define actor-critic algo
 
@@ -139,4 +139,8 @@ while total_num_frames < args.total_frames:
     # Save model
 
     if args.save_interval > 0 and i % args.save_interval == 0:
+        if torch_ac.use_gpu:
+            acmodel.cpu()
         utils.save_model(acmodel, model_path)
+        if torch_ac.use_gpu:
+            acmodel.cuda()
