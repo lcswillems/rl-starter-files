@@ -14,7 +14,7 @@ class Vocabulary:
     def __init__(self, model_name):
         self.path = get_vocab_path(model_name)
         utils.create_folders_if_necessary(self.path)
-        self.max_size = 20
+        self.max_size = 100
         self.vocab = json.load(open(self.path)) if os.path.exists(self.path) else {}
 
     def __getitem__(self, token):
