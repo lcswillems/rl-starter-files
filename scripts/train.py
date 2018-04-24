@@ -142,6 +142,6 @@ while total_num_frames < args.total_frames:
     if args.save_interval > 0 and i % args.save_interval == 0:
         if torch_ac.gpu_available:
             acmodel.cpu()
-        utils.save_model(acmodel, model_path)
+        utils.save_model(acmodel, model_name)
         if torch_ac.gpu_available:
             acmodel.cuda()

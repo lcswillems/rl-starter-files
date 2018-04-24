@@ -1,7 +1,7 @@
 import os
 
 def storage_dir():
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "storage")
+    return "storage"
 
 def create_folders_if_necessary(path):
     dirname = os.path.dirname(path)
