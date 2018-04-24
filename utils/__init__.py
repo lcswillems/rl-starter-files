@@ -8,6 +8,6 @@ def create_folders_if_necessary(path):
     if not(os.path.isdir(dirname)):
         os.makedirs(dirname)
 
-from utils.format import preprocess_obs_space, preprocess_obss
+from utils.format import ObssPreprocessor
 from utils.log import Logger, synthesize
 from utils.model import get_model_path, load_model, save_model

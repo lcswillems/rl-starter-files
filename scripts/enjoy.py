@@ -30,11 +30,17 @@ torch_ac.seed(args.seed)
 env = gym.make(args.env)
 env.seed(args.seed)
 
+# Define model name
+
+model_name = args.model or args.env+"_"+args.algo
+
+# Define obss preprocessor
+
+obss_preprocessor = utils.ObssPreprocessor(model_name, env.observation_space)
+
 # Define actor-critic model
 
-obs_space = utils.preprocess_obs_space(env.observation_space)
-model_path = utils.get_model_path(args.model)
-acmodel = utils.load_model(obs_space, env.action_space, model_path)
+acmodel = utils.load_model(obss_preprocessor.obs_space, env.action_space, model_name)
 
 # Run the agent
 
@@ -45,7 +51,7 @@ while True:
     renderer = env.render("human")
     print("Mission:", obs["mission"])
 
-    preprocessed_obs = utils.preprocess_obss([obs])
+    preprocessed_obs = obss_preprocessor([obs])
     action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).data[0,0]
     obs, reward, done, _ = env.step(action)
     if done:

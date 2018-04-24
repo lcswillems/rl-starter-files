@@ -70,16 +70,17 @@ for i in range(args.processes):
     env.seed(args.seed + i)
     envs.append(env)
 
-# Define model path
+# Define model name
 
 model_name = args.model or args.env+"_"+args.algo
-model_path = utils.get_model_path(model_name)
+
+# Define obss preprocessor
+
+obss_preprocessor = utils.ObssPreprocessor(model_name, envs[0].observation_space)
 
 # Define actor-critic model
 
-from_path = None if args.reset else model_path
-obs_space = utils.preprocess_obs_space(envs[0].observation_space)
-acmodel = utils.load_model(obs_space, envs[0].action_space, from_path)
+acmodel = utils.load_model(obss_preprocessor.obs_space, envs[0].action_space, model_name)
 if torch_ac.gpu_available:
     acmodel.cuda()
 
@@ -88,11 +89,11 @@ if torch_ac.gpu_available:
 if args.algo == "a2c":
     algo = torch_ac.A2CAlgo(envs, acmodel, args.frames_per_update, args.discount, args.lr, args.gae_tau,
                             args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.optim_alpha,
-                            args.optim_eps, utils.preprocess_obss)
+                            args.optim_eps, obss_preprocessor)
 elif args.algo == "ppo":
     algo = torch_ac.PPOAlgo(envs, acmodel, args.frames_per_update, args.discount, args.lr, args.gae_tau,
                             args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.optim_eps,
-                            args.clip_eps, args.epochs, args.batch_size, utils.preprocess_obss)
+                            args.clip_eps, args.epochs, args.batch_size, obss_preprocessor)
 else:
     raise ValueError
 
