@@ -97,7 +97,7 @@ elif args.algo == "ppo":
 else:
     raise ValueError
 
-# Initialize logger, log command and model
+# Define logger, log command and model
 
 suffix = datetime.datetime.now().strftime("%y%m%d%H%M%S")
 logger = utils.Logger(model_name+"_"+suffix)
