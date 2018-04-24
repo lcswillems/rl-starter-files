@@ -56,7 +56,7 @@ for _ in range(args.episodes):
     returnn = 0
 
     while not(done):
-        preprocessed_obs = utils.preprocess_obss([obs], volatile=True)
+        preprocessed_obs = utils.preprocess_obss([obs])
         action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).data[0,0]
         obs, reward, done, _ = env.step(action)
         

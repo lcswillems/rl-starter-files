@@ -3,6 +3,7 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 
 from torch_ac.algos.base import BaseAlgo
+from torch_ac.utils import gpu_available
 
 class A2CAlgo(BaseAlgo):
     def __init__(self, envs, acmodel, frames_per_update=None, discount=0.99, lr=7e-4, gae_tau=0.95,
@@ -23,7 +24,7 @@ class A2CAlgo(BaseAlgo):
 
         # Compute loss
 
-        preprocessed_obs = self.preprocess_obss(ts.obs, volatile=False)
+        preprocessed_obs = self.preprocess_obss(ts.obs, volatile=False, use_gpu=gpu_available)
         rdist = self.acmodel.get_rdist(preprocessed_obs)
         value = self.acmodel.get_value(preprocessed_obs)
 

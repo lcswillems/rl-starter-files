@@ -39,6 +39,7 @@ class ACModel(torch_ac.ACModel):
         self.apply(initialize_parameters)
 
     def get_embed_instr(self, instr):
+        self.instr_gru.flatten_parameters()
         _, hidden = self.instr_gru(instr)
         return hidden[-1]
 

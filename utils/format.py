@@ -5,7 +5,6 @@ from torch.autograd import Variable
 import numpy as np
 import re
 
-import torch_ac
 import utils
 
 def get_vocab_path():
@@ -49,12 +48,12 @@ def preprocess_instr(instr, vocab):
         
     return instr, vocab
 
-def preprocess_obss(obss, volatile):
+def preprocess_obss(obss, volatile=True, use_gpu=False):
     # Preprocessing images
 
     np_image = np.array([np.array(obs["image"]).reshape(-1) for obs in obss])
     image = torch.from_numpy(np_image).float()
-    if torch_ac.use_gpu:
+    if use_gpu:
         image = image.cuda()
 
     # Preprocessing instructions
@@ -81,7 +80,7 @@ def preprocess_obss(obss, volatile):
         np_instr[0:len(instr_),i,:] = hot_instr_
     
     instr = torch.from_numpy(np_instr).float()
-    if torch_ac.use_gpu:
+    if use_gpu:
         instr = instr.cuda()
 
     # Define the observation the model will receive

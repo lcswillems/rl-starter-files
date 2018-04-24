@@ -4,7 +4,7 @@ from torch.autograd import Variable
 import numpy as np
 
 from torch_ac.format import default_preprocess_obss, default_reshape_reward
-from torch_ac.utils import use_gpu, DictList, MultiEnv
+from torch_ac.utils import gpu_available, DictList, MultiEnv
 
 class BaseAlgo(ABC):
     def __init__(self, envs, acmodel, frames_per_update, discount, lr, gae_tau, entropy_coef,
@@ -40,7 +40,7 @@ class BaseAlgo(ABC):
         for _ in range(self.frames_per_update):
             # Do one agent-environment interaction
 
-            preprocessed_obs = self.preprocess_obss(self.obs, volatile=True)
+            preprocessed_obs = self.preprocess_obss(self.obs, use_gpu=gpu_available)
             action = self.acmodel.get_action(preprocessed_obs)
             action = action.data.squeeze(1).cpu().numpy()
             obs, reward, done, _ = self.env.step(action)
@@ -84,7 +84,7 @@ class BaseAlgo(ABC):
         ts.reward = torch.from_numpy(np.array(ts.reward)).float()
         ts.mask = torch.from_numpy(np.array(ts.mask)).float()
         ts.value = torch.from_numpy(np.array(ts.value)).float()
-        if use_gpu:
+        if gpu_available:
             ts.action = ts.action.cuda()
             ts.reward = ts.reward.cuda()
             ts.mask = ts.mask.cuda()
@@ -93,10 +93,10 @@ class BaseAlgo(ABC):
         # Add advantage and return to transitions
 
         ts.advantage = torch.zeros(*ts.reward.shape).float()
-        if use_gpu:
+        if gpu_available:
             ts.advantage = ts.advantage.cuda()
 
-        preprocessed_obs = self.preprocess_obss(self.obs, volatile=True)
+        preprocessed_obs = self.preprocess_obss(self.obs, use_gpu=gpu_available)
         next_value = self.acmodel.get_value(preprocessed_obs).data.squeeze(1)
 
         for i in reversed(range(self.frames_per_update)):

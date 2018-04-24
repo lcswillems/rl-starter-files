@@ -4,6 +4,7 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 
 from torch_ac.algos.base import BaseAlgo
+from torch_ac.utils import gpu_available
 
 class PPOAlgo(BaseAlgo):
     def __init__(self, envs, acmodel, frames_per_update=None, discount=0.99, lr=7e-4, gae_tau=0.95,
@@ -27,12 +28,12 @@ class PPOAlgo(BaseAlgo):
 
         # Add old action log probs to transitions
 
-        rdist = self.acmodel.get_rdist(self.preprocess_obss(ts.obs, volatile=True))
+        rdist = self.acmodel.get_rdist(self.preprocess_obss(ts.obs, use_gpu=gpu_available))
         log_dist = F.log_softmax(rdist, dim=1)
         ts.old_action_log_prob = log_dist.gather(1, Variable(ts.action, volatile=True)).data
 
         # Add old values to transitions
-        value = self.acmodel.get_value(self.preprocess_obss(ts.obs, volatile=True))
+        value = self.acmodel.get_value(self.preprocess_obss(ts.obs, use_gpu=gpu_available))
         ts.old_value = value.data
 
         if self.batch_size == 0:
@@ -46,7 +47,7 @@ class PPOAlgo(BaseAlgo):
 
                 # Compute loss
 
-                preprocessed_obs = self.preprocess_obss(b.obs, volatile=False)
+                preprocessed_obs = self.preprocess_obss(b.obs, volatile=False, use_gpu=gpu_available)
                 rdist = self.acmodel.get_rdist(preprocessed_obs)
                 value = self.acmodel.get_value(preprocessed_obs)
 

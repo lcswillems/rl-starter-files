@@ -2,9 +2,9 @@ import torch
 from torch.autograd import Variable
 import numpy as np
 
-from torch_ac.utils import use_gpu
+from torch_ac.utils import gpu_available
 
-def default_preprocess_obss(obss, volatile):
+def default_preprocess_obss(obss, volatile=True, use_gpu=False):
     obss = torch.from_numpy(np.array(obss)).float()
     if use_gpu:
         obss = obss.cuda()
