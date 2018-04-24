@@ -20,8 +20,6 @@ parser.add_argument("--env", required=True,
                     help="name of the environment to train on")
 parser.add_argument("--model", default=None,
                     help="name of the pre-trained model")
-parser.add_argument("--reset", action="store_true", default=False,
-                    help="initialize model with random parameters")
 parser.add_argument("--seed", type=int, default=1,
                     help="random seed (default: 1)")
 parser.add_argument("--processes", type=int, default=16,
