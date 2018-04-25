@@ -12,7 +12,7 @@ import utils
 
 # Parse arguments
 
-parser = argparse.ArgumentParser(description="PyTorch RL example")
+parser = argparse.ArgumentParser()
 parser.add_argument("--env", required=True,
                     help="name of the environment to be run")
 parser.add_argument("--model", required=True,

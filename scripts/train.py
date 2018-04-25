@@ -13,19 +13,19 @@ import utils
 
 # Parse arguments
 
-parser = argparse.ArgumentParser(description="PyTorch RL example")
+parser = argparse.ArgumentParser()
 parser.add_argument("--algo", required=True,
-                    help="algorithm to use: a2c | ppo")
+                    help="algorithm to use: a2c | ppo (REQUIRED)")
 parser.add_argument("--env", required=True,
-                    help="name of the environment to train on")
+                    help="name of the environment to train on (REQUIRED)")
 parser.add_argument("--model", default=None,
-                    help="name of the pre-trained model")
+                    help="name of the pre-trained model (default: ENV_ALGO)")
 parser.add_argument("--seed", type=int, default=1,
                     help="random seed (default: 1)")
 parser.add_argument("--processes", type=int, default=16,
                     help="number of processes (default: 16)")
 parser.add_argument("--total-frames", type=int, default=10**7,
-                    help="number of frames of training (default: 10e6)")
+                    help="number of frames of training (default: 10e7)")
 parser.add_argument("--log-interval", type=int, default=1,
                     help="interval between log display (default: 1)")
 parser.add_argument("--save-interval", type=int, default=0,
@@ -49,7 +49,7 @@ parser.add_argument("--optim-eps", type=float, default=1e-5,
 parser.add_argument("--optim-alpha", type=float, default=0.99,
                     help="RMSprop optimizer apha (default: 0.99)")
 parser.add_argument("--clip-eps", type=float, default=0.2,
-                    help="clipping epsilon for PPO")
+                    help="clipping epsilon for PPO (default: 0.2)")
 parser.add_argument("--epochs", type=int, default=4,
                     help="number of epochs for PPO (default: 4)")
 parser.add_argument("--batch-size", type=int, default=256,
