@@ -1,7 +1,6 @@
 import os
 import json
 import torch
-from torch.autograd import Variable
 import numpy as np
 import re
 
@@ -37,11 +36,11 @@ class ObssPreprocessor:
             "instr": self.vocab.max_size
         }
 
-    def __call__(self, obss, volatile=True, use_gpu=False):
+    def __call__(self, obss, requires_grad=False, use_gpu=False):
         # Preprocessing images
 
         np_image = np.array([np.array(obs["image"]).reshape(-1) for obs in obss])
-        image = torch.from_numpy(np_image).float()
+        image = torch.tensor(np_image, requires_grad=requires_grad).float()
         if use_gpu:
             image = image.cuda()
 
@@ -61,17 +60,17 @@ class ObssPreprocessor:
         for i, instr_ in enumerate(instr):
             hot_instr_ = np.zeros((len(instr_), self.vocab.max_size))
             hot_instr_[np.arange(len(instr_)), instr_] = 1
-            np_instr[0:len(instr_),i,:] = hot_instr_
+            np_instr[:len(instr_),i,:] = hot_instr_
         
-        instr = torch.from_numpy(np_instr).float()
+        instr = torch.tensor(np_instr, requires_grad=requires_grad).float()
         if use_gpu:
             instr = instr.cuda()
 
         # Define the observation the model will receive
 
         obs = {
-            "image": Variable(image, volatile=volatile),
-            "instr": Variable(instr, volatile=volatile)
+            "image": image,
+            "instr": instr
         }
 
         return obs

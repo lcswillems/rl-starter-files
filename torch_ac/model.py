@@ -14,7 +14,7 @@ class ACModel(nn.Module):
         dist = F.softmax(self.get_rdist(obs), dim=1)
         if deterministic:
             return dist.max(1, keepdim=True)[1]
-        return dist.multinomial()
+        return dist.multinomial(1)
 
     @abstractmethod
     def get_value(self, obs):

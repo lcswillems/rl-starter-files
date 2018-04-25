@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import torch
-from torch.autograd import Variable
 import numpy as np
 
 from torch_ac.format import default_preprocess_obss, default_reshape_reward
@@ -80,10 +79,10 @@ class BaseAlgo(ABC):
             self.log_episode_reshaped_return *= mask
             self.log_episode_num_frames *= mask
 
-        ts.action = torch.from_numpy(np.array(ts.action))
-        ts.reward = torch.from_numpy(np.array(ts.reward)).float()
-        ts.mask = torch.from_numpy(np.array(ts.mask)).float()
-        ts.value = torch.from_numpy(np.array(ts.value)).float()
+        ts.action = torch.tensor(ts.action)
+        ts.reward = torch.tensor(ts.reward).float()
+        ts.mask = torch.tensor(ts.mask).float()
+        ts.value = torch.tensor(ts.value).float()
         if gpu_available:
             ts.action = ts.action.cuda()
             ts.reward = ts.reward.cuda()

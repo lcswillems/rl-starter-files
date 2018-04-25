@@ -1,5 +1,4 @@
 import torch
-from torch.autograd import Variable
 import torch.nn.functional as F
 
 from torch_ac.algos.base import BaseAlgo
@@ -24,7 +23,7 @@ class A2CAlgo(BaseAlgo):
 
         # Compute loss
 
-        preprocessed_obs = self.preprocess_obss(ts.obs, volatile=False, use_gpu=gpu_available)
+        preprocessed_obs = self.preprocess_obss(ts.obs, requires_grad=True, use_gpu=gpu_available)
         rdist = self.acmodel.get_rdist(preprocessed_obs)
         value = self.acmodel.get_value(preprocessed_obs)
 
@@ -32,10 +31,10 @@ class A2CAlgo(BaseAlgo):
         dist = F.softmax(rdist, dim=1)
         entropy = -(log_dist * dist).sum(dim=1).mean()
 
-        action_log_prob = log_dist.gather(1, Variable(ts.action))
-        action_loss = -(action_log_prob * Variable(ts.advantage)).mean()
+        action_log_prob = log_dist.gather(1, ts.action)
+        action_loss = -(action_log_prob * ts.advantage).mean()
 
-        value_loss = (value - Variable(ts.returnn)).pow(2).mean()
+        value_loss = (value - ts.returnn).pow(2).mean()
         
         loss = action_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
 
@@ -48,8 +47,8 @@ class A2CAlgo(BaseAlgo):
 
         # Log some values
 
-        log["value_loss"] = value_loss.data[0]
-        log["action_loss"] = action_loss.data[0]
-        log["entropy"] = entropy.data[0]
+        log["value_loss"] = value_loss.item()
+        log["action_loss"] = action_loss.item()
+        log["entropy"] = entropy.item()
 
         return log

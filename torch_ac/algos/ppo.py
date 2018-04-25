@@ -1,6 +1,5 @@
 import random
 import torch
-from torch.autograd import Variable
 import torch.nn.functional as F
 
 from torch_ac.algos.base import BaseAlgo
@@ -24,16 +23,17 @@ class PPOAlgo(BaseAlgo):
     def update_parameters(self):
         # Collect transitions
 
-        ts, log = self.collect_transitions()       
+        ts, log = self.collect_transitions()
 
-        # Add old action log probs to transitions
+        # Add old action log probs and old values to transitions
 
-        rdist = self.acmodel.get_rdist(self.preprocess_obss(ts.obs, use_gpu=gpu_available))
+        preprocessed_obs = self.preprocess_obss(ts.obs, use_gpu=gpu_available)
+
+        rdist = self.acmodel.get_rdist(preprocessed_obs)
         log_dist = F.log_softmax(rdist, dim=1)
-        ts.old_action_log_prob = log_dist.gather(1, Variable(ts.action, volatile=True)).data
+        ts.old_action_log_prob = log_dist.gather(1, ts.action).data
 
-        # Add old values to transitions
-        value = self.acmodel.get_value(self.preprocess_obss(ts.obs, use_gpu=gpu_available))
+        value = self.acmodel.get_value(preprocessed_obs)
         ts.old_value = value.data
 
         if self.batch_size == 0:
@@ -47,7 +47,7 @@ class PPOAlgo(BaseAlgo):
 
                 # Compute loss
 
-                preprocessed_obs = self.preprocess_obss(b.obs, volatile=False, use_gpu=gpu_available)
+                preprocessed_obs = self.preprocess_obss(b.obs, requires_grad=True, use_gpu=gpu_available)
                 rdist = self.acmodel.get_rdist(preprocessed_obs)
                 value = self.acmodel.get_value(preprocessed_obs)
 
@@ -55,18 +55,15 @@ class PPOAlgo(BaseAlgo):
                 dist = F.softmax(rdist, dim=1)
                 entropy = -(log_dist * dist).sum(dim=1).mean()
 
-                action_log_prob = log_dist.gather(1, Variable(b.action))
-                ratio = torch.exp(action_log_prob - Variable(b.old_action_log_prob))
-                advantage_var = Variable(b.advantage)
-                surr1 = ratio * advantage_var
-                surr2 = torch.clamp(ratio, 1.0 - self.clip_eps, 1.0 + self.clip_eps) * advantage_var
+                action_log_prob = log_dist.gather(1, b.action)
+                ratio = torch.exp(action_log_prob - b.old_action_log_prob)
+                surr1 = ratio * b.advantage
+                surr2 = torch.clamp(ratio, 1.0 - self.clip_eps, 1.0 + self.clip_eps) * b.advantage
                 action_loss = -torch.min(surr1, surr2).mean()
 
-                old_value_var = Variable(b.old_value)
-                value_clipped = old_value_var + torch.clamp(value - old_value_var, -self.clip_eps, self.clip_eps)
-                return_var = Variable(b.returnn)
-                surr1 = (value - return_var).pow(2)
-                surr2 = (value_clipped - return_var).pow(2)
+                value_clipped = b.old_value + torch.clamp(value - b.old_value, -self.clip_eps, self.clip_eps)
+                surr1 = (value - b.returnn).pow(2)
+                surr2 = (value_clipped - b.returnn).pow(2)
                 value_loss = torch.max(surr1, surr2).mean()
 
                 loss = action_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
@@ -75,13 +72,13 @@ class PPOAlgo(BaseAlgo):
 
                 self.optimizer.zero_grad()
                 loss.backward()
-                torch.nn.utils.clip_grad_norm(self.acmodel.parameters(), self.max_grad_norm)
+                torch.nn.utils.clip_grad_norm_(self.acmodel.parameters(), self.max_grad_norm)
                 self.optimizer.step()
         
         # Log some values
 
-        log["value_loss"] = value_loss.data[0]
-        log["action_loss"] = action_loss.data[0]
-        log["entropy"] = entropy.data[0]
+        log["value_loss"] = value_loss.item()
+        log["action_loss"] = action_loss.item()
+        log["entropy"] = entropy.item()
 
         return log
