@@ -12,9 +12,9 @@ import utils
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--env", required=True,
-                    help="name of the environment to be run")
+                    help="name of the environment to be run (REQUIRED)")
 parser.add_argument("--model", required=True,
-                    help="name of the trained model")
+                    help="name of the trained model (REQUIRED)")
 parser.add_argument("--seed", type=int, default=1,
                     help="random seed (default: 1)")
 parser.add_argument("--deterministic", action="store_true", default=False,
