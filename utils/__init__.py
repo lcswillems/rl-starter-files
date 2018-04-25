@@ -10,4 +10,4 @@ def create_folders_if_necessary(path):
 
 from utils.format import ObssPreprocessor
 from utils.log import Logger, synthesize
-from utils.model import get_model_path, load_model, save_model
+from utils.model import load_model, save_model
