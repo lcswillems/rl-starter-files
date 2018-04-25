@@ -95,7 +95,7 @@ elif args.algo == "ppo":
 else:
     raise ValueError
 
-# Define logger, log command and model
+# Define logger and log command and model
 
 suffix = datetime.datetime.now().strftime("%y%m%d%H%M%S")
 logger = utils.Logger(model_name+"_"+suffix)
@@ -119,12 +119,10 @@ while total_num_frames < args.total_frames:
     total_num_frames += update_num_frames
     i += 1
 
-    total_end_time = time.time()
-
     # Print logs
 
     if i % args.log_interval == 0:
-        total_ellapsed_time = int(total_end_time - total_start_time)
+        total_ellapsed_time = int(time.time() - total_start_time)
         fps = update_num_frames/(update_end_time - update_start_time)
 
         logger.log(
