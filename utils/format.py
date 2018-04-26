@@ -39,39 +39,39 @@ class ObssPreprocessor:
     def __call__(self, obss, use_gpu=False):
         # Preprocessing images
 
-        image = numpy.array([obs["image"] for obs in obss])
-        image = image.reshape(image.shape[0], -1)
-        image = torch.tensor(image).float()
+        images = numpy.array([obs["image"] for obs in obss])
+        images = images.reshape(images.shape[0], -1)
+        images = torch.tensor(images).float()
 
         if use_gpu:
-            image = image.cuda()
+            images = images.cuda()
 
         # Preprocessing instructions
 
-        instr = []
+        instrs = []
         max_instr_len = 0
         
         for obs in obss:
             tokens = re.findall("([a-z]+)", obs["mission"].lower())
-            instr_ = [self.vocab[token] for token in tokens]
-            instr.append(instr_)
-            max_instr_len = max(len(instr_), max_instr_len)
+            instr = [self.vocab[token] for token in tokens]
+            instrs.append(instr)
+            max_instr_len = max(len(instr), max_instr_len)
         
-        np_instr = numpy.zeros((max_instr_len, len(obss), self.vocab.max_size))
+        np_instrs = numpy.zeros((max_instr_len, len(obss), self.vocab.max_size))
 
-        for i, instr_ in enumerate(instr):
-            hot_instr_ = numpy.zeros((len(instr_), self.vocab.max_size))
-            hot_instr_[numpy.arange(len(instr_)), instr_] = 1
-            np_instr[:len(instr_),i,:] = hot_instr_
+        for i, instr in enumerate(instrs):
+            hot_instr = numpy.zeros((len(instr), self.vocab.max_size))
+            hot_instr[numpy.arange(len(instr)), instr] = 1
+            np_instrs[:len(instr), i, :] = hot_instr
         
-        instr = torch.tensor(np_instr).float()
+        instr = torch.tensor(np_instrs).float()
         if use_gpu:
             instr = instr.cuda()
 
         # Define the observation the model will receive
 
         obs = {
-            "image": image,
+            "image": images,
             "instr": instr
         }
 
