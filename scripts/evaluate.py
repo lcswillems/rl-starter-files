@@ -5,8 +5,7 @@ import gym
 import gym_minigrid
 import time
 import datetime
-import numpy as np
-import torch_ac
+import numpy
 
 import utils
 
@@ -27,7 +26,7 @@ args = parser.parse_args()
 
 # Set numpy and pytorch seeds
 
-torch_ac.seed(args.seed)
+utils.seed(args.seed)
 
 # Generate environment
 
@@ -77,7 +76,7 @@ end_time = time.time()
 # Print logs
 
 ellapsed_time = int(end_time - start_time)
-fps = np.sum(log["num_frames"])/(end_time - start_time)
+fps = numpy.sum(log["num_frames"])/(end_time - start_time)
 
 print("FPS {:.0f} | D {} | R:x̄σmM {:.2f} {:.2f} {:.2f} {:.2f} | F:x̄σmM {:.1f} {:.1f} {:.1f} {:.1f}"
       .format(fps,

@@ -4,7 +4,6 @@ import argparse
 import gym
 import gym_minigrid
 import time
-import torch_ac
 
 import utils
 
@@ -23,7 +22,7 @@ args = parser.parse_args()
 
 # Set numpy and pytorch seeds
 
-torch_ac.seed(args.seed)
+utils.seed(args.seed)
 
 # Generate environment
 

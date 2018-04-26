@@ -1,5 +1,5 @@
 import os
-import numpy as np
+import numpy
 
 import utils
 
@@ -7,7 +7,7 @@ def get_log_path(log_name):
     return os.path.join(utils.storage_dir(), "logs", log_name+".txt")
 
 def synthesize(array):
-    return np.mean(array), np.std(array), np.amin(array), np.amax(array)
+    return numpy.mean(array), numpy.std(array), numpy.amin(array), numpy.amax(array)
 
 class Logger:
     def __init__(self, log_name):

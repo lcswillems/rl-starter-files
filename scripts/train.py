@@ -5,7 +5,6 @@ import gym
 import gym_minigrid
 import time
 import datetime
-import numpy as np
 import sys
 import torch
 import torch_ac
@@ -59,7 +58,7 @@ args = parser.parse_args()
 
 # Set numpy and pytorch seeds
 
-torch_ac.seed(args.seed)
+utils.seed(args.seed)
 
 # Generate environments
 

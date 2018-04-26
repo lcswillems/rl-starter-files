@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import torch
-import numpy as np
+import numpy
 
 from torch_ac.format import default_preprocess_obss, default_reshape_reward
 from torch_ac.utils import DictList, MultiEnv
@@ -24,12 +24,12 @@ class BaseAlgo(ABC):
         self.num_processes = len(envs)
         self.obs = self.env.reset()
 
-        self.log_episode_return = np.zeros(self.num_processes)
-        self.log_episode_reshaped_return = np.zeros(self.num_processes)
-        self.log_episode_num_frames = np.zeros(self.num_processes)
-        self.log_return = np.zeros(self.num_processes)
-        self.log_reshaped_return = np.zeros(self.num_processes)
-        self.log_num_frames = np.zeros(self.num_processes)
+        self.log_episode_return = numpy.zeros(self.num_processes)
+        self.log_episode_reshaped_return = numpy.zeros(self.num_processes)
+        self.log_episode_num_frames = numpy.zeros(self.num_processes)
+        self.log_return = numpy.zeros(self.num_processes)
+        self.log_reshaped_return = numpy.zeros(self.num_processes)
+        self.log_num_frames = numpy.zeros(self.num_processes)
     
     def collect_transitions(self):
         ts = DictList()
@@ -62,11 +62,11 @@ class BaseAlgo(ABC):
 
             # Update log values
 
-            mask = np.array(mask)
+            mask = numpy.array(mask)
 
-            self.log_episode_return += np.array(reward)
-            self.log_episode_reshaped_return += np.array(reshaped_reward)
-            self.log_episode_num_frames += np.ones(self.num_processes)
+            self.log_episode_return += numpy.array(reward)
+            self.log_episode_reshaped_return += numpy.array(reshaped_reward)
+            self.log_episode_num_frames += numpy.ones(self.num_processes)
 
             self.log_return *= mask
             self.log_return += (1 - mask) * self.log_episode_return
