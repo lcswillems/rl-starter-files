@@ -40,8 +40,9 @@ class BaseAlgo(ABC):
             # Do one agent-environment interaction
 
             preprocessed_obs = self.preprocess_obss(self.obs, use_gpu=torch.cuda.is_available())
-            action = self.acmodel.get_action(preprocessed_obs)
-            action = action.cpu().detach().numpy()
+            with torch.no_grad():
+                action = self.acmodel.get_action(preprocessed_obs)
+            action = action.cpu().numpy()
             obs, reward, done, _ = self.env.step(action)
             
             # Add a transition
@@ -51,8 +52,9 @@ class BaseAlgo(ABC):
                 for obs_, action_, reward_ in zip(obs, action, reward)
             ]
             mask = [0 if done_ else 1 for done_ in done]
-            value = self.acmodel.get_value(preprocessed_obs)
-            value = value.squeeze(1).cpu().detach().numpy()
+            with torch.no_grad():
+                value = self.acmodel.get_value(preprocessed_obs)
+            value = value.squeeze(1).cpu().numpy()
 
             ts.append({"obs": self.obs, "action": action, "reward": reshaped_reward, "mask": mask, "value": value})
             
@@ -96,7 +98,8 @@ class BaseAlgo(ABC):
             ts.advantage = ts.advantage.cuda()
 
         preprocessed_obs = self.preprocess_obss(self.obs, use_gpu=torch.cuda.is_available())
-        next_value = self.acmodel.get_value(preprocessed_obs).squeeze(1)
+        with torch.no_grad():
+            next_value = self.acmodel.get_value(preprocessed_obs).squeeze(1)
 
         for i in reversed(range(self.frames_per_update)):
             next_value = ts.value[i+1] if i < self.frames_per_update - 1 else next_value

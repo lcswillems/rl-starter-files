@@ -27,8 +27,9 @@ class PPOAlgo(BaseAlgo):
         # Add old action log probs and old values to transitions
 
         preprocessed_obs = self.preprocess_obss(ts.obs, use_gpu=torch.cuda.is_available())
-        ts.old_log_prob = self.acmodel.get_dist(preprocessed_obs).log_prob(ts.action)
-        ts.old_value = self.acmodel.get_value(preprocessed_obs)
+        with torch.no_grad():
+            ts.old_log_prob = self.acmodel.get_dist(preprocessed_obs).log_prob(ts.action)
+            ts.old_value = self.acmodel.get_value(preprocessed_obs)
 
         if self.batch_size == 0:
             self.batch_size = len(ts)
@@ -39,17 +40,9 @@ class PPOAlgo(BaseAlgo):
             for i in range(0, len(ts), self.batch_size):
                 b = ts[i:i+self.batch_size]
 
-                # Detach tensors
-
-                b.action = b.action.detach()
-                b.old_log_prob = b.old_log_prob.detach()
-                b.advantage = b.advantage.detach()
-                b.old_value = b.old_value.detach()
-                b.returnn = b.returnn.detach()
-
                 # Compute loss
 
-                preprocessed_obs = self.preprocess_obss(b.obs, requires_grad=True, use_gpu=torch.cuda.is_available())
+                preprocessed_obs = self.preprocess_obss(b.obs, use_gpu=torch.cuda.is_available())
                 dist = self.acmodel.get_dist(preprocessed_obs)
                 value = self.acmodel.get_value(preprocessed_obs)
 

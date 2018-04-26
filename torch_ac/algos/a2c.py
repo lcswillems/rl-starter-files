@@ -22,7 +22,7 @@ class A2CAlgo(BaseAlgo):
 
         # Compute loss
 
-        preprocessed_obs = self.preprocess_obss(ts.obs, requires_grad=True, use_gpu=torch.cuda.is_available())
+        preprocessed_obs = self.preprocess_obss(ts.obs, use_gpu=torch.cuda.is_available())
         dist = self.acmodel.get_dist(preprocessed_obs)
         value = self.acmodel.get_value(preprocessed_obs)
 

@@ -1,7 +1,7 @@
 import torch
 
-def default_preprocess_obss(obss, requires_grad=False, use_gpu=False):
-    obss = torch.tensor(obss, requires_grad=requires_grad)
+def default_preprocess_obss(obss, use_gpu=False):
+    obss = torch.tensor(obss)
     if use_gpu:
         obss = obss.cuda()
     return obss

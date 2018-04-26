@@ -36,11 +36,11 @@ class ObssPreprocessor:
             "instr": self.vocab.max_size
         }
 
-    def __call__(self, obss, requires_grad=False, use_gpu=False):
+    def __call__(self, obss, use_gpu=False):
         # Preprocessing images
 
         np_image = numpy.array([numpy.array(obs["image"]).reshape(-1) for obs in obss])
-        image = torch.tensor(np_image, requires_grad=requires_grad).float()
+        image = torch.tensor(np_image).float()
         if use_gpu:
             image = image.cuda()
 
@@ -62,7 +62,7 @@ class ObssPreprocessor:
             hot_instr_[numpy.arange(len(instr_)), instr_] = 1
             np_instr[:len(instr_),i,:] = hot_instr_
         
-        instr = torch.tensor(np_instr, requires_grad=requires_grad).float()
+        instr = torch.tensor(np_instr).float()
         if use_gpu:
             instr = instr.cuda()
 

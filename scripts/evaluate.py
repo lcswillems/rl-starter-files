@@ -6,6 +6,7 @@ import gym_minigrid
 import time
 import datetime
 import numpy
+import torch
 
 import utils
 
@@ -62,7 +63,8 @@ for _ in range(args.episodes):
 
     while not(done):
         preprocessed_obs = obss_preprocessor([obs])
-        action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).item()
+        with torch.no_grad():
+            action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).item()
         obs, reward, done, _ = env.step(action)
         
         num_frames += 1

@@ -4,6 +4,7 @@ import argparse
 import gym
 import gym_minigrid
 import time
+import torch
 
 import utils
 
@@ -51,7 +52,8 @@ while True:
     print("Mission:", obs["mission"])
 
     preprocessed_obs = obss_preprocessor([obs])
-    action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).item()
+    with torch.no_grad():
+        action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).item()
     obs, reward, done, _ = env.step(action)
     if done:
         obs = env.reset()
