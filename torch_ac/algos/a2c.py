@@ -26,13 +26,13 @@ class A2CAlgo(BaseAlgo):
         dist = self.acmodel.get_dist(preprocessed_obs)
         value = self.acmodel.get_value(preprocessed_obs)
 
-        action_loss = -(dist.log_prob(ts.action) * ts.advantage).mean()
+        policy_loss = -(dist.log_prob(ts.action) * ts.advantage).mean()
 
         entropy = dist.entropy().mean()
 
         value_loss = (value - ts.returnn).pow(2).mean()
         
-        loss = action_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
+        loss = policy_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
 
         # Update actor-critic
 
@@ -44,7 +44,7 @@ class A2CAlgo(BaseAlgo):
         # Log some values
 
         log["value_loss"] = value_loss.item()
-        log["action_loss"] = action_loss.item()
+        log["policy_loss"] = policy_loss.item()
         log["entropy"] = entropy.item()
 
         return log

@@ -46,19 +46,19 @@ class PPOAlgo(BaseAlgo):
                 dist = self.acmodel.get_dist(preprocessed_obs)
                 value = self.acmodel.get_value(preprocessed_obs)
 
+                entropy = dist.entropy()
+
                 ratio = torch.exp(dist.log_prob(b.action) - b.old_log_prob)
                 surr1 = ratio * b.advantage
                 surr2 = torch.clamp(ratio, 1.0 - self.clip_eps, 1.0 + self.clip_eps) * b.advantage
-                action_loss = -torch.min(surr1, surr2).mean()
-
-                entropy = dist.entropy().mean()
+                policy_loss = -torch.min(surr1, surr2).mean()
 
                 value_clipped = b.old_value + torch.clamp(value - b.old_value, -self.clip_eps, self.clip_eps)
                 surr1 = (value - b.returnn).pow(2)
                 surr2 = (value_clipped - b.returnn).pow(2)
                 value_loss = torch.max(surr1, surr2).mean()
 
-                loss = action_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
+                loss = policy_loss - self.entropy_coef * entropy.mean() + self.value_loss_coef * value_loss
 
                 # Update actor-critic
 
@@ -69,8 +69,9 @@ class PPOAlgo(BaseAlgo):
         
         # Log some values
 
+        log["entropy"] = entropy.mean().item()
+        log["value"] = value.mean().item()
         log["value_loss"] = value_loss.item()
-        log["action_loss"] = action_loss.item()
-        log["entropy"] = entropy.item()
+        log["policy_loss"] = policy_loss.item()
 
         return log
