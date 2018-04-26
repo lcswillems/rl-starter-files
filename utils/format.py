@@ -39,8 +39,10 @@ class ObssPreprocessor:
     def __call__(self, obss, use_gpu=False):
         # Preprocessing images
 
-        np_image = numpy.array([numpy.array(obs["image"]).reshape(-1) for obs in obss])
-        image = torch.tensor(np_image).float()
+        image = numpy.array([obs["image"] for obs in obss])
+        image = image.reshape(image.shape[0], -1)
+        image = torch.tensor(image).float()
+
         if use_gpu:
             image = image.cuda()
 
@@ -55,14 +57,14 @@ class ObssPreprocessor:
             instr.append(instr_)
             max_instr_len = max(len(instr_), max_instr_len)
         
-        np_instr = numpy.zeros((max_instr_len, len(obss), self.vocab.max_size))
+        instr = numpy.zeros((max_instr_len, len(obss), self.vocab.max_size))
 
         for i, instr_ in enumerate(instr):
             hot_instr_ = numpy.zeros((len(instr_), self.vocab.max_size))
             hot_instr_[numpy.arange(len(instr_)), instr_] = 1
-            np_instr[:len(instr_),i,:] = hot_instr_
+            instr[:len(instr_),i,:] = hot_instr_
         
-        instr = torch.tensor(np_instr).float()
+        instr = torch.tensor(instr).float()
         if use_gpu:
             instr = instr.cuda()
 
