@@ -37,42 +37,39 @@ class ObssPreprocessor:
         }
 
     def __call__(self, obss, use_gpu=False):
-        # Preprocessing images
+        obs = {}
 
-        images = numpy.array([obs["image"] for obs in obss])
-        images = images.reshape(images.shape[0], -1)
-        images = torch.tensor(images).float()
+        if "image" in self.obs_space.keys():
+            images = numpy.array([obs["image"] for obs in obss])
+            images = images.reshape(images.shape[0], -1)
 
-        if use_gpu:
-            images = images.cuda()
+            images = torch.tensor(images).float()
+            if use_gpu:
+                images = images.cuda()
 
-        # Preprocessing instructions
+            obs["image"] = images
 
-        instrs = []
-        max_instr_len = 0
-        
-        for obs in obss:
-            tokens = re.findall("([a-z]+)", obs["mission"].lower())
-            instr = [self.vocab[token] for token in tokens]
-            instrs.append(instr)
-            max_instr_len = max(len(instr), max_instr_len)
-        
-        np_instrs = numpy.zeros((max_instr_len, len(obss), self.vocab.max_size))
+        if "instr" in self.obs_space.keys():
+            instrs = []
+            max_instr_len = 0
+            
+            for obs in obss:
+                tokens = re.findall("([a-z]+)", obs["mission"].lower())
+                instr = [self.vocab[token] for token in tokens]
+                instrs.append(instr)
+                max_instr_len = max(len(instr), max_instr_len)
+            
+            np_instrs = numpy.zeros((max_instr_len, len(obss), self.vocab.max_size))
 
-        for i, instr in enumerate(instrs):
-            hot_instr = numpy.zeros((len(instr), self.vocab.max_size))
-            hot_instr[numpy.arange(len(instr)), instr] = 1
-            np_instrs[:len(instr), i, :] = hot_instr
-        
-        instr = torch.tensor(np_instrs).float()
-        if use_gpu:
-            instr = instr.cuda()
-
-        # Define the observation the model will receive
-
-        obs = {
-            "image": images,
-            "instr": instr
-        }
+            for i, instr in enumerate(instrs):
+                hot_instr = numpy.zeros((len(instr), self.vocab.max_size))
+                hot_instr[numpy.arange(len(instr)), instr] = 1
+                np_instrs[:len(instr), i, :] = hot_instr
+            
+            instrs = torch.tensor(np_instrs).float()
+            if use_gpu:
+                instrs = instrs.cuda()
+            
+            obs["instr"] = instrs
 
         return obs
