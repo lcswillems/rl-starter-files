@@ -7,14 +7,12 @@ class ACModel(nn.Module):
         pass
 
     @abstractmethod
-    def get_rdist(self, obs):
+    def get_dist(self, obs):
         pass
 
+    @abstractmethod
     def get_action(self, obs, deterministic=False):
-        dist = F.softmax(self.get_rdist(obs), dim=1)
-        if deterministic:
-            return dist.max(1, keepdim=True)[1]
-        return dist.multinomial(1)
+        pass
 
     @abstractmethod
     def get_value(self, obs):

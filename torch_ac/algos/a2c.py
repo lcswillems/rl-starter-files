@@ -24,15 +24,12 @@ class A2CAlgo(BaseAlgo):
         # Compute loss
 
         preprocessed_obs = self.preprocess_obss(ts.obs, requires_grad=True, use_gpu=gpu_available)
-        rdist = self.acmodel.get_rdist(preprocessed_obs)
+        dist = self.acmodel.get_dist(preprocessed_obs)
         value = self.acmodel.get_value(preprocessed_obs)
 
-        log_dist = F.log_softmax(rdist, dim=1)
-        dist = F.softmax(rdist, dim=1)
-        entropy = -(log_dist * dist).sum(dim=1).mean()
+        action_loss = -(dist.log_prob(ts.action) * ts.advantage).mean()
 
-        action_log_prob = log_dist.gather(1, ts.action)
-        action_loss = -(action_log_prob * ts.advantage).mean()
+        entropy = -dist.entropy().mean()
 
         value_loss = (value - ts.returnn).pow(2).mean()
         
@@ -42,7 +39,7 @@ class A2CAlgo(BaseAlgo):
 
         self.optimizer.zero_grad()
         loss.backward()
-        torch.nn.utils.clip_grad_norm(self.acmodel.parameters(), self.max_grad_norm)
+        torch.nn.utils.clip_grad_norm_(self.acmodel.parameters(), self.max_grad_norm)
         self.optimizer.step()
 
         # Log some values

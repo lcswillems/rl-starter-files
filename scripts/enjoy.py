@@ -52,7 +52,7 @@ while True:
     print("Mission:", obs["mission"])
 
     preprocessed_obs = obss_preprocessor([obs])
-    action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).data[0,0]
+    action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).item()
     obs, reward, done, _ = env.step(action)
     if done:
         obs = env.reset()

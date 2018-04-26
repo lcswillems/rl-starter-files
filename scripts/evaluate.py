@@ -63,7 +63,7 @@ for _ in range(args.episodes):
 
     while not(done):
         preprocessed_obs = obss_preprocessor([obs])
-        action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).data[0,0]
+        action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).item()
         obs, reward, done, _ = env.step(action)
         
         num_frames += 1

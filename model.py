@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.distributions.categorical import Categorical
 
 import torch_ac
 
@@ -43,7 +44,7 @@ class ACModel(torch_ac.ACModel):
         _, hidden = self.instr_gru(instr)
         return hidden[-1]
 
-    def get_rdist(self, obs):
+    def get_dist(self, obs):
         x = obs["image"]
         if self.use_instr:
             x = torch.cat((x, self.get_embed_instr(obs["instr"])), dim=1)
@@ -51,7 +52,14 @@ class ACModel(torch_ac.ACModel):
         x = F.tanh(x)
         x = self.a_fc2(x)
         x = F.tanh(x)
-        return self.a_head(x)
+        x = self.a_head(x)
+        return Categorical(logits=F.log_softmax(x, dim=1))
+
+    def get_action(self, obs, deterministic=False):
+        dist = self.get_dist(obs)
+        if deterministic:
+            return dist.probs.max(1, keepdim=True)[1]
+        return dist.sample()
 
     def get_value(self, obs):
         x = obs["image"]

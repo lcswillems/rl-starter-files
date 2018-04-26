@@ -41,7 +41,7 @@ class BaseAlgo(ABC):
 
             preprocessed_obs = self.preprocess_obss(self.obs, use_gpu=gpu_available)
             action = self.acmodel.get_action(preprocessed_obs)
-            action = action.data.squeeze(1).cpu().numpy()
+            action = action.cpu().detach().numpy()
             obs, reward, done, _ = self.env.step(action)
             
             # Add a transition
@@ -52,7 +52,7 @@ class BaseAlgo(ABC):
             ]
             mask = [0 if done_ else 1 for done_ in done]
             value = self.acmodel.get_value(preprocessed_obs)
-            value = value.data.squeeze(1).cpu().numpy()
+            value = value.squeeze(1).cpu().detach().numpy()
 
             ts.append({"obs": self.obs, "action": action, "reward": reshaped_reward, "mask": mask, "value": value})
             
@@ -96,7 +96,7 @@ class BaseAlgo(ABC):
             ts.advantage = ts.advantage.cuda()
 
         preprocessed_obs = self.preprocess_obss(self.obs, use_gpu=gpu_available)
-        next_value = self.acmodel.get_value(preprocessed_obs).data.squeeze(1)
+        next_value = self.acmodel.get_value(preprocessed_obs).squeeze(1)
 
         for i in reversed(range(self.frames_per_update)):
             next_value = ts.value[i+1] if i < self.frames_per_update - 1 else next_value
@@ -110,12 +110,12 @@ class BaseAlgo(ABC):
         # Reshape each transitions attribute
 
         ts.obs = [obs for obss in ts.obs for obs in obss]
-        ts.action = ts.action.view(-1, *ts.action.shape[2:]).unsqueeze(1)
-        ts.reward = ts.reward.view(-1, *ts.reward.shape[2:]).unsqueeze(1)
-        ts.mask = ts.mask.view(-1, *ts.mask.shape[2:]).unsqueeze(1)
-        ts.value = ts.value.view(-1, *ts.value.shape[2:]).unsqueeze(1)
-        ts.advantage = ts.advantage.view(-1, *ts.advantage.shape[2:]).unsqueeze(1)
-        ts.returnn = ts.returnn.view(-1, *ts.returnn.shape[2:]).unsqueeze(1)
+        ts.action = ts.action.view(-1, *ts.action.shape[2:])
+        ts.reward = ts.reward.view(-1, *ts.reward.shape[2:])
+        ts.mask = ts.mask.view(-1, *ts.mask.shape[2:])
+        ts.value = ts.value.view(-1, *ts.value.shape[2:])
+        ts.advantage = ts.advantage.view(-1, *ts.advantage.shape[2:])
+        ts.returnn = ts.returnn.view(-1, *ts.returnn.shape[2:])
 
         # Log some values
 

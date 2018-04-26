@@ -28,13 +28,8 @@ class PPOAlgo(BaseAlgo):
         # Add old action log probs and old values to transitions
 
         preprocessed_obs = self.preprocess_obss(ts.obs, use_gpu=gpu_available)
-
-        rdist = self.acmodel.get_rdist(preprocessed_obs)
-        log_dist = F.log_softmax(rdist, dim=1)
-        ts.old_action_log_prob = log_dist.gather(1, ts.action).data
-
-        value = self.acmodel.get_value(preprocessed_obs)
-        ts.old_value = value.data
+        ts.old_log_prob = self.acmodel.get_dist(preprocessed_obs).log_prob(ts.action)
+        ts.old_value = self.acmodel.get_value(preprocessed_obs)
 
         if self.batch_size == 0:
             self.batch_size = len(ts)
@@ -45,21 +40,26 @@ class PPOAlgo(BaseAlgo):
             for i in range(0, len(ts), self.batch_size):
                 b = ts[i:i+self.batch_size]
 
+                # Detach tensors
+
+                b.action = b.action.detach()
+                b.old_log_prob = b.old_log_prob.detach()
+                b.advantage = b.advantage.detach()
+                b.old_value = b.old_value.detach()
+                b.returnn = b.returnn.detach()
+
                 # Compute loss
 
                 preprocessed_obs = self.preprocess_obss(b.obs, requires_grad=True, use_gpu=gpu_available)
-                rdist = self.acmodel.get_rdist(preprocessed_obs)
+                dist = self.acmodel.get_dist(preprocessed_obs)
                 value = self.acmodel.get_value(preprocessed_obs)
 
-                log_dist = F.log_softmax(rdist, dim=1)
-                dist = F.softmax(rdist, dim=1)
-                entropy = -(log_dist * dist).sum(dim=1).mean()
-
-                action_log_prob = log_dist.gather(1, b.action)
-                ratio = torch.exp(action_log_prob - b.old_action_log_prob)
+                ratio = torch.exp(dist.log_prob(b.action) - b.old_log_prob)
                 surr1 = ratio * b.advantage
                 surr2 = torch.clamp(ratio, 1.0 - self.clip_eps, 1.0 + self.clip_eps) * b.advantage
                 action_loss = -torch.min(surr1, surr2).mean()
+
+                entropy = -dist.entropy().mean()
 
                 value_clipped = b.old_value + torch.clamp(value - b.old_value, -self.clip_eps, self.clip_eps)
                 surr1 = (value - b.returnn).pow(2)
