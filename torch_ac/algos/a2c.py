@@ -29,7 +29,7 @@ class A2CAlgo(BaseAlgo):
 
         action_loss = -(dist.log_prob(ts.action) * ts.advantage).mean()
 
-        entropy = -dist.entropy().mean()
+        entropy = dist.entropy().mean()
 
         value_loss = (value - ts.returnn).pow(2).mean()
         

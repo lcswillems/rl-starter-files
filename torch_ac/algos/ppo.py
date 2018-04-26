@@ -59,7 +59,7 @@ class PPOAlgo(BaseAlgo):
                 surr2 = torch.clamp(ratio, 1.0 - self.clip_eps, 1.0 + self.clip_eps) * b.advantage
                 action_loss = -torch.min(surr1, surr2).mean()
 
-                entropy = -dist.entropy().mean()
+                entropy = dist.entropy().mean()
 
                 value_clipped = b.old_value + torch.clamp(value - b.old_value, -self.clip_eps, self.clip_eps)
                 surr1 = (value - b.returnn).pow(2)
