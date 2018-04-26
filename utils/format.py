@@ -57,14 +57,14 @@ class ObssPreprocessor:
             instr.append(instr_)
             max_instr_len = max(len(instr_), max_instr_len)
         
-        instr = numpy.zeros((max_instr_len, len(obss), self.vocab.max_size))
+        np_instr = numpy.zeros((max_instr_len, len(obss), self.vocab.max_size))
 
         for i, instr_ in enumerate(instr):
             hot_instr_ = numpy.zeros((len(instr_), self.vocab.max_size))
             hot_instr_[numpy.arange(len(instr_)), instr_] = 1
-            instr[:len(instr_),i,:] = hot_instr_
+            np_instr[:len(instr_),i,:] = hot_instr_
         
-        instr = torch.tensor(instr).float()
+        instr = torch.tensor(np_instr).float()
         if use_gpu:
             instr = instr.cuda()
 
