@@ -4,8 +4,8 @@ import argparse
 import gym
 import gym_minigrid
 import time
-
 import torch_ac
+
 import utils
 
 # Parse arguments

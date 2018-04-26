@@ -7,8 +7,9 @@ import time
 import datetime
 import numpy as np
 import sys
-
+import torch
 import torch_ac
+
 import utils
 
 # Parse arguments
@@ -79,7 +80,7 @@ obss_preprocessor = utils.ObssPreprocessor(model_name, envs[0].observation_space
 # Define actor-critic model
 
 acmodel = utils.load_model(obss_preprocessor.obs_space, envs[0].action_space, model_name)
-if torch_ac.gpu_available:
+if torch.cuda.is_available():
     acmodel.cuda()
 
 # Define actor-critic algo
@@ -136,8 +137,8 @@ while total_num_frames < args.total_frames:
     # Save model
 
     if args.save_interval > 0 and i % args.save_interval == 0:
-        if torch_ac.gpu_available:
+        if torch.cuda.is_available():
             acmodel.cpu()
         utils.save_model(acmodel, model_name)
-        if torch_ac.gpu_available:
+        if torch.cuda.is_available():
             acmodel.cuda()

@@ -6,8 +6,8 @@ import gym_minigrid
 import time
 import datetime
 import numpy as np
-
 import torch_ac
+
 import utils
 
 # Parse arguments

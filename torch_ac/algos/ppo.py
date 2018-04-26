@@ -3,7 +3,6 @@ import torch
 import torch.nn.functional as F
 
 from torch_ac.algos.base import BaseAlgo
-from torch_ac.utils import gpu_available
 
 class PPOAlgo(BaseAlgo):
     def __init__(self, envs, acmodel, frames_per_update=None, discount=0.99, lr=7e-4, gae_tau=0.95,
@@ -27,7 +26,7 @@ class PPOAlgo(BaseAlgo):
 
         # Add old action log probs and old values to transitions
 
-        preprocessed_obs = self.preprocess_obss(ts.obs, use_gpu=gpu_available)
+        preprocessed_obs = self.preprocess_obss(ts.obs, use_gpu=torch.cuda.is_available())
         ts.old_log_prob = self.acmodel.get_dist(preprocessed_obs).log_prob(ts.action)
         ts.old_value = self.acmodel.get_value(preprocessed_obs)
 
@@ -50,7 +49,7 @@ class PPOAlgo(BaseAlgo):
 
                 # Compute loss
 
-                preprocessed_obs = self.preprocess_obss(b.obs, requires_grad=True, use_gpu=gpu_available)
+                preprocessed_obs = self.preprocess_obss(b.obs, requires_grad=True, use_gpu=torch.cuda.is_available())
                 dist = self.acmodel.get_dist(preprocessed_obs)
                 value = self.acmodel.get_value(preprocessed_obs)
 

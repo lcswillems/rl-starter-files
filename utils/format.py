@@ -32,7 +32,7 @@ class ObssPreprocessor:
     def __init__(self, model_name, obs_space):
         self.vocab = Vocabulary(model_name)
         self.obs_space = {
-            "image": int(np.prod(obs_space.spaces["image"].shape)),
+            "image": 147,
             "instr": self.vocab.max_size
         }
 

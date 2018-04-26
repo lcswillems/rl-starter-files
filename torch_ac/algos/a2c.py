@@ -2,7 +2,6 @@ import torch
 import torch.nn.functional as F
 
 from torch_ac.algos.base import BaseAlgo
-from torch_ac.utils import gpu_available
 
 class A2CAlgo(BaseAlgo):
     def __init__(self, envs, acmodel, frames_per_update=None, discount=0.99, lr=7e-4, gae_tau=0.95,
@@ -23,7 +22,7 @@ class A2CAlgo(BaseAlgo):
 
         # Compute loss
 
-        preprocessed_obs = self.preprocess_obss(ts.obs, requires_grad=True, use_gpu=gpu_available)
+        preprocessed_obs = self.preprocess_obss(ts.obs, requires_grad=True, use_gpu=torch.cuda.is_available())
         dist = self.acmodel.get_dist(preprocessed_obs)
         value = self.acmodel.get_value(preprocessed_obs)
 
