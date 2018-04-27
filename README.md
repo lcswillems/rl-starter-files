@@ -51,7 +51,7 @@ export OMP_NUM_THREADS=1
 
 and a bunch of optional arguments are available among which:
 - `--model MODEL`: name of the model, used for loading and saving it. If not specified, it is the `_`-concatenation of the environment name and algorithm name.
-- `--frames-per-update FRAMES_PER_UPDATE`: number of frames per agent before updating parameters.
+- `--frames-per-agent FRAMES_PER_AGENT`: number of frames per agent before updating parameters.
 - ... (see more in `train.py`)
 
 Here is an example of command:

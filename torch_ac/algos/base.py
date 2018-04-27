@@ -6,12 +6,12 @@ from torch_ac.format import default_preprocess_obss, default_reshape_reward
 from torch_ac.utils import DictList, MultiEnv
 
 class BaseAlgo(ABC):
-    def __init__(self, envs, acmodel, frames_per_update, discount, lr, gae_tau, entropy_coef,
+    def __init__(self, envs, acmodel, frames_per_agent, discount, lr, gae_tau, entropy_coef,
                  value_loss_coef, max_grad_norm, preprocess_obss, reshape_reward):
         self.env = MultiEnv(envs)
         self.acmodel = acmodel
         self.acmodel.train()
-        self.frames_per_update = frames_per_update
+        self.frames_per_agent = frames_per_agent
         self.discount = discount
         self.lr = lr
         self.gae_tau = gae_tau
@@ -36,7 +36,7 @@ class BaseAlgo(ABC):
 
         # Add obs, action, reward, mask and value to transitions
 
-        for _ in range(self.frames_per_update):
+        for _ in range(self.frames_per_agent):
             # Do one agent-environment interaction
 
             preprocessed_obs = self.preprocess_obss(self.obs, use_gpu=torch.cuda.is_available())
@@ -101,9 +101,9 @@ class BaseAlgo(ABC):
         with torch.no_grad():
             next_value = self.acmodel.get_value(preprocessed_obs).squeeze(1)
 
-        for i in reversed(range(self.frames_per_update)):
-            next_value = ts.value[i+1] if i < self.frames_per_update - 1 else next_value
-            next_advantage = ts.advantage[i+1] if i < self.frames_per_update - 1 else 0
+        for i in reversed(range(self.frames_per_agent)):
+            next_value = ts.value[i+1] if i < self.frames_per_agent - 1 else next_value
+            next_advantage = ts.advantage[i+1] if i < self.frames_per_agent - 1 else 0
             
             delta = ts.reward[i] + self.discount * next_value * ts.mask[i] - ts.value[i]
             ts.advantage[i] = delta + self.discount * self.gae_tau * next_advantage * ts.mask[i]

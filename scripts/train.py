@@ -24,14 +24,14 @@ parser.add_argument("--seed", type=int, default=1,
                     help="random seed (default: 1)")
 parser.add_argument("--processes", type=int, default=16,
                     help="number of processes (default: 16)")
-parser.add_argument("--total-frames", type=int, default=10**7,
+parser.add_argument("--frames", type=int, default=10**7,
                     help="number of frames of training (default: 10e7)")
 parser.add_argument("--log-interval", type=int, default=1,
-                    help="interval between log display (default: 1)")
+                    help="number of updates between two logs (default: 1)")
 parser.add_argument("--save-interval", type=int, default=0,
-                    help="interval between model saving (default: 0, 0 means no saving)")
-parser.add_argument("--frames-per-update", type=int, default=None,
-                    help="number of frames per agent before updating parameters (default: 64)")
+                    help="number of updates between two saves (default: 0, 0 means no saving)")
+parser.add_argument("--frames-per-agent", type=int, default=None,
+                    help="number of frames per agent before update (default: 5 for A2C and 128 for PPO)")
 parser.add_argument("--discount", type=float, default=0.99,
                     help="discount factor (default: 0.99)")
 parser.add_argument("--lr", type=float, default=7e-4,
@@ -85,11 +85,11 @@ if torch.cuda.is_available():
 # Define actor-critic algo
 
 if args.algo == "a2c":
-    algo = torch_ac.A2CAlgo(envs, acmodel, args.frames_per_update, args.discount, args.lr, args.gae_tau,
+    algo = torch_ac.A2CAlgo(envs, acmodel, args.frames_per_agent, args.discount, args.lr, args.gae_tau,
                             args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.optim_alpha,
                             args.optim_eps, obss_preprocessor)
 elif args.algo == "ppo":
-    algo = torch_ac.PPOAlgo(envs, acmodel, args.frames_per_update, args.discount, args.lr, args.gae_tau,
+    algo = torch_ac.PPOAlgo(envs, acmodel, args.frames_per_agent, args.discount, args.lr, args.gae_tau,
                             args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.optim_eps,
                             args.clip_eps, args.epochs, args.batch_size, obss_preprocessor)
 else:
@@ -104,19 +104,19 @@ logger.log(acmodel)
 
 # Train model
 
-total_num_frames = 0
+num_frames = 0
 total_start_time = time.time()
 i = 0
 
-while total_num_frames < args.total_frames:
+while num_frames < args.total_frames:
     # Update parameters
 
     update_start_time = time.time()
     log = algo.update_parameters()
     update_end_time = time.time()
     
-    update_num_frames = log["total_num_frames"]
-    total_num_frames += update_num_frames
+    update_num_frames = sum(log["num_frames"])
+    num_frames += update_num_frames
     i += 1
 
     # Print logs
@@ -126,8 +126,8 @@ while total_num_frames < args.total_frames:
         fps = update_num_frames/(update_end_time - update_start_time)
 
         logger.log(
-            "U {} | tF {:06} | FPS {:04.0f} | D {} | rR:x̄σmM {: .2f} {: .2f} {: .2f} {: .2f} | F:x̄σmM {:.1f} {:.1f} {:.1f} {:.1f} | H {:.3f} | V {:.3f} | pL {: .3f} | vL {:.3f}"
-            .format(i, total_num_frames, fps,
+            "U {} | F {:06} | FPS {:04.0f} | D {} | rR:x̄σmM {: .2f} {: .2f} {: .2f} {: .2f} | F:x̄σmM {:.1f} {:.1f} {:.1f} {:.1f} | H {:.3f} | V {:.3f} | pL {: .3f} | vL {:.3f}"
+            .format(i, num_frames, fps,
                     datetime.timedelta(seconds=total_ellapsed_time),
                     *utils.synthesize(log["reshaped_return"]),
                     *utils.synthesize(log["num_frames"]),

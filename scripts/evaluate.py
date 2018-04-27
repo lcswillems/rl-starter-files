@@ -5,7 +5,6 @@ import gym
 import gym_minigrid
 import time
 import datetime
-import numpy
 import torch
 
 import utils
@@ -19,8 +18,8 @@ parser.add_argument("--model", required=True,
                     help="name of the trained model (REQUIRED)")
 parser.add_argument("--episodes", type=int, default=100,
                     help="number of episodes of evaluation (default: 100)")
-parser.add_argument("--seed", type=int, default=1,
-                    help="random seed (default: 1)")
+parser.add_argument("--seed", type=int, default=2,
+                    help="random seed (default: 2)")
 parser.add_argument("--deterministic", action="store_true", default=False,
                     help="action with highest probability is selected")
 args = parser.parse_args()
@@ -77,11 +76,12 @@ end_time = time.time()
 
 # Print logs
 
+num_frames = sum(log["num_frames"])
+fps = num_frames/(end_time - start_time)
 ellapsed_time = int(end_time - start_time)
-fps = numpy.sum(log["num_frames"])/(end_time - start_time)
 
-print("FPS {:.0f} | D {} | R:x̄σmM {:.2f} {:.2f} {:.2f} {:.2f} | F:x̄σmM {:.1f} {:.1f} {:.1f} {:.1f}"
-      .format(fps,
+print("F {} | FPS {:.0f} | D {} | R:x̄σmM {:.2f} {:.2f} {:.2f} {:.2f} | F:x̄σmM {:.1f} {:.1f} {:.1f} {:.1f}"
+      .format(num_frames, fps,
               datetime.timedelta(seconds=ellapsed_time),
               *utils.synthesize(log["return"]),
               *utils.synthesize(log["num_frames"])))
