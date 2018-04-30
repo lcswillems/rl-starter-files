@@ -4,13 +4,13 @@ import torch.nn.functional as F
 from torch_ac.algos.base import BaseAlgo
 
 class A2CAlgo(BaseAlgo):
-    def __init__(self, envs, acmodel, frames_per_agent=None, discount=0.99, lr=7e-4, gae_tau=0.95,
-                 entropy_coef=0.01, value_loss_coef=0.5, max_grad_norm=0.5, rmsprop_alpha=0.99,
-                 rmsprop_eps=1e-5, preprocess_obss=None, reshape_reward=None):
-        frames_per_agent = frames_per_agent or 5
+    def __init__(self, envs, acmodel, num_frames_per_proc=None, discount=0.99, lr=7e-4, gae_tau=0.95,
+                 entropy_coef=0.01, value_loss_coef=0.5, max_grad_norm=0.5, recurrence=4,
+                 rmsprop_alpha=0.99, rmsprop_eps=1e-5, preprocess_obss=None, reshape_reward=None):
+        num_frames_per_proc = num_frames_per_proc or 5
 
-        super().__init__(envs, acmodel, frames_per_agent, discount, lr, gae_tau, entropy_coef,
-                         value_loss_coef, max_grad_norm, preprocess_obss, reshape_reward)
+        super().__init__(envs, acmodel, num_frames_per_proc, discount, lr, gae_tau, entropy_coef,
+                         value_loss_coef, max_grad_norm, recurrence, preprocess_obss, reshape_reward)
 
         self.optimizer = torch.optim.RMSprop(self.acmodel.parameters(), lr,
                                              alpha=rmsprop_alpha, eps=rmsprop_eps)
@@ -22,13 +22,15 @@ class A2CAlgo(BaseAlgo):
 
         # Compute loss
 
-        preprocessed_obs = self.preprocess_obss(ts.obs, use_gpu=torch.cuda.is_available())
-        dist = self.acmodel.get_dist(preprocessed_obs)
-        value = self.acmodel.get_value(preprocessed_obs)
-
-        policy_loss = -(dist.log_prob(ts.action) * ts.advantage).mean()
+        preprocessed_obs = self.preprocess_obss(ts.obs, device=self.device)
+        if self.is_recurrent:
+            dist, value, _ = self.acmodel(preprocessed_obs, ts.state * ts.mask)
+        else:
+            dist, value = self.acmodel(preprocessed_obs)
 
         entropy = dist.entropy().mean()
+
+        policy_loss = -(dist.log_prob(ts.action) * ts.advantage).mean()
 
         value_loss = (value - ts.returnn).pow(2).mean()
         
@@ -43,8 +45,9 @@ class A2CAlgo(BaseAlgo):
 
         # Log some values
 
-        log["value_loss"] = value_loss.item()
+        log["entropy"] = entropy.mean().item()
+        log["value"] = value.mean().item()
         log["policy_loss"] = policy_loss.item()
-        log["entropy"] = entropy.item()
+        log["value_loss"] = value_loss.item()
 
         return log

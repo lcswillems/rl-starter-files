@@ -51,12 +51,12 @@ export OMP_NUM_THREADS=1
 
 and a bunch of optional arguments are available among which:
 - `--model MODEL`: name of the model, used for loading and saving it. If not specified, it is the `_`-concatenation of the environment name and algorithm name.
-- `--frames-per-agent FRAMES_PER_AGENT`: number of frames per agent before updating parameters.
+- `--frames-per-proc FRAMES_PER_PROC`: number of frames per process before updating parameters.
 - ... (see more in `train.py`)
 
 Here is an example of command:
 ```
-scripts/train.py --algo a2c --env MiniGrid-DoorKey-5x5-v0 --seed 12 --processes 8 --save-interval 10 --update-frames 50
+scripts/train.py --algo a2c --env MiniGrid-DoorKey-5x5-v0 --seed 12 --procs 8 --save-interval 10 --update-frames 50
 ```
 
 ### Enjoying

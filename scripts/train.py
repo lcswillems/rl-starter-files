@@ -22,7 +22,7 @@ parser.add_argument("--model", default=None,
                     help="name of the pre-trained model (default: ENV_ALGO)")
 parser.add_argument("--seed", type=int, default=1,
                     help="random seed (default: 1)")
-parser.add_argument("--processes", type=int, default=16,
+parser.add_argument("--procs", type=int, default=16,
                     help="number of processes (default: 16)")
 parser.add_argument("--frames", type=int, default=10**7,
                     help="number of frames of training (default: 10e7)")
@@ -30,8 +30,8 @@ parser.add_argument("--log-interval", type=int, default=1,
                     help="number of updates between two logs (default: 1)")
 parser.add_argument("--save-interval", type=int, default=0,
                     help="number of updates between two saves (default: 0, 0 means no saving)")
-parser.add_argument("--frames-per-agent", type=int, default=None,
-                    help="number of frames per agent before update (default: 5 for A2C and 128 for PPO)")
+parser.add_argument("--frames-per-proc", type=int, default=None,
+                    help="number of frames per process before update (default: 5 for A2C and 128 for PPO)")
 parser.add_argument("--discount", type=float, default=0.99,
                     help="discount factor (default: 0.99)")
 parser.add_argument("--lr", type=float, default=7e-4,
@@ -44,6 +44,8 @@ parser.add_argument("--value-loss-coef", type=float, default=0.5,
                     help="value loss term coefficient (default: 0.5)")
 parser.add_argument("--max-grad-norm", type=float, default=0.5,
                     help="maximum norm of gradient (default: 0.5)")
+parser.add_argument("--recurrence", type=int, default=4,
+                    help="length of the recurrence during update for recurrent model (default: 4)")
 parser.add_argument("--optim-eps", type=float, default=1e-5,
                     help="Adam and RMSprop optimizer epsilon (default: 1e-5)")
 parser.add_argument("--optim-alpha", type=float, default=0.99,
@@ -63,7 +65,7 @@ utils.seed(args.seed)
 # Generate environments
 
 envs = []
-for i in range(args.processes):
+for i in range(args.procs):
     env = gym.make(args.env)
     env.seed(args.seed + i)
     envs.append(env)
@@ -85,13 +87,13 @@ if torch.cuda.is_available():
 # Define actor-critic algo
 
 if args.algo == "a2c":
-    algo = torch_ac.A2CAlgo(envs, acmodel, args.frames_per_agent, args.discount, args.lr, args.gae_tau,
-                            args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.optim_alpha,
-                            args.optim_eps, obss_preprocessor)
+    algo = torch_ac.A2CAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_tau,
+                            args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
+                            args.optim_alpha, args.optim_eps, obss_preprocessor)
 elif args.algo == "ppo":
-    algo = torch_ac.PPOAlgo(envs, acmodel, args.frames_per_agent, args.discount, args.lr, args.gae_tau,
-                            args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.optim_eps,
-                            args.clip_eps, args.epochs, args.batch_size, obss_preprocessor)
+    algo = torch_ac.PPOAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_tau,
+                            args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
+                            args.optim_eps, args.clip_eps, args.epochs, args.batch_size, obss_preprocessor)
 else:
     raise ValueError
 
@@ -108,34 +110,35 @@ num_frames = 0
 total_start_time = time.time()
 i = 0
 
-while num_frames < args.total_frames:
+while num_frames < args.frames:
     # Update parameters
 
     update_start_time = time.time()
     log = algo.update_parameters()
     update_end_time = time.time()
     
-    update_num_frames = sum(log["num_frames"])
-    num_frames += update_num_frames
+    num_frames += log["num_frames"]
     i += 1
 
     # Print logs
 
     if i % args.log_interval == 0:
         total_ellapsed_time = int(time.time() - total_start_time)
-        fps = update_num_frames/(update_end_time - update_start_time)
+        fps = log["num_frames"]/(update_end_time - update_start_time)
 
         logger.log(
             "U {} | F {:06} | FPS {:04.0f} | D {} | rR:x̄σmM {: .2f} {: .2f} {: .2f} {: .2f} | F:x̄σmM {:.1f} {:.1f} {:.1f} {:.1f} | H {:.3f} | V {:.3f} | pL {: .3f} | vL {:.3f}"
             .format(i, num_frames, fps,
                     datetime.timedelta(seconds=total_ellapsed_time),
-                    *utils.synthesize(log["reshaped_return"]),
-                    *utils.synthesize(log["num_frames"]),
+                    *utils.synthesize(log["reshaped_return_per_episode"]),
+                    *utils.synthesize(log["num_frames_per_episode"]),
                     log["entropy"], log["value"], log["policy_loss"], log["value_loss"]))
 
-    # Save model
+    # Save obss preprocessor vocabulary and model
 
     if args.save_interval > 0 and i % args.save_interval == 0:
+        obss_preprocessor.vocab.save()
+
         if torch.cuda.is_available():
             acmodel.cpu()
         utils.save_model(acmodel, model_name)

@@ -3,6 +3,7 @@ import json
 import torch
 import numpy
 import re
+import torch
 
 import utils
 
@@ -12,20 +13,20 @@ def get_vocab_path(model_name):
 class Vocabulary:
     def __init__(self, model_name):
         self.path = get_vocab_path(model_name)
-        utils.create_folders_if_necessary(self.path)
         self.max_size = 100
-        self.vocab = json.load(open(self.path)) if os.path.exists(self.path) else {}
+        self.vocab = {}
+        if os.path.exists(self.path):
+            self.vocab = json.load(open(self.path))
 
     def __getitem__(self, token):
         if not(token in self.vocab.keys()):
             if len(self.vocab) >= self.max_size:
                 raise ValueError("Maximum vocabulary capacity reached")
-            self.vocab[token] = len(self.vocab) + 1
-            self.save()
-        
+            self.vocab[token] = len(self.vocab) + 1        
         return self.vocab[token]
 
     def save(self):
+        utils.create_folders_if_necessary(self.path)
         json.dump(self.vocab, open(self.path, "w"))
 
 class ObssPreprocessor:
@@ -33,21 +34,18 @@ class ObssPreprocessor:
         self.vocab = Vocabulary(model_name)
         self.obs_space = {
             "image": 147,
-            "instr": self.vocab.max_size
+            # "instr": self.vocab.max_size
         }
 
-    def __call__(self, obss, use_gpu=False):
-        obs = {}
+    def __call__(self, obss, device=None):
+        obs_ = {}
 
         if "image" in self.obs_space.keys():
             images = numpy.array([obs["image"] for obs in obss])
             images = images.reshape(images.shape[0], -1)
+            images = torch.tensor(images, device=device, dtype=torch.float)
 
-            images = torch.tensor(images).float()
-            if use_gpu:
-                images = images.cuda()
-
-            obs["image"] = images
+            obs_["image"] = images
 
         if "instr" in self.obs_space.keys():
             instrs = []
@@ -66,10 +64,8 @@ class ObssPreprocessor:
                 hot_instr[numpy.arange(len(instr)), instr] = 1
                 np_instrs[:len(instr), i, :] = hot_instr
             
-            instrs = torch.tensor(np_instrs).float()
-            if use_gpu:
-                instrs = instrs.cuda()
+            instrs = torch.tensor(np_instrs, device=device, dtype=torch.float)
             
-            obs["instr"] = instrs
+            obs_["instr"] = instrs
 
-        return obs
+        return obs_

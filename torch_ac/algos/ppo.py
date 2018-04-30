@@ -5,13 +5,14 @@ import torch.nn.functional as F
 from torch_ac.algos.base import BaseAlgo
 
 class PPOAlgo(BaseAlgo):
-    def __init__(self, envs, acmodel, frames_per_agent=None, discount=0.99, lr=7e-4, gae_tau=0.95,
-                 entropy_coef=0.01, value_loss_coef=0.5, max_grad_norm=0.5, adam_eps=1e-5, clip_eps=0.2,
-                 epochs=4, batch_size=256, preprocess_obss=None, reshape_reward=None):
-        frames_per_agent = frames_per_agent or 128
+    def __init__(self, envs, acmodel, num_frames_per_proc=None, discount=0.99, lr=7e-4, gae_tau=0.95,
+                 entropy_coef=0.01, value_loss_coef=0.5, max_grad_norm=0.5, recurrence=4,
+                 adam_eps=1e-5, clip_eps=0.2, epochs=4, batch_size=256, preprocess_obss=None,
+                 reshape_reward=None):
+        num_frames_per_proc = num_frames_per_proc or 128
 
-        super().__init__(envs, acmodel, frames_per_agent, discount, lr, gae_tau, entropy_coef,
-                         value_loss_coef, max_grad_norm, preprocess_obss, reshape_reward)
+        super().__init__(envs, acmodel, num_frames_per_proc, discount, lr, gae_tau, entropy_coef,
+                         value_loss_coef, max_grad_norm, recurrence, preprocess_obss, reshape_reward)
 
         self.clip_eps = clip_eps
         self.epochs = epochs
@@ -26,10 +27,14 @@ class PPOAlgo(BaseAlgo):
 
         # Add old action log probs and old values to transitions
 
-        preprocessed_obs = self.preprocess_obss(ts.obs, use_gpu=torch.cuda.is_available())
+        preprocessed_obs = self.preprocess_obss(ts.obs, device=self.device)
         with torch.no_grad():
-            ts.old_log_prob = self.acmodel.get_dist(preprocessed_obs).log_prob(ts.action)
-            ts.old_value = self.acmodel.get_value(preprocessed_obs)
+            if self.is_recurrent:
+                dist, value, _ = self.acmodel(preprocessed_obs, ts.state * ts.mask)
+            else:
+                dist, value = self.acmodel(preprocessed_obs)
+        ts.old_log_prob = dist.log_prob(ts.action)
+        ts.old_value = value
 
         if self.batch_size == 0:
             self.batch_size = len(ts)
@@ -42,9 +47,11 @@ class PPOAlgo(BaseAlgo):
 
                 # Compute loss
 
-                preprocessed_obs = self.preprocess_obss(b.obs, use_gpu=torch.cuda.is_available())
-                dist = self.acmodel.get_dist(preprocessed_obs)
-                value = self.acmodel.get_value(preprocessed_obs)
+                preprocessed_obs = self.preprocess_obss(b.obs, device=self.device)
+                if self.is_recurrent:
+                    dist, value, _ = self.acmodel(preprocessed_obs, b.state * b.mask)
+                else:
+                    dist, value = self.acmodel(preprocessed_obs)
 
                 entropy = dist.entropy()
 
@@ -71,7 +78,7 @@ class PPOAlgo(BaseAlgo):
 
         log["entropy"] = entropy.mean().item()
         log["value"] = value.mean().item()
-        log["value_loss"] = value_loss.item()
         log["policy_loss"] = policy_loss.item()
+        log["value_loss"] = value_loss.item()
 
         return log

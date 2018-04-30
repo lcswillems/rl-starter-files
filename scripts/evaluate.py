@@ -55,6 +55,7 @@ start_time = time.time()
 
 for _ in range(args.episodes):
     obs = env.reset()
+    state = torch.zeros(1, acmodel.state_size)
     done = False
 
     num_frames = 0
@@ -62,9 +63,8 @@ for _ in range(args.episodes):
 
     while not(done):
         preprocessed_obs = obss_preprocessor([obs])
-        with torch.no_grad():
-            action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).item()
-        obs, reward, done, _ = env.step(action)
+        action, state = acmodel.get_action(preprocessed_obs, state, deterministic=args.deterministic)
+        obs, reward, done, _ = env.step(action.item())
         
         num_frames += 1
         returnn += reward

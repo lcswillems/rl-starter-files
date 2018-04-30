@@ -1,19 +1,18 @@
-from abc import abstractmethod
+from abc import abstractmethod, abstractproperty
 import torch.nn as nn
 import torch.nn.functional as F
 
 class ACModel(nn.Module):
-    def forward(self):
+    @abstractmethod
+    def forward(self, obs):
         pass
 
+class RecurrentACModel(nn.Module):
     @abstractmethod
-    def get_dist(self, obs):
+    def forward(self, obs, state):
         pass
-
+    
+    @property
     @abstractmethod
-    def get_action(self, obs, deterministic=False):
-        pass
-
-    @abstractmethod
-    def get_value(self, obs):
+    def state_size(self):
         pass

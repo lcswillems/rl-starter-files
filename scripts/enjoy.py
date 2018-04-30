@@ -15,8 +15,8 @@ parser.add_argument("--env", required=True,
                     help="name of the environment to be run (REQUIRED)")
 parser.add_argument("--model", required=True,
                     help="name of the trained model (REQUIRED)")
-parser.add_argument("--seed", type=int, default=1,
-                    help="random seed (default: 1)")
+parser.add_argument("--seed", type=int, default=2,
+                    help="random seed (default: 2)")
 parser.add_argument("--deterministic", action="store_true", default=False,
                     help="action with highest probability is selected")
 args = parser.parse_args()
@@ -52,8 +52,7 @@ while True:
     print("Mission:", obs["mission"])
 
     preprocessed_obs = obss_preprocessor([obs])
-    with torch.no_grad():
-        action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).item()
+    action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).item()
     obs, reward, done, _ = env.step(action)
     if done:
         obs = env.reset()
