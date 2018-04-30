@@ -30,7 +30,7 @@ class ACModel(torch_ac.RecurrentACModel):
 
         # Decide which components are enabled
         self.use_instr = "instr" in obs_space.keys()
-        self.use_memory = False
+        self.use_memory = True
 
         # Define image embedding
         self.image_fc1 = nn.Linear(obs_space["image"], 64)
@@ -96,7 +96,7 @@ class ACModel(torch_ac.RecurrentACModel):
     def _get_value_from_embedding(self, embedding):
         x = self.c_fc1(embedding)
         x = F.tanh(x)
-        return self.c_head(x)
+        return self.c_head(x).squeeze(1)
 
     def _get_embed_image(self, image):
         x = self.image_fc1(image)

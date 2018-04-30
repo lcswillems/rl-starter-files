@@ -40,7 +40,7 @@ class BaseAlgo(ABC):
         if self.is_recurrent:
             self.state = torch.zeros(shape[1], self.acmodel.state_size, device=self.device)
             self.states = torch.zeros(*shape, self.acmodel.state_size, device=self.device)
-        self.mask = torch.zeros(shape[1])
+        self.mask = torch.ones(shape[1])
         self.masks = torch.zeros(*shape, device=self.device)
         self.actions = torch.zeros(*shape, device=self.device, dtype=torch.int)
         self.values = torch.zeros(*shape, device=self.device)
@@ -80,7 +80,7 @@ class BaseAlgo(ABC):
             self.masks[i] = self.mask
             self.mask = 1 - torch.tensor(done, dtype=torch.float)
             self.actions[i] = action
-            self.values[i] = value.squeeze(1)
+            self.values[i] = value
             if self.reshape_reward is not None:
                 self.rewards[i] = torch.tensor([
                     self.reshape_reward(obs_, action_, reward_)
@@ -114,7 +114,6 @@ class BaseAlgo(ABC):
                 _, next_value, _ = self.acmodel(preprocessed_obs, self.state * self.mask.unsqueeze(1))
             else:
                 _, next_value = self.acmodel(preprocessed_obs)
-        next_value = next_value.squeeze(1)
 
         for i in reversed(range(self.num_frames_per_proc)):
             next_value = self.values[i+1] if i < self.num_frames_per_proc - 1 else next_value
