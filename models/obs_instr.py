@@ -13,95 +13,70 @@ def initialize_parameters(m):
         if m.bias is not None:
             m.bias.data.fill_(0)
 
-class ACModel(torch_ac.RecurrentACModel):
-    image_embedding_size = 64
+class ACModel(torch_ac.ACModel):
     instr_embedding_size = 128
-    
-    @property
-    def state_size(self):
-        return 2*self.semi_state_size
-
-    @property
-    def semi_state_size(self):
-        return self.obs_embedding_size
 
     def __init__(self, obs_space, action_space):
         super().__init__()
 
         # Decide which components are enabled
         self.use_instr = "instr" in obs_space.keys()
-        self.use_memory = True
-
-        # Define image embedding
-        self.image_fc1 = nn.Linear(obs_space["image"], 64)
-        self.image_fc2 = nn.Linear(64, self.image_embedding_size)
 
         # Define instruction embedding
         if self.use_instr:
             self.instr_rnn = nn.GRU(obs_space["instr"], self.instr_embedding_size)
 
-        # Define observation embedding size
-        self.obs_embedding_size = self.image_embedding_size
+        self.obs_embedding_size = obs_space["image"]
         if self.use_instr:
             self.obs_embedding_size += self.instr_embedding_size
 
-        # Define memory
-        if self.use_memory:
-            self.memory_rnn = nn.LSTMCell(self.obs_embedding_size, self.semi_state_size)
-
         # Define actor's model
         self.a_fc1 = nn.Linear(self.obs_embedding_size, 64)
+        self.a_fc2 = nn.Linear(64, 64)
         self.a_head = nn.Linear(64, action_space.n)
 
         # Define critic's model
         self.c_fc1 = nn.Linear(self.obs_embedding_size, 64)
+        self.c_fc2 = nn.Linear(64, 64)
         self.c_head = nn.Linear(64, 1)
 
         # Initialize parameters correctly
         self.apply(initialize_parameters)
 
-    def forward(self, obs, state):
+    def forward(self, obs):
         embedding = self._get_embedding(obs)
-        if self.use_memory:
-            hidden = (state[:, :self.semi_state_size], state[:, self.semi_state_size:])
-            hidden = self.memory_rnn(embedding, hidden)
-            embedding = hidden[0]
-            state = torch.cat(hidden, dim=1)
-        dist = self._get_dist_from_embedding(embedding)
-        value = self._get_value_from_embedding(embedding)
-        return dist, value, state
+        
+        x = self.a_fc1(embedding)
+        x = F.tanh(x)
+        x = self.a_fc2(x)
+        x = F.tanh(x)
+        x = self.a_head(x)
+        dist = Categorical(logits=F.log_softmax(x, dim=1))
 
-    def get_action(self, obs, state, deterministic=False):
+        x = self.c_fc1(embedding)
+        x = F.tanh(x)
+        x = self.c_fc2(x)
+        x = F.tanh(x)
+        x = self.c_head(x)
+        value = x.squeeze(1)
+
+        return dist, value
+
+    def get_action(self, obs, deterministic=False):
         with torch.no_grad():
-            dist, _, state = self(obs, state)
+            dist, _ = self(obs)
         if deterministic:
             action = dist.probs.max(1, keepdim=True)[1]
         else:
             action = dist.sample()
-        return action, state
+        return action
 
     def _get_embedding(self, obs):
-        embed_image = self._get_embed_image(obs["image"])
+        embed_image = obs["image"]
         if self.use_instr:
             embed_instr = self._get_embed_instr(obs["instr"])
             return torch.cat((embed_image, embed_instr), dim=1)
         return embed_image
-
-    def _get_dist_from_embedding(self, embedding):
-        x = self.a_fc1(embedding)
-        x = F.tanh(x)
-        x = self.a_head(x)
-        return Categorical(logits=F.log_softmax(x, dim=1))
-
-    def _get_value_from_embedding(self, embedding):
-        x = self.c_fc1(embedding)
-        x = F.tanh(x)
-        return self.c_head(x).squeeze(1)
-
-    def _get_embed_image(self, image):
-        x = self.image_fc1(image)
-        x = F.tanh(x)
-        return self.image_fc2(x)
 
     def _get_embed_instr(self, instr):
         self.instr_rnn.flatten_parameters()
