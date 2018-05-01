@@ -34,7 +34,7 @@ class ObssPreprocessor:
         self.vocab = Vocabulary(model_name)
         self.obs_space = {
             "image": 147,
-            # "instr": self.vocab.max_size
+            "instr": self.vocab.max_size
         }
 
     def __call__(self, obss, device=None):
@@ -69,3 +69,6 @@ class ObssPreprocessor:
             obs_["instr"] = instrs
 
         return obs_
+
+def reward_reshaper(obs, action, reward):
+    return reward - 0.01
