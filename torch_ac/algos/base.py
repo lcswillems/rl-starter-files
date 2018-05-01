@@ -29,6 +29,7 @@ class BaseAlgo(ABC):
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.num_procs = len(envs)
+        self.num_frames = self.num_frames_per_proc * self.num_procs
         self.is_recurrent = isinstance(self.acmodel, RecurrentACModel)
 
         # Store transitions values
@@ -141,7 +142,7 @@ class BaseAlgo(ABC):
             "return_per_episode": self.log_return.cpu().numpy(),
             "reshaped_return_per_episode": self.log_reshaped_return.cpu().numpy(),
             "num_frames_per_episode": self.log_num_frames.cpu().numpy(),
-            "num_frames": self.num_frames_per_proc * self.num_procs
+            "num_frames": self.num_frames
         }
 
         return ts, log
