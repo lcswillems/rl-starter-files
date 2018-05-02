@@ -51,11 +51,11 @@ class ACModel(torch_ac.RecurrentACModel):
 
         # Define actor's model
         self.a_fc1 = nn.Linear(self.obs_embedding_size, 64)
-        self.a_head = nn.Linear(64, action_space.n)
+        self.a_fc2 = nn.Linear(64, action_space.n)
 
         # Define critic's model
         self.c_fc1 = nn.Linear(self.obs_embedding_size, 64)
-        self.c_head = nn.Linear(64, 1)
+        self.c_fc2 = nn.Linear(64, 1)
 
         # Initialize parameters correctly
         self.apply(initialize_parameters)
@@ -71,12 +71,12 @@ class ACModel(torch_ac.RecurrentACModel):
 
         x = self.a_fc1(embedding)
         x = F.tanh(x)
-        x = self.a_head(x)
+        x = self.a_fc2(x)
         dist = Categorical(logits=F.log_softmax(x, dim=1))
 
         x = self.c_fc1(embedding)
         x = F.tanh(x)
-        x = self.c_head(x)
+        x = self.c_fc2(x)
         value = x.squeeze(1)
 
         return dist, value, state

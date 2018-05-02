@@ -20,12 +20,12 @@ class ACModel(torch_ac.ACModel):
         # Define actor's model
         self.a_fc1 = nn.Linear(obs_space["image"], 64)
         self.a_fc2 = nn.Linear(64, 64)
-        self.a_head = nn.Linear(64, action_space.n)
+        self.a_fc3 = nn.Linear(64, action_space.n)
 
         # Define critic's model
         self.c_fc1 = nn.Linear(obs_space["image"], 64)
         self.c_fc2 = nn.Linear(64, 64)
-        self.c_head = nn.Linear(64, 1)
+        self.c_fc3 = nn.Linear(64, 1)
 
         # Initialize parameters correctly
         self.apply(initialize_parameters)
@@ -35,14 +35,14 @@ class ACModel(torch_ac.ACModel):
         x = F.tanh(x)
         x = self.a_fc2(x)
         x = F.tanh(x)
-        x = self.a_head(x)
+        x = self.a_fc3(x)
         dist = Categorical(logits=F.log_softmax(x, dim=1))
 
         x = self.c_fc1(obs["image"])
         x = F.tanh(x)
         x = self.c_fc2(x)
         x = F.tanh(x)
-        x = self.c_head(x)
+        x = self.c_fc3(x)
         value = x.squeeze(1)
 
         return dist, value
