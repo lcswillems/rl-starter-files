@@ -24,7 +24,7 @@ class ACModel(torch_ac.ACModel):
 
         # Define instruction embedding
         if self.use_instr:
-            self.instr_rnn = nn.GRU(obs_space["instr"], self.instr_embedding_size)
+            self.instr_rnn = nn.GRU(obs_space["instr"], self.instr_embedding_size, batch_first=True)
 
         self.obs_embedding_size = obs_space["image"]
         if self.use_instr:
@@ -63,9 +63,9 @@ class ACModel(torch_ac.ACModel):
         return dist, value
 
     def _get_embedding(self, obs):
-        embed_image = obs["image"]
+        embed_image = obs.image
         if self.use_instr:
-            embed_instr = self._get_embed_instr(obs["instr"])
+            embed_instr = self._get_embed_instr(obs.instr)
             return torch.cat((embed_image, embed_instr), dim=1)
         return embed_image
 

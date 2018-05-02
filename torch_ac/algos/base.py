@@ -47,6 +47,7 @@ class BaseAlgo(ABC):
         self.values = torch.zeros(*shape, device=self.device)
         self.rewards = torch.zeros(*shape, device=self.device)
         self.advantages = torch.zeros(*shape, device=self.device)
+        self.log_probs = torch.zeros(*shape, device=self.device)
 
         # Store log values
 
@@ -89,6 +90,7 @@ class BaseAlgo(ABC):
                 ])
             else:
                 self.rewards[i] = torch.tensor(reward)
+            self.log_probs[i] = dist.log_prob(action)
 
             # Update log values
 
@@ -136,6 +138,11 @@ class BaseAlgo(ABC):
         ts.reward = self.rewards.view(-1, *self.rewards.shape[2:])
         ts.advantage = self.advantages.view(-1, *self.advantages.shape[2:])
         ts.returnn = ts.value + ts.advantage
+        ts.log_prob = self.log_probs.view(-1, *self.log_probs.shape[2:])
+
+        # Preprocess transitions
+
+        ts.obs = self.preprocess_obss(ts.obs, device=self.device)        
 
         # Log some values
 

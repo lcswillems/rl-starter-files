@@ -4,6 +4,7 @@ import torch
 import numpy
 import re
 import torch
+import torch_ac
 
 import utils
 
@@ -38,14 +39,14 @@ class ObssPreprocessor:
         }
 
     def __call__(self, obss, device=None):
-        obs_ = {}
+        obs_ = torch_ac.DictList()
 
         if "image" in self.obs_space.keys():
             images = numpy.array([obs["image"] for obs in obss])
             images = images.reshape(images.shape[0], -1)
             images = torch.tensor(images, device=device, dtype=torch.float)
 
-            obs_["image"] = images
+            obs_.image = images
 
         if "instr" in self.obs_space.keys():
             instrs = []
@@ -57,16 +58,16 @@ class ObssPreprocessor:
                 instrs.append(instr)
                 max_instr_len = max(len(instr), max_instr_len)
             
-            np_instrs = numpy.zeros((max_instr_len, len(obss), self.vocab.max_size))
+            np_instrs = numpy.zeros((len(obss), max_instr_len, self.vocab.max_size))
 
             for i, instr in enumerate(instrs):
                 hot_instr = numpy.zeros((len(instr), self.vocab.max_size))
                 hot_instr[numpy.arange(len(instr)), instr] = 1
-                np_instrs[:len(instr), i, :] = hot_instr
+                np_instrs[i, :len(instr), :] = hot_instr
             
             instrs = torch.tensor(np_instrs, device=device, dtype=torch.float)
             
-            obs_["instr"] = instrs
+            obs_.instr = instrs
 
         return obs_
 

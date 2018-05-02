@@ -38,7 +38,7 @@ class ACModel(torch_ac.RecurrentACModel):
 
         # Define instruction embedding
         if self.use_instr:
-            self.instr_rnn = nn.GRU(obs_space["instr"], self.instr_embedding_size)
+            self.instr_rnn = nn.GRU(obs_space["instr"], self.instr_embedding_size, batch_first=True)
 
         # Define observation embedding size
         self.obs_embedding_size = self.image_embedding_size
@@ -82,9 +82,9 @@ class ACModel(torch_ac.RecurrentACModel):
         return dist, value, state
 
     def _get_embedding(self, obs):
-        embed_image = self._get_embed_image(obs["image"])
+        embed_image = self._get_embed_image(obs.image)
         if self.use_instr:
-            embed_instr = self._get_embed_instr(obs["instr"])
+            embed_instr = self._get_embed_instr(obs.instr)
             return torch.cat((embed_image, embed_instr), dim=1)
         return embed_image
 

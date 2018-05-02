@@ -22,11 +22,10 @@ class A2CAlgo(BaseAlgo):
 
         # Compute loss
 
-        preprocessed_obs = self.preprocess_obss(ts.obs, device=self.device)
         if self.is_recurrent:
-            dist, value, _ = self.acmodel(preprocessed_obs, ts.state * ts.mask)
+            dist, value, _ = self.acmodel(ts.obs, ts.state * ts.mask)
         else:
-            dist, value = self.acmodel(preprocessed_obs)
+            dist, value = self.acmodel(ts.obs)
 
         entropy = dist.entropy().mean()
 

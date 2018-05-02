@@ -1,5 +1,3 @@
-import random
-
 class DictList(dict):
     """A dictionnary of lists of same size. Dictionnary items can be
     accessed using `.` notation and list items using `[]` notation.
@@ -24,19 +22,3 @@ class DictList(dict):
     def __setitem__(self, index, d):
         for key, value in d.items():
             dict.__getitem__(self, key)[index] = value
-    
-    def append(self, d):
-        for key, value in d.items():
-            if not(key in dict.keys(self)):
-                dict.__setitem__(self, key, [])
-            dict.__getitem__(self, key).append(value)
-    
-    def shuffle(self):
-        indexes = list(range(len(self)))
-        random.shuffle(indexes)
-        for key, value in dict.items(self):
-            if isinstance(value, list):
-                value = [value[i] for i in indexes]
-            else:
-                value = value[indexes]
-            self.__setattr__(key, value)

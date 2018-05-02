@@ -31,14 +31,14 @@ class ACModel(torch_ac.ACModel):
         self.apply(initialize_parameters)
 
     def forward(self, obs):
-        x = self.a_fc1(obs["image"])
+        x = self.a_fc1(obs.image)
         x = F.tanh(x)
         x = self.a_fc2(x)
         x = F.tanh(x)
         x = self.a_fc3(x)
         dist = Categorical(logits=F.log_softmax(x, dim=1))
 
-        x = self.c_fc1(obs["image"])
+        x = self.c_fc1(obs.image)
         x = F.tanh(x)
         x = self.c_fc2(x)
         x = F.tanh(x)
