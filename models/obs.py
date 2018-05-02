@@ -46,12 +46,3 @@ class ACModel(torch_ac.ACModel):
         value = x.squeeze(1)
 
         return dist, value
-
-    def get_action(self, obs, deterministic=False):
-        with torch.no_grad():
-            dist, _ = self(obs)
-        if deterministic:
-            action = dist.probs.max(1, keepdim=True)[1]
-        else:
-            action = dist.sample()
-        return action

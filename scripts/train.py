@@ -58,7 +58,7 @@ parser.add_argument("--batch-size", type=int, default=256,
                     help="batch size for PPO (default: 256, 0 means all)")
 args = parser.parse_args()
 
-# Set numpy and pytorch seeds
+# Set seed for all randomness sources
 
 utils.seed(args.seed)
 

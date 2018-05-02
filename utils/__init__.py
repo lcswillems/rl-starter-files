@@ -18,6 +18,7 @@ def seed(seed):
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
 
+from utils.agent import Agent
 from utils.format import ObssPreprocessor, reward_reshaper
 from utils.log import Logger, synthesize
 from utils.model import load_model, save_model

@@ -81,15 +81,6 @@ class ACModel(torch_ac.RecurrentACModel):
 
         return dist, value, state
 
-    def get_action(self, obs, state, deterministic=False):
-        with torch.no_grad():
-            dist, _, state = self(obs, state)
-        if deterministic:
-            action = dist.probs.max(1, keepdim=True)[1]
-        else:
-            action = dist.sample()
-        return action, state
-
     def _get_embedding(self, obs):
         embed_image = self._get_embed_image(obs["image"])
         if self.use_instr:

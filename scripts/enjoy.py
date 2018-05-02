@@ -21,7 +21,7 @@ parser.add_argument("--deterministic", action="store_true", default=False,
                     help="action with highest probability is selected")
 args = parser.parse_args()
 
-# Set numpy and pytorch seeds
+# Set seed for all randomness sources
 
 utils.seed(args.seed)
 
@@ -34,13 +34,9 @@ env.seed(args.seed)
 
 model_name = args.model or args.env+"_"+args.algo
 
-# Define obss preprocessor
+# Define agent
 
-obss_preprocessor = utils.ObssPreprocessor(model_name, env.observation_space)
-
-# Define actor-critic model
-
-acmodel = utils.load_model(obss_preprocessor.obs_space, env.action_space, model_name)
+agent = utils.Agent(model_name, env.observation_space, env.action_space)
 
 # Run the agent
 
@@ -51,9 +47,10 @@ while True:
     renderer = env.render("human")
     print("Mission:", obs["mission"])
 
-    preprocessed_obs = obss_preprocessor([obs])
-    action = acmodel.get_action(preprocessed_obs, deterministic=args.deterministic).item()
+    action = agent.get_action(obs, deterministic=args.deterministic)
     obs, reward, done, _ = env.step(action)
+    agent.analyze_feedback(reward, done)
+
     if done:
         obs = env.reset()
 
