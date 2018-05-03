@@ -7,6 +7,6 @@ setup(
     packages=["torch_ac"],
     install_requires=[
         "numpy>=1.13.0",
-        "torch>=0.3.1"
+        "torch>=0.4.0"
     ]
 )
