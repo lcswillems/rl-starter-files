@@ -85,8 +85,8 @@ class BaseAlgo(ABC):
             self.values[i] = value
             if self.reshape_reward is not None:
                 self.rewards[i] = torch.tensor([
-                    self.reshape_reward(obs_, action_, reward_)
-                    for obs_, action_, reward_ in zip(obs, action, reward)
+                    self.reshape_reward(obs_, action_, reward_, done_)
+                    for obs_, action_, reward_, done_ in zip(obs, action, reward, done)
                 ])
             else:
                 self.rewards[i] = torch.tensor(reward)

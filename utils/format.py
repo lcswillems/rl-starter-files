@@ -71,5 +71,8 @@ class ObssPreprocessor:
 
         return obs_
 
-def reward_reshaper(obs, action, reward):
-    return reward - 0.01
+def reward_reshaper(obs, action, reward, done):
+    penality = 0.01
+    if reward == 0 and done:
+        penality += 1
+    return reward - penality
