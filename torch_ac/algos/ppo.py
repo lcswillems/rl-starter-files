@@ -27,6 +27,11 @@ class PPOAlgo(BaseAlgo):
         ts, log = self.collect_transitions()
 
         for _ in range(self.epochs):
+            log_entropies = []
+            log_values = []
+            log_policy_losses = []
+            log_value_losses = []
+
             for b in batchify(ts, self.batch_size):
                 # Compute loss
 
@@ -55,12 +60,19 @@ class PPOAlgo(BaseAlgo):
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(self.acmodel.parameters(), self.max_grad_norm)
                 self.optimizer.step()
+
+                # Update log values
+
+                log_entropies.append(entropy.mean().item())
+                log_values.append(value.mean().item())
+                log_policy_losses.append(policy_loss.item())
+                log_value_losses.append(value_loss.item())
         
         # Log some values
 
-        log["entropy"] = entropy.mean().item()
-        log["value"] = value.mean().item()
-        log["policy_loss"] = policy_loss.item()
-        log["value_loss"] = value_loss.item()
+        log["entropy"] = sum(log_entropies) / len(log_entropies)
+        log["value"] = sum(log_values) / len(log_values)
+        log["policy_loss"] = sum(log_policy_losses) / len(log_policy_losses)
+        log["value_loss"] = sum(log_value_losses) / len(log_value_losses)
 
         return log
