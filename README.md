@@ -140,7 +140,11 @@ where:
 
 These logs are also saved in a log file in `storage/logs`.
 
-By default, logs are also plotted in Tensorboard using the `tensorboardX` package that you can install with `pip3 install tensorboardX`.
+By default, logs are also plotted in Tensorboard using the `tensorboardX` package that you can install with `pip3 install tensorboardX`. You just have to execute:
+
+```tensorboard --logdir storage/logs```
+
+and you will get something like this:
 
 <p align="center"><img src="README-images/train-tensorboard.png"></p>
 
