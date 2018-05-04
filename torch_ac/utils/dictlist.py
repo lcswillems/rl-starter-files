@@ -7,7 +7,7 @@ class DictList(dict):
         >>> d.a
         [[1, 2], [3, 4]]
         >>> d[0]
-        dictlist({"a": [1, 2], "b": [5]})
+        DictList({"a": [1, 2], "b": [5]})
     """
 
     __getattr__ = dict.__getitem__
