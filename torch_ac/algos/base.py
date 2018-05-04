@@ -94,7 +94,7 @@ class BaseAlgo(ABC):
 
             # Update log values
 
-            self.log_episode_return += self.rewards[i]
+            self.log_episode_return += torch.tensor(reward, device=self.device, dtype=torch.float)
             self.log_episode_reshaped_return += self.rewards[i]
             self.log_episode_num_frames += torch.ones(self.num_procs, device=self.device)
 
