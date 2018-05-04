@@ -13,7 +13,7 @@ def initialize_parameters(m):
         if m.bias is not None:
             m.bias.data.fill_(0)
 
-class ACModel(torch_ac.ACModel):
+class ACModel(nn.Module, torch_ac.ACModel):
     instr_embedding_size = 128
 
     def __init__(self, obs_space, action_space):

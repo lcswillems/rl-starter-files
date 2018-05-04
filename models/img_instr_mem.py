@@ -13,7 +13,7 @@ def initialize_parameters(m):
         if m.bias is not None:
             m.bias.data.fill_(0)
 
-class ACModel(torch_ac.RecurrentACModel):
+class ACModel(nn.Module, torch_ac.RecurrentACModel):
     image_embedding_size = 64
     instr_embedding_size = 128
     

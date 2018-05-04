@@ -2,7 +2,7 @@ from abc import abstractmethod, abstractproperty
 import torch.nn as nn
 import torch.nn.functional as F
 
-class ACModel(nn.Module):
+class ACModel:
     @abstractmethod
     def __init__(self, obs_space, action_space):
         pass
@@ -11,11 +11,7 @@ class ACModel(nn.Module):
     def forward(self, obs):
         pass
 
-class RecurrentACModel(nn.Module):
-    @abstractmethod
-    def __init__(self, obs_space, action_space):
-        pass
-
+class RecurrentACModel(ACModel):
     @abstractmethod
     def forward(self, obs, state):
         pass
