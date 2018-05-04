@@ -43,7 +43,7 @@ agent = utils.Agent(model_name, env.observation_space, env.action_space)
 
 # Initialize logs
 
-log = {"num_frames": [], "return": []}
+log = {"num_frames_per_episode": [], "return_per_episode": []}
 
 # Run the agent
 
@@ -64,14 +64,14 @@ for _ in range(args.episodes):
         num_frames += 1
         returnn += reward
     
-    log["num_frames"].append(num_frames)
-    log["return"].append(returnn)
+    log["num_frames_per_episode"].append(num_frames)
+    log["return_per_episode"].append(returnn)
 
 end_time = time.time()
 
 # Print logs
 
-num_frames = sum(log["num_frames"])
+num_frames = sum(log["num_frames_per_episode"])
 fps = num_frames/(end_time - start_time)
 ellapsed_time = int(end_time - start_time)
 duration = datetime.timedelta(seconds=ellapsed_time)
