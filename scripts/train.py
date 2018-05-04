@@ -30,6 +30,8 @@ parser.add_argument("--log-interval", type=int, default=1,
                     help="number of updates between two logs (default: 1)")
 parser.add_argument("--save-interval", type=int, default=0,
                     help="number of updates between two saves (default: 0, 0 means no saving)")
+parser.add_argument("--no-tb", action="store_true", default=False,
+                    help="don't log into tensorboard")
 parser.add_argument("--frames-per-proc", type=int, default=None,
                     help="number of frames per process before update (default: 5 for A2C and 128 for PPO)")
 parser.add_argument("--discount", type=float, default=0.99,
@@ -72,7 +74,7 @@ for i in range(args.procs):
 
 # Define model name
 
-model_name = args.model or args.env+"_"+args.algo
+model_name = args.model or args.env + "_" + args.algo
 
 # Define obss preprocessor
 
@@ -98,10 +100,16 @@ elif args.algo == "ppo":
 else:
     raise ValueError
 
-# Define logger and log command and model
+# Define logger and tensorboard writer then log command and model
 
 suffix = datetime.datetime.now().strftime("%y%m%d%H%M%S")
-logger = utils.Logger(model_name+"_"+suffix)
+log_name = model_name + "_" + suffix
+
+logger = utils.Logger(log_name)
+if not(args.no_tb):
+    from tensorboardX import SummaryWriter
+    writer = SummaryWriter(utils.get_log_path(log_name, ext=False))
+
 logger.log(" ".join(sys.argv), to_print=False)
 logger.log(acmodel)
 
@@ -126,14 +134,31 @@ while num_frames < args.frames:
     if i % args.log_interval == 0:
         total_ellapsed_time = int(time.time() - total_start_time)
         fps = log["num_frames"]/(update_end_time - update_start_time)
+        duration = datetime.timedelta(seconds=total_ellapsed_time)
+        return_per_episode = utils.synthesize(log["return_per_episode"])
+        rreturn_per_episode = utils.synthesize(log["reshaped_return_per_episode"])
+        num_frames_per_episode = utils.synthesize(log["num_frames_per_episode"])
 
         logger.log(
             "U {} | F {:06} | FPS {:04.0f} | D {} | rR:x̄σmM {: .2f} {: .2f} {: .2f} {: .2f} | F:x̄σmM {:.1f} {:.1f} {:.1f} {:.1f} | H {:.3f} | V {:.3f} | pL {: .3f} | vL {:.3f}"
-            .format(i, num_frames, fps,
-                    datetime.timedelta(seconds=total_ellapsed_time),
-                    *utils.synthesize(log["reshaped_return_per_episode"]),
-                    *utils.synthesize(log["num_frames_per_episode"]),
+            .format(i, num_frames, fps, duration,
+                    *rreturn_per_episode.values(),
+                    *num_frames_per_episode.values(),
                     log["entropy"], log["value"], log["policy_loss"], log["value_loss"]))
+        if not(args.no_tb):
+            writer.add_scalar("frames", num_frames, i)
+            writer.add_scalar("FPS", fps, i)
+            writer.add_scalar("duration", total_ellapsed_time, i)
+            for key, value in return_per_episode.items():
+                writer.add_scalar("return_" + key, value, i)
+            for key, value in rreturn_per_episode.items():
+                writer.add_scalar("rreturn_" + key, value, i)
+            for key, value in num_frames_per_episode.items():
+                writer.add_scalar("num_frames_" + key, value, i)
+            writer.add_scalar("entropy", log["entropy"], i)
+            writer.add_scalar("value", log["value"], i)
+            writer.add_scalar("policy_loss", log["policy_loss"], i)
+            writer.add_scalar("value_loss", log["value_loss"], i)
 
     # Save obss preprocessor vocabulary and model
 

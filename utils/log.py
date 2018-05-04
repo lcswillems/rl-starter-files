@@ -3,11 +3,17 @@ import numpy
 
 import utils
 
-def get_log_path(log_name):
-    return os.path.join(utils.storage_dir(), "logs", log_name+".txt")
+def get_log_path(log_name, ext=True):
+    log_basename = log_name + (".txt" if ext else "")
+    return os.path.join(utils.storage_dir(), "logs", log_basename)
 
 def synthesize(array):
-    return numpy.mean(array), numpy.std(array), numpy.amin(array), numpy.amax(array)
+    return {
+        "mean": numpy.mean(array),
+        "std": numpy.std(array),
+        "min": numpy.amin(array),
+        "max": numpy.amax(array)
+    }
 
 class Logger:
     def __init__(self, log_name):
