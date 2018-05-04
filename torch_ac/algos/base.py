@@ -41,7 +41,7 @@ class BaseAlgo(ABC):
         if self.is_recurrent:
             self.state = torch.zeros(shape[1], self.acmodel.state_size, device=self.device)
             self.states = torch.zeros(*shape, self.acmodel.state_size, device=self.device)
-        self.mask = torch.ones(shape[1])
+        self.mask = torch.ones(shape[1], device=self.device)
         self.masks = torch.zeros(*shape, device=self.device)
         self.actions = torch.zeros(*shape, device=self.device, dtype=torch.int)
         self.values = torch.zeros(*shape, device=self.device)
@@ -51,12 +51,12 @@ class BaseAlgo(ABC):
 
         # Store log values
 
-        self.log_episode_return = torch.zeros(self.num_procs)
-        self.log_episode_reshaped_return = torch.zeros(self.num_procs)
-        self.log_episode_num_frames = torch.zeros(self.num_procs)
-        self.log_return = torch.zeros(self.num_procs)
-        self.log_reshaped_return = torch.zeros(self.num_procs)
-        self.log_num_frames = torch.zeros(self.num_procs)
+        self.log_episode_return = torch.zeros(self.num_procs, device=self.device)
+        self.log_episode_reshaped_return = torch.zeros(self.num_procs, device=self.device)
+        self.log_episode_num_frames = torch.zeros(self.num_procs, device=self.device)
+        self.log_return = torch.zeros(self.num_procs, device=self.device)
+        self.log_reshaped_return = torch.zeros(self.num_procs, device=self.device)
+        self.log_num_frames = torch.zeros(self.num_procs, device=self.device)
 
     def collect_transitions(self):        
         for i in range(self.num_frames_per_proc):
@@ -80,23 +80,23 @@ class BaseAlgo(ABC):
                 self.states[i] = self.state
                 self.state = state
             self.masks[i] = self.mask
-            self.mask = 1 - torch.tensor(done, dtype=torch.float)
+            self.mask = 1 - torch.tensor(done, device=self.device, dtype=torch.float)
             self.actions[i] = action
             self.values[i] = value
             if self.reshape_reward is not None:
                 self.rewards[i] = torch.tensor([
                     self.reshape_reward(obs_, action_, reward_, done_)
                     for obs_, action_, reward_, done_ in zip(obs, action, reward, done)
-                ])
+                ], device=self.device)
             else:
-                self.rewards[i] = torch.tensor(reward)
+                self.rewards[i] = torch.tensor(reward, device=self.device)
             self.log_probs[i] = dist.log_prob(action)
 
             # Update log values
 
-            self.log_episode_return += torch.tensor(reward, dtype=torch.float)
+            self.log_episode_return += self.rewards[i]
             self.log_episode_reshaped_return += self.rewards[i]
-            self.log_episode_num_frames += torch.ones(self.num_procs)
+            self.log_episode_num_frames += torch.ones(self.num_procs, device=self.device)
 
             self.log_return *= self.mask
             self.log_return += (1 - self.mask) * self.log_episode_return
