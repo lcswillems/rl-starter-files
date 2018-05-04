@@ -19,6 +19,6 @@ def seed(seed):
         torch.cuda.manual_seed_all(seed)
 
 from utils.agent import Agent
-from utils.format import ObssPreprocessor, reward_reshaper
+from utils.format import ObssPreprocessor, reshape_reward
 from utils.log import get_log_path, synthesize, Logger
 from utils.model import load_model, save_model
