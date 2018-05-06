@@ -198,7 +198,7 @@ This will print the evaluation in your terminal:
 
 <p align="center"><img src="README-images/evaluate-terminal-log.png"></p>
 
-where "R" is for "reward".
+where "R" is for "return".
 
 ## Todo
 
