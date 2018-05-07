@@ -10,17 +10,17 @@ class Agent:
 
         self.is_recurrent = isinstance(self.acmodel, RecurrentACModel)
         if self.is_recurrent:
-            self._initialize_state()
+            self._initialize_memory()
     
-    def _initialize_state(self):
-        self.state = torch.zeros(1, self.acmodel.state_size)
+    def _initialize_memory(self):
+        self.memory = torch.zeros(1, self.acmodel.memory_size)
 
     def get_action(self, obs, deterministic=False):
         preprocessed_obs = self.obss_preprocessor([obs])
 
         with torch.no_grad():
             if self.is_recurrent:
-                dist, _, self.state = self.acmodel(preprocessed_obs, self.state)
+                dist, _, self.memory = self.acmodel(preprocessed_obs, self.memory)
             else:
                 dist, _ = self.acmodel(preprocessed_obs)
         
@@ -33,4 +33,4 @@ class Agent:
     
     def analyze_feedback(self, reward, done):
         if done and self.is_recurrent:
-            self._initialize_state()
+            self._initialize_memory()

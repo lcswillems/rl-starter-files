@@ -39,8 +39,8 @@ class BaseAlgo(ABC):
         self.obs = self.env.reset()
         self.obss = [None]*(shape[0])
         if self.is_recurrent:
-            self.state = torch.zeros(shape[1], self.acmodel.state_size, device=self.device)
-            self.states = torch.zeros(*shape, self.acmodel.state_size, device=self.device)
+            self.memory = torch.zeros(shape[1], self.acmodel.memory_size, device=self.device)
+            self.memories = torch.zeros(*shape, self.acmodel.memory_size, device=self.device)
         self.mask = torch.ones(shape[1], device=self.device)
         self.masks = torch.zeros(*shape, device=self.device)
         self.actions = torch.zeros(*shape, device=self.device, dtype=torch.int)
@@ -65,7 +65,7 @@ class BaseAlgo(ABC):
             preprocessed_obs = self.preprocess_obss(self.obs, device=self.device)
             with torch.no_grad():
                 if self.is_recurrent:
-                    dist, value, state = self.acmodel(preprocessed_obs, self.state * self.mask.unsqueeze(1))
+                    dist, value, memory = self.acmodel(preprocessed_obs, self.memory * self.mask.unsqueeze(1))
                 else:
                     dist, value = self.acmodel(preprocessed_obs)
             action = dist.sample()
@@ -77,8 +77,8 @@ class BaseAlgo(ABC):
             self.obss[i] = self.obs
             self.obs = obs
             if self.is_recurrent:
-                self.states[i] = self.state
-                self.state = state
+                self.memories[i] = self.memory
+                self.memory = memory
             self.masks[i] = self.mask
             self.mask = 1 - torch.tensor(done, device=self.device, dtype=torch.float)
             self.actions[i] = action
@@ -114,7 +114,7 @@ class BaseAlgo(ABC):
         preprocessed_obs = self.preprocess_obss(self.obs, device=self.device)
         with torch.no_grad():
             if self.is_recurrent:
-                _, next_value, _ = self.acmodel(preprocessed_obs, self.state * self.mask.unsqueeze(1))
+                _, next_value, _ = self.acmodel(preprocessed_obs, self.memory * self.mask.unsqueeze(1))
             else:
                 _, next_value = self.acmodel(preprocessed_obs)
 
@@ -131,7 +131,7 @@ class BaseAlgo(ABC):
         ts = DictList()
         ts.obs = [obs for obss in self.obss for obs in obss]
         if self.is_recurrent:
-            ts.state = self.states.view(-1, *self.states.shape[2:])
+            ts.memory = self.memories.view(-1, *self.memories.shape[2:])
             ts.mask = self.masks.view(-1, *self.masks.shape[2:]).unsqueeze(1)
         ts.action = self.actions.view(-1, *self.actions.shape[2:])
         ts.value = self.values.view(-1, *self.values.shape[2:])

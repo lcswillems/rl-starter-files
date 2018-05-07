@@ -36,7 +36,7 @@ class PPOAlgo(BaseAlgo):
                 # Compute loss
 
                 if self.is_recurrent:
-                    dist, value, _ = self.acmodel(b.obs, b.state * b.mask)
+                    dist, value, _ = self.acmodel(b.obs, b.memory * b.mask)
                 else:
                     dist, value = self.acmodel(b.obs)
 

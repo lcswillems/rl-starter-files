@@ -13,10 +13,10 @@ class ACModel:
 
 class RecurrentACModel(ACModel):
     @abstractmethod
-    def forward(self, obs, state):
+    def forward(self, obs, memory):
         pass
     
     @property
     @abstractmethod
-    def state_size(self):
+    def memory_size(self):
         pass

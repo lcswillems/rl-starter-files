@@ -18,11 +18,11 @@ class ACModel(nn.Module, torch_ac.RecurrentACModel):
     instr_embedding_size = 128
     
     @property
-    def state_size(self):
-        return 2*self.semi_state_size
+    def memory_size(self):
+        return 2*self.semi_memory_size
 
     @property
-    def semi_state_size(self):
+    def semi_memory_size(self):
         return self.obs_embedding_size
 
     def __init__(self, obs_space, action_space):
@@ -47,7 +47,7 @@ class ACModel(nn.Module, torch_ac.RecurrentACModel):
 
         # Define memory
         if self.use_memory:
-            self.memory_rnn = nn.LSTMCell(self.obs_embedding_size, self.semi_state_size)
+            self.memory_rnn = nn.LSTMCell(self.obs_embedding_size, self.semi_memory_size)
 
         # Define actor's model
         self.a_fc1 = nn.Linear(self.obs_embedding_size, 64)
@@ -60,14 +60,14 @@ class ACModel(nn.Module, torch_ac.RecurrentACModel):
         # Initialize parameters correctly
         self.apply(initialize_parameters)
 
-    def forward(self, obs, state):
+    def forward(self, obs, memory):
         embedding = self._get_embedding(obs)
 
         if self.use_memory:
-            hidden = (state[:, :self.semi_state_size], state[:, self.semi_state_size:])
+            hidden = (memory[:, :self.semi_memory_size], memory[:, self.semi_memory_size:])
             hidden = self.memory_rnn(embedding, hidden)
             embedding = hidden[0]
-            state = torch.cat(hidden, dim=1)
+            memory = torch.cat(hidden, dim=1)
 
         x = self.a_fc1(embedding)
         x = F.tanh(x)
@@ -79,7 +79,7 @@ class ACModel(nn.Module, torch_ac.RecurrentACModel):
         x = self.c_fc2(x)
         value = x.squeeze(1)
 
-        return dist, value, state
+        return dist, value, memory
 
     def _get_embedding(self, obs):
         embed_image = self._get_embed_image(obs.image)

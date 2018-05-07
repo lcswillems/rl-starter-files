@@ -23,7 +23,7 @@ class A2CAlgo(BaseAlgo):
         # Compute loss
 
         if self.is_recurrent:
-            dist, value, _ = self.acmodel(ts.obs, ts.state * ts.mask)
+            dist, value, _ = self.acmodel(ts.obs, ts.memory * ts.mask)
         else:
             dist, value = self.acmodel(ts.obs)
 

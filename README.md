@@ -66,8 +66,8 @@ I will detail here the points that can't be understood immediately by looking at
 
 `torch_ac.RecurrentACModel` has 3 abstract methods:
 - `__init__` that takes into parameter the same parameters than `torch_ac.ACModel`.
-- `forward` that takes into parameter the same parameters than `torch_ac.ACModel` along with a tensor of N states `state` of size N x M where M is the size of a state. It returns the same thing than `torch_ac.ACModel` plus a tensor of N states `state`.
-- `state_size` that returns the size M of a state.
+- `forward` that takes into parameter the same parameters than `torch_ac.ACModel` along with a tensor of N memories `memory` of size N x M where M is the size of a memory. It returns the same thing than `torch_ac.ACModel` plus a tensor of N memories `memory`.
+- `memory_size` that returns the size M of a memory.
 
 For speed purposes, the observations are only preprocessed once. Hence, because of the use of batches in PPO, the preprocessed observations `X` must allow to retrieve from it a sublist of preprocessed observations given a list of indexes `indexes` with `X[indexes]`. If your preprocessed observations are a Pytorch tensor, you are already done, and if you want your preprocessed observations to be a dictionnary of lists or of tensors, you will also be already done if you use the `torch_ac.DictList` class as follow:
 
