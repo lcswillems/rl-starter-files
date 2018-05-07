@@ -20,7 +20,7 @@ inspired by 3 repositories:
 - Recurrent policy
 - Fast:
     - Multiprocessing for collection trajectories in multiple environments simultaneously
-    - GPU for tensor operations
+    - GPU (CUDA) for tensor operations
 - Tensorboard
 - Pytorch 0.4.0
 
