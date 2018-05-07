@@ -49,23 +49,21 @@ class ObssPreprocessor:
             obs_.image = images
 
         if "instr" in self.obs_space.keys():
-            instrs = []
+            raw_instrs = []
             max_instr_len = 0
             
             for obs in obss:
                 tokens = re.findall("([a-z]+)", obs["mission"].lower())
-                instr = [self.vocab[token] for token in tokens]
-                instrs.append(instr)
+                instr = numpy.array([self.vocab[token] for token in tokens])
+                raw_instrs.append(instr)
                 max_instr_len = max(len(instr), max_instr_len)
             
-            np_instrs = numpy.zeros((len(obss), max_instr_len, self.vocab.max_size))
+            instrs = numpy.zeros((len(obss), max_instr_len))
 
-            for i, instr in enumerate(instrs):
-                hot_instr = numpy.zeros((len(instr), self.vocab.max_size))
-                hot_instr[numpy.arange(len(instr)), instr] = 1
-                np_instrs[i, :len(instr), :] = hot_instr
+            for i, instr in enumerate(raw_instrs):
+                instrs[i, :len(instr)] = instr
             
-            instrs = torch.tensor(np_instrs, device=device, dtype=torch.float)
+            instrs = torch.tensor(instrs, device=device, dtype=torch.long)
             
             obs_.instr = instrs
 
