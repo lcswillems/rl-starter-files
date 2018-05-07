@@ -32,7 +32,7 @@ class BaseAlgo(ABC):
         self.num_frames = self.num_frames_per_proc * self.num_procs
         self.is_recurrent = isinstance(self.acmodel, RecurrentACModel)
 
-        # Store transitions values
+        # Store experiences values
 
         shape = (self.num_frames_per_proc, self.num_procs)
 
@@ -58,7 +58,7 @@ class BaseAlgo(ABC):
         self.log_reshaped_return = torch.zeros(self.num_procs, device=self.device)
         self.log_num_frames = torch.zeros(self.num_procs, device=self.device)
 
-    def collect_transitions(self):        
+    def collect_experiences(self):        
         for i in range(self.num_frames_per_proc):
             # Do one agent-environment interaction
 
@@ -72,7 +72,7 @@ class BaseAlgo(ABC):
 
             obs, reward, done, _ = self.env.step(action.cpu().numpy())
             
-            # Update transitions values
+            # Update experiences values
 
             self.obss[i] = self.obs
             self.obs = obs
@@ -109,7 +109,7 @@ class BaseAlgo(ABC):
             self.log_episode_reshaped_return *= self.mask
             self.log_episode_num_frames *= self.mask
 
-        # Add advantage and return to transitions
+        # Add advantage and return to experiences
 
         preprocessed_obs = self.preprocess_obss(self.obs, device=self.device)
         with torch.no_grad():
@@ -126,23 +126,23 @@ class BaseAlgo(ABC):
             delta = self.rewards[i] + self.discount * next_value * next_mask - self.values[i]
             self.advantages[i] = delta + self.discount * self.gae_tau * next_advantage * next_mask
 
-        # Defines transitions
+        # Defines experiences
 
-        ts = DictList()
-        ts.obs = [obs for obss in self.obss for obs in obss]
+        exps = DictList()
+        exps.obs = [obs for obss in self.obss for obs in obss]
         if self.is_recurrent:
-            ts.memory = self.memories.view(-1, *self.memories.shape[2:])
-            ts.mask = self.masks.view(-1, *self.masks.shape[2:]).unsqueeze(1)
-        ts.action = self.actions.view(-1, *self.actions.shape[2:])
-        ts.value = self.values.view(-1, *self.values.shape[2:])
-        ts.reward = self.rewards.view(-1, *self.rewards.shape[2:])
-        ts.advantage = self.advantages.view(-1, *self.advantages.shape[2:])
-        ts.returnn = ts.value + ts.advantage
-        ts.log_prob = self.log_probs.view(-1, *self.log_probs.shape[2:])
+            exps.memory = self.memories.view(-1, *self.memories.shape[2:])
+            exps.mask = self.masks.view(-1, *self.masks.shape[2:]).unsqueeze(1)
+        exps.action = self.actions.view(-1, *self.actions.shape[2:])
+        exps.value = self.values.view(-1, *self.values.shape[2:])
+        exps.reward = self.rewards.view(-1, *self.rewards.shape[2:])
+        exps.advantage = self.advantages.view(-1, *self.advantages.shape[2:])
+        exps.returnn = exps.value + exps.advantage
+        exps.log_prob = self.log_probs.view(-1, *self.log_probs.shape[2:])
 
-        # Preprocess transitions
+        # Preprocess experiences
 
-        ts.obs = self.preprocess_obss(ts.obs, device=self.device)        
+        exps.obs = self.preprocess_obss(exps.obs, device=self.device)        
 
         # Log some values
 
@@ -153,7 +153,7 @@ class BaseAlgo(ABC):
             "num_frames": self.num_frames
         }
 
-        return ts, log
+        return exps, log
 
     @abstractmethod
     def update_parameters(self):

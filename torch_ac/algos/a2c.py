@@ -16,22 +16,22 @@ class A2CAlgo(BaseAlgo):
                                              alpha=rmsprop_alpha, eps=rmsprop_eps)
     
     def update_parameters(self):
-        # Collect transitions
+        # Collect experiences
 
-        ts, log = self.collect_transitions()
+        exps, log = self.collect_experiences()
 
         # Compute loss
 
         if self.is_recurrent:
-            dist, value, _ = self.acmodel(ts.obs, ts.memory * ts.mask)
+            dist, value, _ = self.acmodel(exps.obs, exps.memory * exps.mask)
         else:
-            dist, value = self.acmodel(ts.obs)
+            dist, value = self.acmodel(exps.obs)
 
         entropy = dist.entropy().mean()
 
-        policy_loss = -(dist.log_prob(ts.action) * ts.advantage).mean()
+        policy_loss = -(dist.log_prob(exps.action) * exps.advantage).mean()
 
-        value_loss = (value - ts.returnn).pow(2).mean()
+        value_loss = (value - exps.returnn).pow(2).mean()
         
         loss = policy_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
 

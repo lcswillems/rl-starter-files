@@ -22,9 +22,9 @@ class PPOAlgo(BaseAlgo):
         self.optimizer = torch.optim.Adam(self.acmodel.parameters(), lr, eps=adam_eps)
     
     def update_parameters(self):
-        # Collect transitions
+        # Collect experiences
 
-        ts, log = self.collect_transitions()
+        ts, log = self.collect_experiences()
 
         for _ in range(self.epochs):
             log_entropies = []
