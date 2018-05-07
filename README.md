@@ -146,7 +146,8 @@ By default, logs are also plotted in Tensorboard using the `tensorboardX` packag
 
 and you will get something like this:
 
-<p align="center"><img src="README-images/train-tensorboard.png"></p>
+<p align="center"><img src="README-images/train-tensorboard-1.png"></p>
+<p align="center"><img src="README-images/train-tensorboard-2.png"></p>
 
 If you don't want to use Tensorboard, you will have to add `--no-tb` to the command.
 
