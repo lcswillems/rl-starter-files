@@ -177,13 +177,17 @@ scripts/enjoy.py --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
 
 **Note:** if you have not installed `torch_ac`, you will have to replace `scripts/enjoy.py` by `python3 -m scripts.enjoy`.
 
-This gives you the following visualization:
+In the following environment, the agent has to reach the green goal. In particular, it has to learn how to open a locked door.
 
 <p align="center"><img src="README-images/enjoy-doorkey.gif"></p>
 
-On the `MiniGrid-GoToDoor-5x5-v0` environment that requires to understand textual instructions to be solved, you can get the following visualization:
+In the following environment, the agent has to open a door specified by its color. In particular, it has to understand textual instructions.
 
 <p align="center"><img src="README-images/enjoy-gotodoor.gif"></p>
+
+In the following environment, the agent has to open the red door and then the blue door. Because the agent initially faces the blue door, it has to remember if the red door is opened.
+
+<p align="center"><img src="README-images/enjoy-twodoors.gif"></p>
 
 ### `evaluate.py`
 
