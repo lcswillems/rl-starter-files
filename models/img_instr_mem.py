@@ -30,7 +30,7 @@ class ACModel(nn.Module, torch_ac.RecurrentACModel):
 
         # Decide which components are enabled
         self.use_instr = "instr" in obs_space.keys()
-        self.use_memory = False
+        self.use_memory = True
 
         # Define image embedding
         self.image_fc1 = nn.Linear(obs_space["image"], 64)

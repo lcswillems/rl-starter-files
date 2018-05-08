@@ -1,6 +1,6 @@
-# PyTorch A2C and PPO
+# PyTorch A2C and PPO deep reinforcement learning algorithms
 
-A recurrent, multi-process and readable PyTorch implementation of:
+A recurrent, multi-process and readable PyTorch implementation of the deep reinforcement learning algorithms:
 
 - [Synchronous A3C (A2C)](https://arxiv.org/pdf/1602.01783.pdf)
 - [Proximal Policy Optimization (PPO)](https://arxiv.org/pdf/1707.06347.pdf)
@@ -17,7 +17,7 @@ inspired by 3 repositories:
 - Discrete & continuous action space
 - Entropy regularization
 - Reward shaping
-- Recurrent policy
+- Recurrent policy by specifying recurrence length
 - Fast:
     - Multiprocessing for collection trajectories in multiple environments simultaneously
     - GPU (CUDA) for tensor operations
@@ -55,9 +55,10 @@ I will detail here the points that can't be understood immediately by looking at
 
 `torch_ac.A2CAlgo` and `torch_ac.PPOAlgo` have 2 methods:
 - `__init__` that may take, among the other parameters :
-    - an actor-critic model that is an instance of a class that inherits from one of the two abstract classes `torch_ac.ACModel` or `torch_ac.RecurrentACModel`.
+    - an `acmodel` actor-critic model that is an instance of a class that inherits from one of the two abstract classes `torch_ac.ACModel` or `torch_ac.RecurrentACModel`.
     - a `preprocess_obss` function that transforms a list of observations given by the environment into an object `X`. This object `X` must allow to retrieve from it a sublist of preprocessed observations given a list of indexes `indexes` with `X[indexes]`. By default, the observations given by the environment are transformed into a Pytorch tensor.
     - a `reshape_reward` function that takes into parameter an observation `obs`, the action `action` of the model, the reward `reward` and the terminal status `done` and returns a new reward.
+    - a `recurrence` number to specify over how many timestep gradient will be backpropagated. This number is only considered if a recurrent model is used and **must divide** the `num_frames_per_agent` parameter and, for PPO, the `batch_size` parameter.
 - `update_parameters` that returns some logs.
 
 `torch_ac.ACModel` has 2 abstract methods:
@@ -71,7 +72,7 @@ I will detail here the points that can't be understood immediately by looking at
 
 For speed purposes, the observations are only preprocessed once. Hence, because of the use of batches in PPO, the preprocessed observations `X` must allow to retrieve from it a sublist of preprocessed observations given a list of indexes `indexes` with `X[indexes]`. If your preprocessed observations are a Pytorch tensor, you are already done, and if you want your preprocessed observations to be a dictionnary of lists or of tensors, you will also be already done if you use the `torch_ac.DictList` class as follow:
 
-```
+```python
 >>> d = DictList({"a": [[1, 2], [3, 4]], "b": [[5], [6]]})
 >>> d.a
 [[1, 2], [3, 4]]
@@ -88,6 +89,14 @@ An example of use of `torch_ac.A2CAlgo` and `torch_ac.PPOAlgo` classes is given 
 An example of implementation of `torch_ac.ACModel` and `torch_ac.RecurrentACModel` abstract classes is given in `models/img_instr.py` and `models/img_instr_mem.py` respectively.
 
 An example of use of `torch_ac.DictList` and an example of a `preprocess_obss` function is given in the `ObsPreprocessor.__call__` function of `utils/format.py`.
+
+## Note before using
+
+`OMP_NUM_THREADS` affects the number of threads used by MKL. The default value may severly damage your performance. This may be avoided if set to 1:
+
+```
+export OMP_NUM_THREADS=1
+```
 
 ## `scripts`
 
@@ -200,7 +209,3 @@ This will print the evaluation in your terminal:
 <p align="center"><img src="README-images/evaluate-terminal-log.png"></p>
 
 where "R" is for "return".
-
-## Todo
-
-- Allow a recurrence length > 1

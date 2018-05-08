@@ -1,4 +1,4 @@
-import random
+import numpy
 import torch
 import torch.nn.functional as F
 
@@ -19,54 +19,96 @@ class PPOAlgo(BaseAlgo):
         self.epochs = epochs
         self.batch_size = batch_size
 
+        assert self.batch_size % self.recurrence == 0
+
         self.optimizer = torch.optim.Adam(self.acmodel.parameters(), lr, eps=adam_eps)
     
     def update_parameters(self):
         # Collect experiences
 
-        ts, log = self.collect_experiences()
+        exps, log = self.collect_experiences()
 
         for _ in range(self.epochs):
+            # Initialize log values
+
             log_entropies = []
             log_values = []
             log_policy_losses = []
             log_value_losses = []
 
-            for b in batchify(ts, self.batch_size):
-                # Compute loss
+            for inds in self.batches_starting_indexes():
+                # Initialize batch values
 
-                if self.is_recurrent:
-                    dist, value, _ = self.acmodel(b.obs, b.memory * b.mask)
-                else:
-                    dist, value = self.acmodel(b.obs)
+                batch_entropy = 0
+                batch_value = 0
+                batch_policy_loss = 0
+                batch_value_loss = 0
+                batch_loss = 0
 
-                entropy = dist.entropy()
+                # Initialize memory
 
-                ratio = torch.exp(dist.log_prob(b.action) - b.log_prob)
-                surr1 = ratio * b.advantage
-                surr2 = torch.clamp(ratio, 1.0 - self.clip_eps, 1.0 + self.clip_eps) * b.advantage
-                policy_loss = -torch.min(surr1, surr2).mean()
+                memory = exps.memory[inds]
 
-                value_clipped = b.value + torch.clamp(value - b.value, -self.clip_eps, self.clip_eps)
-                surr1 = (value - b.returnn).pow(2)
-                surr2 = (value_clipped - b.returnn).pow(2)
-                value_loss = torch.max(surr1, surr2).mean()
+                for i in range(self.recurrence):
+                    # Compute loss
 
-                loss = policy_loss - self.entropy_coef * entropy.mean() + self.value_loss_coef * value_loss
+                    if self.is_recurrent:
+                        dist, value, memory = self.acmodel(exps.obs[inds], memory * exps.mask[inds])
+                    else:
+                        dist, value = self.acmodel(exps.obs[inds])
+
+                    entropy = dist.entropy().mean()
+
+                    ratio = torch.exp(dist.log_prob(exps.action[inds]) - exps.log_prob[inds])
+                    surr1 = ratio * exps.advantage[inds]
+                    surr2 = torch.clamp(ratio, 1.0 - self.clip_eps, 1.0 + self.clip_eps) * exps.advantage[inds]
+                    policy_loss = -torch.min(surr1, surr2).mean()
+
+                    value_clipped = exps.value[inds] + torch.clamp(value - exps.value[inds], -self.clip_eps, self.clip_eps)
+                    surr1 = (value - exps.returnn[inds]).pow(2)
+                    surr2 = (value_clipped - exps.returnn[inds]).pow(2)
+                    value_loss = torch.max(surr1, surr2).mean()
+
+                    loss = policy_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
+
+                    # Update batch values
+
+                    batch_entropy += entropy.item()
+                    batch_value += value.mean().item()
+                    batch_policy_loss += policy_loss.item()
+                    batch_value_loss += value_loss.item()
+                    batch_loss += loss
+
+                    # Update indexes
+
+                    inds += 1
+
+                    # Store states
+
+                    if i < self.recurrence - 1:
+                        exps.memory[inds] = memory.detach()
+
+                # Update batch values
+
+                batch_entropy /= self.recurrence
+                batch_value /= self.recurrence
+                batch_policy_loss /= self.recurrence
+                batch_value_loss /= self.recurrence
+                batch_loss /= self.recurrence
 
                 # Update actor-critic
 
                 self.optimizer.zero_grad()
-                loss.backward()
+                batch_loss.backward()
                 torch.nn.utils.clip_grad_norm_(self.acmodel.parameters(), self.max_grad_norm)
                 self.optimizer.step()
 
                 # Update log values
 
-                log_entropies.append(entropy.mean().item())
-                log_values.append(value.mean().item())
-                log_policy_losses.append(policy_loss.item())
-                log_value_losses.append(value_loss.item())
+                log_entropies.append(batch_entropy)
+                log_values.append(batch_value)
+                log_policy_losses.append(batch_policy_loss)
+                log_value_losses.append(batch_value_loss)
         
         # Log some values
 
@@ -76,3 +118,12 @@ class PPOAlgo(BaseAlgo):
         log["value_loss"] = sum(log_value_losses) / len(log_value_losses)
 
         return log
+    
+    def batches_starting_indexes(self):
+        indexes = numpy.arange(0, self.num_frames, self.recurrence)
+        indexes = numpy.random.permutation(indexes)
+
+        num_indexes = self.batch_size // self.recurrence
+        batches_indexes = [indexes[i:i+num_indexes] for i in range(0, len(indexes), num_indexes)]
+        
+        return batches_indexes

@@ -32,6 +32,13 @@ class BaseAlgo(ABC):
         self.num_frames = self.num_frames_per_proc * self.num_procs
         self.is_recurrent = isinstance(self.acmodel, RecurrentACModel)
 
+        # Control parameters
+
+        if not(self.is_recurrent):
+            self.recurrence = 1
+
+        assert self.num_frames_per_proc % self.recurrence == 0
+
         # Store experiences values
 
         shape = (self.num_frames_per_proc, self.num_procs)
