@@ -47,7 +47,8 @@ class PPOAlgo(BaseAlgo):
 
                 # Initialize memory
 
-                memory = exps.memory[inds]
+                if self.is_recurrent:
+                    memory = exps.memory[inds]
 
                 for i in range(self.recurrence):
                     # Compute loss
@@ -85,7 +86,7 @@ class PPOAlgo(BaseAlgo):
 
                     # Store states
 
-                    if i < self.recurrence - 1:
+                    if self.is_recurrent and i < self.recurrence - 1:
                         exps.memory[inds] = memory.detach()
 
                 # Update batch values
