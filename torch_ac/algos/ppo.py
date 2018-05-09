@@ -84,7 +84,7 @@ class PPOAlgo(BaseAlgo):
 
                     inds += 1
 
-                    # Store states
+                    # Update memories for next batch
 
                     if self.is_recurrent and i < self.recurrence - 1:
                         exps.memory[inds] = memory.detach()
