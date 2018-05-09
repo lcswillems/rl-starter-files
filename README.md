@@ -107,7 +107,7 @@ Along with the `torch_ac` package, I provide 3 general reinforcement learning sc
 
 For your own purposes, you will probabily need to change models in the `models` folder, the line `from models.img_instr import ACModel` in `utils/model.py`, the `ObssPreprocessor.__call__` method and `reshape_reward` function in `utils.format`.
 
-They were designed especially for the [MiniGrid environments](https://github.com/maximecb/gym-minigrid). These environments give observation containing an image and a textual instruction. They are used in what follows for illustrating purposes.
+They were designed especially for the [MiniGrid environments](https://github.com/maximecb/gym-minigrid). These environments give an observation containing an image and a textual instruction. They are used in what follows for illustrating purposes.
 
 These scripts assume that you have already installed the `gym` package (with `pip3 install gym` for example). If you have not installed `gym_minigrid` and don't want to install it, you will have to remove the `import gym_minigrid` lines in all the scripts.
 
@@ -177,15 +177,15 @@ scripts/enjoy.py --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
 
 **Note:** if you have not installed `torch_ac`, you will have to replace `scripts/enjoy.py` by `python3 -m scripts.enjoy`.
 
-In the following environment, the agent has to reach the green goal. In particular, it has to learn how to open a locked door.
+In the `MiniGrid-DoorKey-6x6-v0` environment, the agent has to reach the green goal. In particular, it has to learn how to open a locked door.
 
 <p align="center"><img src="README-images/enjoy-doorkey.gif"></p>
 
-In the following environment, the agent has to open a door specified by its color. In particular, it has to understand textual instructions.
+In the `MiniGrid-GoToDoor-5x5-v0` environment, the agent has to open a door specified by its color. In particular, it has to understand textual instructions.
 
 <p align="center"><img src="README-images/enjoy-gotodoor.gif"></p>
 
-In the following environment, the agent has to open the red door and then the blue door. Because the agent initially faces the blue door, it has to remember if the red door is opened.
+In the `MiniGrid-RedBlueDoors-6x6-v0` environment, the agent has to open the red door and then the blue door. Because the agent initially faces the blue door, it has to remember if the red door is opened.
 
 <p align="center"><img src="README-images/enjoy-twodoors.gif"></p>
 
