@@ -51,23 +51,27 @@ class PPOAlgo(BaseAlgo):
                     memory = exps.memory[inds]
 
                 for i in range(self.recurrence):
+                    # Create a sub-batch of experience
+
+                    sb = exps[inds]
+
                     # Compute loss
 
                     if self.is_recurrent:
-                        dist, value, memory = self.acmodel(exps.obs[inds], memory * exps.mask[inds])
+                        dist, value, memory = self.acmodel(sb.obs, memory * sb.mask)
                     else:
-                        dist, value = self.acmodel(exps.obs[inds])
+                        dist, value = self.acmodel(sb.obs)
 
                     entropy = dist.entropy().mean()
 
-                    ratio = torch.exp(dist.log_prob(exps.action[inds]) - exps.log_prob[inds])
-                    surr1 = ratio * exps.advantage[inds]
-                    surr2 = torch.clamp(ratio, 1.0 - self.clip_eps, 1.0 + self.clip_eps) * exps.advantage[inds]
+                    ratio = torch.exp(dist.log_prob(sb.action) - sb.log_prob)
+                    surr1 = ratio * sb.advantage
+                    surr2 = torch.clamp(ratio, 1.0 - self.clip_eps, 1.0 + self.clip_eps) * sb.advantage
                     policy_loss = -torch.min(surr1, surr2).mean()
 
-                    value_clipped = exps.value[inds] + torch.clamp(value - exps.value[inds], -self.clip_eps, self.clip_eps)
-                    surr1 = (value - exps.returnn[inds]).pow(2)
-                    surr2 = (value_clipped - exps.returnn[inds]).pow(2)
+                    value_clipped = sb.value + torch.clamp(value - sb.value, -self.clip_eps, self.clip_eps)
+                    surr1 = (value - sb.returnn).pow(2)
+                    surr2 = (value_clipped - sb.returnn).pow(2)
                     value_loss = torch.max(surr1, surr2).mean()
 
                     loss = policy_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
@@ -84,7 +88,7 @@ class PPOAlgo(BaseAlgo):
 
                     inds += 1
 
-                    # Update memories for next batch
+                    # Update memories for next epoch
 
                     if self.is_recurrent and i < self.recurrence - 1:
                         exps.memory[inds] = memory.detach()

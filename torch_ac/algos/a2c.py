@@ -39,18 +39,22 @@ class A2CAlgo(BaseAlgo):
             memory = exps.memory[inds]
 
         for _ in range(self.recurrence):
+            # Create a sub-batch of experience
+
+            sb = exps[inds]
+
             # Compute loss
 
             if self.is_recurrent:
-                dist, value, memory = self.acmodel(exps.obs[inds], memory * exps.mask[inds])
+                dist, value, memory = self.acmodel(sb.obs, memory * sb.mask)
             else:
-                dist, value = self.acmodel(exps.obs[inds])
+                dist, value = self.acmodel(sb.obs)
 
             entropy = dist.entropy().mean()
 
-            policy_loss = -(dist.log_prob(exps.action[inds]) * exps.advantage[inds]).mean()
+            policy_loss = -(dist.log_prob(sb.action) * sb.advantage).mean()
 
-            value_loss = (value - exps.returnn[inds]).pow(2).mean()
+            value_loss = (value - sb.returnn).pow(2).mean()
             
             loss = policy_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
 
