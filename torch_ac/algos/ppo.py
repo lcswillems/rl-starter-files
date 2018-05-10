@@ -3,7 +3,6 @@ import torch
 import torch.nn.functional as F
 
 from torch_ac.algos.base import BaseAlgo
-from torch_ac.utils.batch import batchify
 
 class PPOAlgo(BaseAlgo):
     def __init__(self, envs, acmodel, num_frames_per_proc=None, discount=0.99, lr=7e-4, gae_tau=0.95,
