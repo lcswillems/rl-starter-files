@@ -18,8 +18,8 @@ parser.add_argument("--model", required=True,
                     help="name of the trained model (REQUIRED)")
 parser.add_argument("--episodes", type=int, default=100,
                     help="number of episodes of evaluation (default: 100)")
-parser.add_argument("--seed", type=int, default=2,
-                    help="random seed (default: 2)")
+parser.add_argument("--seed", type=int, default=0,
+                    help="random seed (default: 0)")
 parser.add_argument("--deterministic", action="store_true", default=False,
                     help="action with highest probability is selected")
 args = parser.parse_args()
