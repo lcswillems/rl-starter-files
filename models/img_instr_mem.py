@@ -14,9 +14,45 @@ def initialize_parameters(m):
             m.bias.data.fill_(0)
 
 class ACModel(nn.Module, torch_ac.RecurrentACModel):
-    image_embedding_size = 64
-    instr_embedding_size = 128
-    
+    def __init__(self, obs_space, action_space):
+        super().__init__()
+
+        # Decide which components are enabled
+        self.use_instr = "instr" in obs_space.keys()
+        self.use_memory = True
+
+        # Define instruction embedding
+        if self.use_instr:
+            self.word_embedding_size = 32
+            self.word_embedding = nn.Embedding(obs_space["instr"], self.word_embedding_size)
+            self.instr_embedding_size = 128
+            self.instr_rnn = nn.GRU(self.word_embedding_size, self.instr_embedding_size, batch_first=True)
+
+        # Define initial observation embedding size
+        self.initial_obs_embedding_size = obs_space["image"]
+        if self.use_instr:
+            self.initial_obs_embedding_size += self.instr_embedding_size
+        self.obs_embedding_size = 64
+        
+        # Define observation embedding
+        self.obs_fc1 = nn.Linear(self.initial_obs_embedding_size, 64)
+        self.obs_fc2 = nn.Linear(64, self.obs_embedding_size)
+
+        # Define memory
+        if self.use_memory:
+            self.memory_rnn = nn.LSTMCell(self.obs_embedding_size, self.semi_memory_size)
+
+        # Define actor's model
+        self.a_fc1 = nn.Linear(self.semi_memory_size, 64)
+        self.a_fc2 = nn.Linear(64, action_space.n)
+
+        # Define critic's model
+        self.c_fc1 = nn.Linear(self.semi_memory_size, 64)
+        self.c_fc2 = nn.Linear(64, 1)
+
+        # Initialize parameters correctly
+        self.apply(initialize_parameters)
+
     @property
     def memory_size(self):
         return 2*self.semi_memory_size
@@ -25,47 +61,20 @@ class ACModel(nn.Module, torch_ac.RecurrentACModel):
     def semi_memory_size(self):
         return self.obs_embedding_size
 
-    def __init__(self, obs_space, action_space):
-        super().__init__()
-
-        # Decide which components are enabled
-        self.use_instr = "instr" in obs_space.keys()
-        self.use_memory = True
-
-        # Define image embedding
-        self.image_fc1 = nn.Linear(obs_space["image"], 64)
-        self.image_fc2 = nn.Linear(64, self.image_embedding_size)
-
-        # Define instruction embedding
-        if self.use_instr:
-            self.instr_rnn = nn.GRU(obs_space["instr"], self.instr_embedding_size, batch_first=True)
-
-        # Define observation embedding size
-        self.obs_embedding_size = self.image_embedding_size
-        if self.use_instr:
-            self.obs_embedding_size += self.instr_embedding_size
-
-        # Define memory
-        if self.use_memory:
-            self.memory_rnn = nn.LSTMCell(self.obs_embedding_size, self.semi_memory_size)
-
-        # Define actor's model
-        self.a_fc1 = nn.Linear(self.obs_embedding_size, 64)
-        self.a_fc2 = nn.Linear(64, action_space.n)
-
-        # Define critic's model
-        self.c_fc1 = nn.Linear(self.obs_embedding_size, 64)
-        self.c_fc2 = nn.Linear(64, 1)
-
-        # Initialize parameters correctly
-        self.apply(initialize_parameters)
-
     def forward(self, obs, memory):
-        embedding = self._get_embedding(obs)
+        if self.use_instr:
+            embed_instr = self._get_embed_instr(obs.instr)
+
+        x = obs.image
+        if self.use_instr:
+            x = torch.cat((x, embed_instr), dim=1)
+        x = self.obs_fc1(x)
+        x = F.tanh(x)
+        x = self.obs_fc2(x)
 
         if self.use_memory:
             hidden = (memory[:, :self.semi_memory_size], memory[:, self.semi_memory_size:])
-            hidden = self.memory_rnn(embedding, hidden)
+            hidden = self.memory_rnn(x, hidden)
             embedding = hidden[0]
             memory = torch.cat(hidden, dim=1)
 
@@ -81,19 +90,7 @@ class ACModel(nn.Module, torch_ac.RecurrentACModel):
 
         return dist, value, memory
 
-    def _get_embedding(self, obs):
-        embed_image = self._get_embed_image(obs.image)
-        if self.use_instr:
-            embed_instr = self._get_embed_instr(obs.instr)
-            return torch.cat((embed_image, embed_instr), dim=1)
-        return embed_image
-
-    def _get_embed_image(self, image):
-        x = self.image_fc1(image)
-        x = F.tanh(x)
-        return self.image_fc2(x)
-
     def _get_embed_instr(self, instr):
         self.instr_rnn.flatten_parameters()
-        _, hidden = self.instr_rnn(instr)
+        _, hidden = self.instr_rnn(self.word_embedding(instr))
         return hidden[-1]
