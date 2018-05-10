@@ -26,51 +26,42 @@ inspired by 3 repositories:
 
 ## Installation
 
-The first option is to directly install the `torch_ac` module with:
+You have to clone the repository and then install the module:
 ```
-pip3 install https://github.com/lcswillems/pytorch-a2c-ppo/archive/master.zip
-```
-
-To get updates from the code, you will need to execute again this command.
-
-However, this command will not allow you to use the additionnal scripts in the `scripts` folder.
-
-The second option is to clone the repository and then install the module:
-```
-pip3 install -e .
+pip3 install -e torch_rl
 ```
 
-To gets updates from the code, you will need to execute again this command after a `git pull`.
+To gets updates from the code, you just need to do a `git pull`. No need to install the module again.
 
-## `torch_ac` module
+## `torch_rl` module
 
 The module consists of:
-- 2 classes `torch_ac.A2CAlgo` and `torch_ac.PPOAlgo` for, respectively, A2C and PPO algorithms
-- 2 abstract classes `torch_ac.ACModel` and `torch_ac.RecurrentACModel` for, respectively, non-recurrent and recurrent actor-critic models
-- 1 class `torch_ac.DictList` for making dictionnaries of lists batch-friendly
+- 2 classes `torch_rl.A2CAlgo` and `torch_rl.PPOAlgo` for, respectively, A2C and PPO algorithms
+- 2 abstract classes `torch_rl.ACModel` and `torch_rl.RecurrentACModel` for, respectively, non-recurrent and recurrent actor-critic models
+- 1 class `torch_rl.DictList` for making dictionnaries of lists batch-friendly
 
 ### How to use?
 
 I will detail here the points that can't be understood immediately by looking at the definition files of the classes, or by looking at the arguments of `scripts/train.py` with `scripts/train.py --help` command.
 
-`torch_ac.A2CAlgo` and `torch_ac.PPOAlgo` have 2 methods:
+`torch_rl.A2CAlgo` and `torch_rl.PPOAlgo` have 2 methods:
 - `__init__` that may take, among the other parameters :
-    - an `acmodel` actor-critic model that is an instance of a class that inherits from one of the two abstract classes `torch_ac.ACModel` or `torch_ac.RecurrentACModel`.
+    - an `acmodel` actor-critic model that is an instance of a class that inherits from one of the two abstract classes `torch_rl.ACModel` or `torch_rl.RecurrentACModel`.
     - a `preprocess_obss` function that transforms a list of observations given by the environment into an object `X`. This object `X` must allow to retrieve from it a sublist of preprocessed observations given a list of indexes `indexes` with `X[indexes]`. By default, the observations given by the environment are transformed into a Pytorch tensor.
     - a `reshape_reward` function that takes into parameter an observation `obs`, the action `action` of the model, the reward `reward` and the terminal status `done` and returns a new reward.
     - a `recurrence` number to specify over how many timestep gradient will be backpropagated. This number is only considered if a recurrent model is used and **must divide** the `num_frames_per_agent` parameter and, for PPO, the `batch_size` parameter.
 - `update_parameters` that returns some logs.
 
-`torch_ac.ACModel` has 2 abstract methods:
+`torch_rl.ACModel` has 2 abstract methods:
 - `__init__` that takes into parameter the `observation_space` and the `action_space` given by the environment.
 - `forward` that takes into parameter N preprocessed observations `obs` and returns a Pytorch distribution `dist` and a tensor of values `value`. The tensor of values **must be** of size N, not N x 1.
 
-`torch_ac.RecurrentACModel` has 3 abstract methods:
-- `__init__` that takes into parameter the same parameters than `torch_ac.ACModel`.
-- `forward` that takes into parameter the same parameters than `torch_ac.ACModel` along with a tensor of N memories `memory` of size N x M where M is the size of a memory. It returns the same thing than `torch_ac.ACModel` plus a tensor of N memories `memory`.
+`torch_rl.RecurrentACModel` has 3 abstract methods:
+- `__init__` that takes into parameter the same parameters than `torch_rl.ACModel`.
+- `forward` that takes into parameter the same parameters than `torch_rl.ACModel` along with a tensor of N memories `memory` of size N x M where M is the size of a memory. It returns the same thing than `torch_rl.ACModel` plus a tensor of N memories `memory`.
 - `memory_size` that returns the size M of a memory.
 
-For speed purposes, the observations are only preprocessed once. Hence, because of the use of batches in PPO, the preprocessed observations `X` must allow to retrieve from it a sublist of preprocessed observations given a list of indexes `indexes` with `X[indexes]`. If your preprocessed observations are a Pytorch tensor, you are already done, and if you want your preprocessed observations to be a dictionnary of lists or of tensors, you will also be already done if you use the `torch_ac.DictList` class as follow:
+For speed purposes, the observations are only preprocessed once. Hence, because of the use of batches in PPO, the preprocessed observations `X` must allow to retrieve from it a sublist of preprocessed observations given a list of indexes `indexes` with `X[indexes]`. If your preprocessed observations are a Pytorch tensor, you are already done, and if you want your preprocessed observations to be a dictionnary of lists or of tensors, you will also be already done if you use the `torch_rl.DictList` class as follow:
 
 ```python
 >>> d = DictList({"a": [[1, 2], [3, 4]], "b": [[5], [6]]})
@@ -84,11 +75,11 @@ DictList({"a": [1, 2], "b": [5]})
 
 ### Examples
 
-An example of use of `torch_ac.A2CAlgo` and `torch_ac.PPOAlgo` classes is given in `scripts/train.py`.
+An example of use of `torch_rl.A2CAlgo` and `torch_rl.PPOAlgo` classes is given in `scripts/train.py`.
 
-An example of implementation of `torch_ac.ACModel` and `torch_ac.RecurrentACModel` abstract classes is given in `models/img_instr.py` and `models/img_instr_mem.py` respectively.
+An example of implementation of `torch_rl.ACModel` and `torch_rl.RecurrentACModel` abstract classes is given in `models/img_instr.py` and `models/img_instr_mem.py` respectively.
 
-An example of use of `torch_ac.DictList` and an example of a `preprocess_obss` function is given in the `ObsPreprocessor.__call__` function of `utils/format.py`.
+An example of use of `torch_rl.DictList` and an example of a `preprocess_obss` function is given in the `ObsPreprocessor.__call__` function of `utils/format.py`.
 
 ## Note before using
 
@@ -100,7 +91,7 @@ export OMP_NUM_THREADS=1
 
 ## `scripts`
 
-Along with the `torch_ac` package, I provide 3 general reinforcement learning scripts:
+Along with the `torch_rl` package, I provide 3 general reinforcement learning scripts:
 - `train.py` for training a actor-critic model with A2C or PPO.
 - `enjoy.py` for visualizing your trained model acting.
 - `evaluate.py` for evaluating the performances of your trained model over X episodes.
@@ -129,7 +120,7 @@ Here is an example of command:
 scripts/train.py --algo ppo --env MiniGrid-DoorKey-5x5-v0 --model DoorKey --save-interval 10 --frames 1000000
 ```
 
-**Note:** if you have not installed `torch_ac`, you will have to replace `scripts/train.py` by `python3 -m scripts.train`.
+**Note:** if you have not installed `torch_rl`, you will have to replace `scripts/train.py` by `python3 -m scripts.train`.
 
 This will print some logs in your terminal:
 
@@ -175,7 +166,7 @@ Here is an example of command:
 scripts/enjoy.py --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
 ```
 
-**Note:** if you have not installed `torch_ac`, you will have to replace `scripts/enjoy.py` by `python3 -m scripts.enjoy`.
+**Note:** if you have not installed `torch_rl`, you will have to replace `scripts/enjoy.py` by `python3 -m scripts.enjoy`.
 
 In the `MiniGrid-DoorKey-6x6-v0` environment, the agent has to reach the green goal. In particular, it has to learn how to open a locked door.
 
@@ -206,7 +197,7 @@ Here is an example of command:
 scripts/evaluate.py --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
 ```
 
-**Note:** if you have not installed `torch_ac`, you will have to replace `scripts/evaluate.py` by `python3 -m scripts.evaluate`.
+**Note:** if you have not installed `torch_rl`, you will have to replace `scripts/evaluate.py` by `python3 -m scripts.evaluate`.
 
 This will print the evaluation in your terminal:
 

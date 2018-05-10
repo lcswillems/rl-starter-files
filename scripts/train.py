@@ -7,7 +7,7 @@ import time
 import datetime
 import sys
 import torch
-import torch_ac
+import torch_rl
 
 import utils
 
@@ -89,11 +89,11 @@ if torch.cuda.is_available():
 # Define actor-critic algo
 
 if args.algo == "a2c":
-    algo = torch_ac.A2CAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_tau,
+    algo = torch_rl.A2CAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_tau,
                             args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
                             args.optim_alpha, args.optim_eps, obss_preprocessor, utils.reshape_reward)
 elif args.algo == "ppo":
-    algo = torch_ac.PPOAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_tau,
+    algo = torch_rl.PPOAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_tau,
                             args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
                             args.optim_eps, args.clip_eps, args.epochs, args.batch_size, obss_preprocessor,
                             utils.reshape_reward)

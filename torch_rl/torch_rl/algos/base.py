@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 import torch
 import numpy
 
-from torch_ac.format import default_preprocess_obss
-from torch_ac.model import RecurrentACModel
-from torch_ac.utils import DictList, MultiEnv
+from torch_rl.format import default_preprocess_obss
+from torch_rl.model import RecurrentACModel
+from torch_rl.utils import DictList, MultiEnv
 
 class BaseAlgo(ABC):
     def __init__(self, envs, acmodel, num_frames_per_proc, discount, lr, gae_tau, entropy_coef,

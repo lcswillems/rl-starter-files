@@ -1,5 +1,5 @@
 import torch
-from torch_ac import RecurrentACModel
+from torch_rl import RecurrentACModel
 
 import utils
 

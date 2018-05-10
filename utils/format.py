@@ -3,7 +3,7 @@ import json
 import numpy
 import re
 import torch
-import torch_ac
+import torch_rl
 
 import utils
 
@@ -38,7 +38,7 @@ class ObssPreprocessor:
         }
 
     def __call__(self, obss, device=None):
-        obs_ = torch_ac.DictList()
+        obs_ = torch_rl.DictList()
 
         if "image" in self.obs_space.keys():
             images = numpy.array([obs["image"] for obs in obss])
