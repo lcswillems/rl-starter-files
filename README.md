@@ -138,10 +138,10 @@ This will print some logs in your terminal:
 where:
 - "U" is for "Update".
 - "F" is for "Total number of frames".
-- "FPS" is for "frame per second".
-- "D" is for "duration".
-- "rR" is for "reshaped return". The 4 following numbers are, in the order, the mean, the standard deviation, the minimum, the maximum of the reshaped return per episode during the update.
-- "F" is for the number of "Frame". The 4 following numbers are again, in the order, the mean, the standard deviation, the minimum, the maximum of the number of frames per episode during the update.
+- "FPS" is for "Frames Per Second".
+- "D" is for "Duration".
+- "rR" is for "reshaped Return". The 4 following numbers are, in the order, the mean, the standard deviation, the minimum, the maximum of the reshaped return per episode during the update.
+- "F" is for the number of "Frames". The 4 following numbers are again, in the order, the mean, the standard deviation, the minimum, the maximum of the number of frames per episode during the update.
 - "H" is for "Entropy".
 - "V" is for "Value".
 - "pL" is for "Policy loss".
@@ -212,4 +212,4 @@ This will print the evaluation in your terminal:
 
 <p align="center"><img src="README-images/evaluate-terminal-log.png"></p>
 
-where "R" is for "return".
+where "R" is for "Return".
