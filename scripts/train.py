@@ -19,7 +19,7 @@ parser.add_argument("--algo", required=True,
 parser.add_argument("--env", required=True,
                     help="name of the environment to train on (REQUIRED)")
 parser.add_argument("--model", default=None,
-                    help="name of the pre-trained model (default: ENV_ALGO)")
+                    help="name of the model (default: ENV_ALGO_TIME)")
 parser.add_argument("--seed", type=int, default=1,
                     help="random seed (default: 1)")
 parser.add_argument("--procs", type=int, default=16,
@@ -74,7 +74,8 @@ for i in range(args.procs):
 
 # Define model name
 
-model_name = args.model or args.env + "_" + args.algo
+suffix = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+model_name = args.model or args.env + "_" + args.algo + "_" + suffix
 
 # Define obss preprocessor
 
@@ -102,7 +103,6 @@ else:
 
 # Define logger and tensorboard writer then log command and model
 
-suffix = datetime.datetime.now().strftime("%y%m%d%H%M%S")
 log_name = model_name + "_" + suffix
 
 logger = utils.Logger(log_name)
