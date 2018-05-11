@@ -120,8 +120,6 @@ Here is an example of command:
 scripts/train.py --algo ppo --env MiniGrid-DoorKey-5x5-v0 --model DoorKey --save-interval 10 --frames 1000000
 ```
 
-**Note:** if you have not installed `torch_rl`, you will have to replace `scripts/train.py` by `python3 -m scripts.train`.
-
 This will print some logs in your terminal:
 
 <p align="center"><img src="README-images/train-terminal-log.png"></p>
@@ -166,8 +164,6 @@ Here is an example of command:
 scripts/enjoy.py --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
 ```
 
-**Note:** if you have not installed `torch_rl`, you will have to replace `scripts/enjoy.py` by `python3 -m scripts.enjoy`.
-
 In the `MiniGrid-DoorKey-6x6-v0` environment, the agent has to reach the green goal. In particular, it has to learn how to open a locked door.
 
 <p align="center"><img src="README-images/enjoy-doorkey.gif"></p>
@@ -196,8 +192,6 @@ Here is an example of command:
 ```
 scripts/evaluate.py --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
 ```
-
-**Note:** if you have not installed `torch_rl`, you will have to replace `scripts/evaluate.py` by `python3 -m scripts.evaluate`.
 
 This will print the evaluation in your terminal:
 
