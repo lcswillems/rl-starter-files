@@ -77,6 +77,8 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
             hidden = self.memory_rnn(x, hidden)
             embedding = hidden[0]
             memory = torch.cat(hidden, dim=1)
+        else:
+            embedding = x
 
         x = self.a_fc1(embedding)
         x = F.tanh(x)
