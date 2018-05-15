@@ -2,9 +2,13 @@
 
 import argparse
 import gym
-import gym_minigrid
 import time
 import torch
+
+try:
+    import gym_minigrid
+except ImportError:
+    pass
 
 import utils
 
