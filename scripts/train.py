@@ -105,7 +105,7 @@ elif args.algo == "ppo":
 else:
     raise ValueError
 
-# Define logger and tensorboard writer then log command and model
+# Define logger and tensorboard writer then
 
 log_name = model_name + ("_" + suffix if args.model is not None else "")
 
@@ -114,7 +114,10 @@ if args.tb:
     from tensorboardX import SummaryWriter
     writer = SummaryWriter(utils.get_log_path(log_name, ext=False))
 
+# Log command, availabily of CUDA and model
+
 logger.log(args, to_print=False)
+logger.log("CUDA available: {}".format(torch.cuda.is_available()))
 logger.log(acmodel)
 
 # Train model
