@@ -61,9 +61,11 @@ class BaseAlgo(ABC):
         self.log_episode_return = torch.zeros(self.num_procs, device=self.device)
         self.log_episode_reshaped_return = torch.zeros(self.num_procs, device=self.device)
         self.log_episode_num_frames = torch.zeros(self.num_procs, device=self.device)
-        self.log_return = torch.zeros(self.num_procs, device=self.device)
-        self.log_reshaped_return = torch.zeros(self.num_procs, device=self.device)
-        self.log_num_frames = torch.zeros(self.num_procs, device=self.device)
+
+        self.log_done_counter = 0
+        self.log_return = [0] * self.num_procs
+        self.log_reshaped_return = [0] * self.num_procs
+        self.log_num_frames = [0] * self.num_procs
 
     def collect_experiences(self):        
         for i in range(self.num_frames_per_proc):
@@ -105,12 +107,12 @@ class BaseAlgo(ABC):
             self.log_episode_reshaped_return += self.rewards[i]
             self.log_episode_num_frames += torch.ones(self.num_procs, device=self.device)
 
-            self.log_return *= self.mask
-            self.log_return += (1 - self.mask) * self.log_episode_return
-            self.log_reshaped_return *= self.mask
-            self.log_reshaped_return += (1 - self.mask) * self.log_episode_reshaped_return
-            self.log_num_frames *= self.mask
-            self.log_num_frames += (1 - self.mask) * self.log_episode_num_frames
+            for i, done_ in enumerate(done):
+                if done_:
+                    self.log_done_counter += 1
+                    self.log_return.append(self.log_episode_return[i].item())
+                    self.log_reshaped_return.append(self.log_episode_reshaped_return[i].item())
+                    self.log_num_frames.append(self.log_episode_num_frames[i].item())
 
             self.log_episode_return *= self.mask
             self.log_episode_reshaped_return *= self.mask
@@ -153,12 +155,19 @@ class BaseAlgo(ABC):
 
         # Log some values
 
+        keep = max(self.log_done_counter, self.num_procs)
+
         log = {
-            "return_per_episode": self.log_return.cpu().numpy(),
-            "reshaped_return_per_episode": self.log_reshaped_return.cpu().numpy(),
-            "num_frames_per_episode": self.log_num_frames.cpu().numpy(),
+            "return_per_episode": self.log_return[-keep:],
+            "reshaped_return_per_episode": self.log_reshaped_return[-keep:],
+            "num_frames_per_episode": self.log_num_frames[-keep:],
             "num_frames": self.num_frames
         }
+
+        self.log_done_counter = 0
+        self.log_return = self.log_return[-self.num_procs:]
+        self.log_reshaped_return = self.log_reshaped_return[-self.num_procs:]
+        self.log_num_frames = self.log_num_frames[-self.num_procs:]
 
         return exps, log
 
