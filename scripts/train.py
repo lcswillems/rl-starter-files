@@ -46,8 +46,8 @@ parser.add_argument("--value-loss-coef", type=float, default=0.5,
                     help="value loss term coefficient (default: 0.5)")
 parser.add_argument("--max-grad-norm", type=float, default=0.5,
                     help="maximum norm of gradient (default: 0.5)")
-parser.add_argument("--recurrence", type=int, default=4,
-                    help="length of the recurrence during update for recurrent model (default: 4)")
+parser.add_argument("--recurrence", type=int, default=1,
+                    help="number of timesteps gradient is backpropagated (default: 1)")
 parser.add_argument("--optim-eps", type=float, default=1e-5,
                     help="Adam and RMSprop optimizer epsilon (default: 1e-5)")
 parser.add_argument("--optim-alpha", type=float, default=0.99,
