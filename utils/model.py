@@ -1,7 +1,7 @@
 import os
 import torch
 
-from models.img_instr import ACModel
+from model import ACModel
 import utils
 
 def get_model_path(model_name):
