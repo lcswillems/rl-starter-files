@@ -77,7 +77,7 @@ DictList({"a": [1, 2], "b": [5]})
 
 An example of use of `torch_rl.A2CAlgo` and `torch_rl.PPOAlgo` classes is given in `scripts/train.py`.
 
-An example of implementation of `torch_rl.ACModel` and `torch_rl.RecurrentACModel` abstract classes is given in `models/img_instr.py` and `models/img_instr_mem.py` respectively.
+An example of implementation of `torch_rl.RecurrentACModel` abstract class is given in `model.py`.
 
 An example of use of `torch_rl.DictList` and an example of a `preprocess_obss` function is given in the `ObsPreprocessor.__call__` function of `utils/format.py`.
 
@@ -96,7 +96,7 @@ Along with the `torch_rl` package, I provide 3 general reinforcement learning sc
 - `enjoy.py` for visualizing your trained model acting.
 - `evaluate.py` for evaluating the performances of your trained model over X episodes.
 
-For your own purposes, you will probabily need to change models in the `models` folder, the line `from models.img_instr import ACModel` in `utils/model.py`, the `ObssPreprocessor.__call__` method and `reshape_reward` function in `utils.format`.
+For your own purposes, you will probabily need to change the model in `model.py`, the `ObssPreprocessor.__call__` method and `reshape_reward` function in `utils.format`.
 
 They were designed especially for the [MiniGrid environments](https://github.com/maximecb/gym-minigrid). These environments give an observation containing an image and a textual instruction to the agent and a reward of 1 if it successfully executes the instruction, 0 otherwise. They are used in what follows for illustrating purposes.
 
