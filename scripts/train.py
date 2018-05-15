@@ -78,7 +78,7 @@ for i in range(args.procs):
 
 # Define model name
 
-suffix = datetime.datetime.now().strftime("%y%m%d%H%M%S")
+suffix = datetime.datetime.now().strftime("%y-%m-%d-%H-%M-%S")
 model_name = args.model or args.env + "_" + args.algo + "_" + suffix
 
 # Define obss preprocessor
