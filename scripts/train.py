@@ -103,7 +103,7 @@ else:
 
 # Define logger and tensorboard writer then log command and model
 
-log_name = model_name + "_" + suffix
+log_name = model_name + ("_" + suffix if args.model is not None else "")
 
 logger = utils.Logger(log_name)
 if not(args.no_tb):
