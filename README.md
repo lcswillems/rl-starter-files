@@ -48,7 +48,7 @@ I will detail here the points that can't be understood immediately by looking at
 - `__init__` that may take, among the other parameters :
     - an `acmodel` actor-critic model that is an instance of a class that inherits from one of the two abstract classes `torch_rl.ACModel` or `torch_rl.RecurrentACModel`.
     - a `preprocess_obss` function that transforms a list of observations given by the environment into an object `X`. This object `X` must allow to retrieve from it a sublist of preprocessed observations given a list of indexes `indexes` with `X[indexes]`. By default, the observations given by the environment are transformed into a Pytorch tensor.
-    - a `reshape_reward` function that takes into parameter an observation `obs`, the action `action` of the model, the reward `reward` and the terminal status `done` and returns a new reward.
+    - a `reshape_reward` function that takes into parameter, in the order, an observation `obs`, the action `action` of the model, the reward `reward` and the terminal status `done` and returns a new reward.
     - a `recurrence` number to specify over how many timestep gradient will be backpropagated. This number is only considered if a recurrent model is used and **must divide** the `num_frames_per_agent` parameter and, for PPO, the `batch_size` parameter.
 - `update_parameters` that returns some logs.
 
@@ -96,7 +96,10 @@ Along with the `torch_rl` package, I provide 3 general reinforcement learning sc
 - `enjoy.py` for visualizing your trained model acting.
 - `evaluate.py` for evaluating the performances of your trained model over X episodes.
 
-For your own purposes, you will probabily need to change the model in `model.py`, the `ObssPreprocessor.__call__` method and `reshape_reward` function in `utils.format`.
+For your own purposes, you will probabily need to change:
+- the model in `model.py`,
+- the `ObssPreprocessor.__call__` method in `utils.format`,
+- the `reshape_reward` function in `utils.format`.
 
 They were designed especially for the [MiniGrid environments](https://github.com/maximecb/gym-minigrid). These environments give an observation containing an image and a textual instruction to the agent and a reward of 1 if it successfully executes the instruction, 0 otherwise. They are used in what follows for illustrating purposes.
 
@@ -129,7 +132,7 @@ where:
 - "F" is for the total number of "Frames".
 - "FPS" is for "Frames Per Second".
 - "D" is for "Duration".
-- "rR" is for "reshaped Return" per episode. The 4 following numbers are, in the order, the mean, the standard deviation, the minimum, the maximum of the reshaped return per episode during the update.
+- "rR" is for "reshaped Return" per episode. The 4 following numbers are, in the order, the mean `x̄`, the standard deviation `σ`, the minimum `m` and the maximum `M` of the reshaped return per episode during the update.
 - "F" is for the number of "Frames" per episode. The 4 following numbers are again, in the order, the mean, the standard deviation, the minimum, the maximum of the number of frames per episode during the update.
 - "H" is for "Entropy".
 - "V" is for "Value".
@@ -138,7 +141,7 @@ where:
 
 These logs are also saved in a log file in `storage/logs`.
 
-By default, logs are also plotted in Tensorboard using the `tensorboardX` package that you can install with `pip3 install tensorboardX`. You just have to execute:
+If you add `--tb` to the command, logs are also plotted in Tensorboard using the `tensorboardX` package that you can install with `pip3 install tensorboardX`. Then, you just have to execute:
 
 ```tensorboard --logdir storage/logs```
 
@@ -146,8 +149,6 @@ and you will get something like this:
 
 <p align="center"><img src="README-images/train-tensorboard-1.png"></p>
 <p align="center"><img src="README-images/train-tensorboard-2.png"></p>
-
-If you don't want to use Tensorboard, you will have to add `--no-tb` to the command.
 
 ### `enjoy.py`
 
