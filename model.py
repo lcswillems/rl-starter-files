@@ -37,16 +37,16 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
             self.instr_rnn = nn.GRU(self.word_embedding_size, self.instr_embedding_size, batch_first=True)
 
         # Resize image embedding
-        self.image_embedding_size = self.semi_memory_size
+        self.embedding_size = self.semi_memory_size
         if self.use_instr:
-            self.image_embedding_size += self.instr_embedding_size
+            self.embedding_size += self.instr_embedding_size
 
         # Define actor's model
-        self.a_fc1 = nn.Linear(self.image_embedding_size, 64)
+        self.a_fc1 = nn.Linear(self.embedding_size, 64)
         self.a_fc2 = nn.Linear(64, action_space.n)
 
         # Define critic's model
-        self.c_fc1 = nn.Linear(self.image_embedding_size, 64)
+        self.c_fc1 = nn.Linear(self.embedding_size, 64)
         self.c_fc2 = nn.Linear(64, 1)
 
         # Initialize parameters correctly
