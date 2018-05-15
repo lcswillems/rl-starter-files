@@ -79,7 +79,8 @@ for i in range(args.procs):
 # Define model name
 
 suffix = datetime.datetime.now().strftime("%y-%m-%d-%H-%M-%S")
-model_name = args.model or args.env + "_" + args.algo + "_" + suffix
+default_model_name = "{}_{}_seed{}_{}".format(args.env, args.algo, args.seed, suffix)
+model_name = args.model or default_model_name
 
 # Define obss preprocessor
 
