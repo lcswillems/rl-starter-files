@@ -98,7 +98,7 @@ Along with the `torch_rl` package, I provide 3 general reinforcement learning sc
 
 For your own purposes, you will probabily need to change models in the `models` folder, the line `from models.img_instr import ACModel` in `utils/model.py`, the `ObssPreprocessor.__call__` method and `reshape_reward` function in `utils.format`.
 
-They were designed especially for the [MiniGrid environments](https://github.com/maximecb/gym-minigrid). These environments give an observation containing an image and a textual instruction. They are used in what follows for illustrating purposes.
+They were designed especially for the [MiniGrid environments](https://github.com/maximecb/gym-minigrid). These environments give an observation containing an image and a textual instruction to the agent and a reward of 1 if it successfully executes the instruction, 0 otherwise. They are used in what follows for illustrating purposes.
 
 These scripts assume that you have already installed the `gym` package (with `pip3 install gym` for example). If you have not installed `gym_minigrid` and don't want to install it, you will have to remove the `import gym_minigrid` lines in all the scripts.
 
@@ -174,7 +174,7 @@ In the `MiniGrid-GoToDoor-5x5-v0` environment, the agent has to open a door spec
 
 In the `MiniGrid-RedBlueDoors-6x6-v0` environment, the agent has to open the red door and then the blue door. Because the agent initially faces the blue door, it has to remember if the red door is opened.
 
-<p align="center"><img src="README-images/enjoy-twodoors.gif"></p>
+<p align="center"><img src="README-images/enjoy-redbluedoors.gif"></p>
 
 ### `evaluate.py`
 
