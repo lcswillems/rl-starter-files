@@ -110,7 +110,7 @@ if not(args.no_tb):
     from tensorboardX import SummaryWriter
     writer = SummaryWriter(utils.get_log_path(log_name, ext=False))
 
-logger.log(" ".join(sys.argv), to_print=False)
+logger.log(args, to_print=False)
 logger.log(acmodel)
 
 # Train model
