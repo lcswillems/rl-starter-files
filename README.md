@@ -17,7 +17,7 @@ inspired by 3 repositories:
 - Discrete & continuous action space
 - Entropy regularization
 - Reward shaping
-- Recurrent policy by specifying recurrence length
+- Recurrent policy by specifying the recurrence
 - Fast:
     - Multiprocessing for collection trajectories in multiple environments simultaneously
     - GPU (CUDA) for tensor operations
@@ -120,7 +120,7 @@ and a bunch of optional arguments are available among which:
 
 Here is an example of command:
 ```
-scripts/train.py --algo ppo --env MiniGrid-DoorKey-5x5-v0 --model DoorKey --save-interval 10 --frames 1000000
+python3 -m scripts.train --algo ppo --env MiniGrid-DoorKey-5x5-v0 --model DoorKey --save-interval 10 --frames 1000000
 ```
 
 This will print some logs in your terminal:
@@ -162,7 +162,7 @@ and several optional arguments are available (see more using `--help`).
 
 Here is an example of command:
 ```
-scripts/enjoy.py --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
+python3 -m scripts.enjoy --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
 ```
 
 In the `MiniGrid-DoorKey-6x6-v0` environment, the agent has to reach the green goal. In particular, it has to learn how to open a locked door.
@@ -191,7 +191,7 @@ By default, the model is tested on 100 episodes with a random seed set to 2 inst
 
 Here is an example of command:
 ```
-scripts/evaluate.py --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
+python3 -m scripts.evaluate --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
 ```
 
 This will print the evaluation in your terminal:
