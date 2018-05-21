@@ -118,10 +118,10 @@ class PPOAlgo(BaseAlgo):
         
         # Log some values
 
-        log["entropy"] = sum(log_entropies) / len(log_entropies)
-        log["value"] = sum(log_values) / len(log_values)
-        log["policy_loss"] = sum(log_policy_losses) / len(log_policy_losses)
-        log["value_loss"] = sum(log_value_losses) / len(log_value_losses)
+        log["entropy"] = numpy.mean(log_entropies)
+        log["value"] = numpy.mean(log_values)
+        log["policy_loss"] = numpy.mean(log_policy_losses)
+        log["value_loss"] = numpy.mean(log_value_losses)
 
         return log
     
