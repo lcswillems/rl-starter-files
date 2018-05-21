@@ -108,12 +108,10 @@ else:
 
 # Define logger and tensorboard writer then
 
-log_name = model_name + ("_" + suffix if args.model is not None else "")
-
-logger = utils.Logger(log_name)
+logger = utils.Logger(model_name)
 if args.tb:
     from tensorboardX import SummaryWriter
-    writer = SummaryWriter(utils.get_log_path(log_name, ext=False))
+    writer = SummaryWriter(utils.get_log_path(model_name, ext=False))
 
 # Log command, availabily of CUDA and model
 
