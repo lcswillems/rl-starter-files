@@ -39,7 +39,7 @@ env.seed(args.seed)
 
 # Define agent
 
-agent = utils.Agent(args.model, env.observation_space, env.action_space)
+agent = utils.Agent(args.model, env.observation_space, env.action_space, args.deterministic)
 
 # Initialize logs
 
@@ -57,7 +57,7 @@ for _ in range(args.episodes):
     returnn = 0
 
     while not(done):
-        action = agent.get_action(obs, deterministic=args.deterministic)
+        action = agent.get_action(obs)
         obs, reward, done, _ = env.step(action)
         agent.analyze_feedback(reward, done)
         

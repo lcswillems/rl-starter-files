@@ -36,7 +36,7 @@ env.seed(args.seed)
 
 # Define agent
 
-agent = utils.Agent(args.model, env.observation_space, env.action_space)
+agent = utils.Agent(args.model, env.observation_space, env.action_space, args.deterministic)
 
 # Run the agent
 
@@ -47,7 +47,7 @@ while True:
     renderer = env.render("human")
     print("Mission:", obs["mission"])
 
-    action = agent.get_action(obs, deterministic=args.deterministic)
+    action = agent.get_action(obs)
     obs, reward, done, _ = env.step(action)
     agent.analyze_feedback(reward, done)
 
