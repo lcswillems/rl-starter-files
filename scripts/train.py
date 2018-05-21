@@ -35,7 +35,7 @@ parser.add_argument("--log-interval", type=int, default=1,
 parser.add_argument("--save-interval", type=int, default=0,
                     help="number of updates between two saves (default: 0, 0 means no saving)")
 parser.add_argument("--tb", action="store_true", default=False,
-                    help="don't log into tensorboard")
+                    help="log into tensorboard")
 parser.add_argument("--frames-per-proc", type=int, default=None,
                     help="number of frames per process before update (default: 5 for A2C and 128 for PPO)")
 parser.add_argument("--discount", type=float, default=0.99,
