@@ -61,7 +61,7 @@ parser.add_argument("--clip-eps", type=float, default=0.2,
 parser.add_argument("--epochs", type=int, default=4,
                     help="number of epochs for PPO (default: 4)")
 parser.add_argument("--batch-size", type=int, default=256,
-                    help="batch size for PPO (default: 256, 0 means all)")
+                    help="batch size for PPO (default: 256)")
 args = parser.parse_args()
 
 # Set seed for all randomness sources
