@@ -43,7 +43,7 @@ agent = utils.Agent(args.model, env.observation_space, env.action_space, args.de
 
 # Initialize logs
 
-log = {"num_frames_per_episode": [], "return_per_episode": []}
+logs = {"num_frames_per_episode": [], "return_per_episode": []}
 
 # Run the agent
 
@@ -64,19 +64,19 @@ for _ in range(args.episodes):
         num_frames += 1
         returnn += reward
     
-    log["num_frames_per_episode"].append(num_frames)
-    log["return_per_episode"].append(returnn)
+    logs["num_frames_per_episode"].append(num_frames)
+    logs["return_per_episode"].append(returnn)
 
 end_time = time.time()
 
 # Print logs
 
-num_frames = sum(log["num_frames_per_episode"])
+num_frames = sum(logs["num_frames_per_episode"])
 fps = num_frames/(end_time - start_time)
 ellapsed_time = int(end_time - start_time)
 duration = datetime.timedelta(seconds=ellapsed_time)
-return_per_episode = utils.synthesize(log["return_per_episode"])
-num_frames_per_episode = utils.synthesize(log["num_frames_per_episode"])
+return_per_episode = utils.synthesize(logs["return_per_episode"])
+num_frames_per_episode = utils.synthesize(logs["num_frames_per_episode"])
 
 print("F {} | FPS {:.0f} | D {} | R:x̄σmM {:.2f} {:.2f} {:.2f} {:.2f} | F:x̄σmM {:.1f} {:.1f} {} {}"
       .format(num_frames, fps, duration,

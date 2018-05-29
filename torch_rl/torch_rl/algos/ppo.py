@@ -27,7 +27,7 @@ class PPOAlgo(BaseAlgo):
     def update_parameters(self):
         # Collect experiences
 
-        exps, log = self.collect_experiences()
+        exps, logs = self.collect_experiences()
 
         for _ in range(self.epochs):
             # Initialize log values
@@ -118,12 +118,12 @@ class PPOAlgo(BaseAlgo):
         
         # Log some values
 
-        log["entropy"] = numpy.mean(log_entropies)
-        log["value"] = numpy.mean(log_values)
-        log["policy_loss"] = numpy.mean(log_policy_losses)
-        log["value_loss"] = numpy.mean(log_value_losses)
+        logs["entropy"] = numpy.mean(log_entropies)
+        logs["value"] = numpy.mean(log_values)
+        logs["policy_loss"] = numpy.mean(log_policy_losses)
+        logs["value_loss"] = numpy.mean(log_value_losses)
 
-        return log
+        return logs
     
     def batches_starting_indexes(self):
         indexes = numpy.arange(0, self.num_frames, self.recurrence)

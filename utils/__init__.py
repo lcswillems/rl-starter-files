@@ -20,5 +20,5 @@ def seed(seed):
 
 from utils.agent import Agent
 from utils.format import ObssPreprocessor, reshape_reward
-from utils.log import get_log_path, synthesize, Logger
-from utils.model import load_model, save_model
+from utils.log import get_log_dir, synthesize, Logger
+from utils.model import get_model_dir, load_model, save_model

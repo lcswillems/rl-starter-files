@@ -19,7 +19,7 @@ class A2CAlgo(BaseAlgo):
     def update_parameters(self):
         # Collect experiences
 
-        exps, log = self.collect_experiences()
+        exps, logs = self.collect_experiences()
 
         # Compute starting indexes
 
@@ -87,12 +87,12 @@ class A2CAlgo(BaseAlgo):
 
         # Log some values
 
-        log["entropy"] = update_entropy
-        log["value"] = update_value
-        log["policy_loss"] = update_policy_loss
-        log["value_loss"] = update_value_loss
+        logs["entropy"] = update_entropy
+        logs["value"] = update_value
+        logs["policy_loss"] = update_policy_loss
+        logs["value_loss"] = update_value_loss
 
-        return log
+        return logs
     
     def starting_indexes(self):
         return numpy.arange(0, self.num_frames, self.recurrence)
