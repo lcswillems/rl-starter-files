@@ -23,7 +23,6 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
 
         # Define image embedding
         self.image_embedding_size = 64        
-        self.image_fc = nn.Linear(obs_space["image"], self.image_embedding_size)
         self.image_conv = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=16, kernel_size=(2, 2)),
             nn.ReLU(),
