@@ -35,7 +35,7 @@ class A2CAlgo(BaseAlgo):
 
         # Initialize memory
 
-        if self.is_recurrent:
+        if self.acmodel.recurrent:
             memory = exps.memory[inds]
 
         for _ in range(self.recurrence):
@@ -45,7 +45,7 @@ class A2CAlgo(BaseAlgo):
 
             # Compute loss
 
-            if self.is_recurrent:
+            if self.acmodel.recurrent:
                 dist, value, memory = self.acmodel(sb.obs, memory * sb.mask)
             else:
                 dist, value = self.acmodel(sb.obs)

@@ -3,7 +3,6 @@ import torch
 import numpy
 
 from torch_rl.format import default_preprocess_obss
-from torch_rl.model import RecurrentACModel
 from torch_rl.utils import DictList, MultiEnv
 
 class BaseAlgo(ABC):
@@ -30,11 +29,10 @@ class BaseAlgo(ABC):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.num_procs = len(envs)
         self.num_frames = self.num_frames_per_proc * self.num_procs
-        self.is_recurrent = isinstance(self.acmodel, RecurrentACModel)
 
         # Control parameters
 
-        if not(self.is_recurrent):
+        if not(self.acmodel.recurrent):
             self.recurrence = 1
 
         assert self.num_frames_per_proc % self.recurrence == 0
@@ -45,7 +43,7 @@ class BaseAlgo(ABC):
 
         self.obs = self.env.reset()
         self.obss = [None]*(shape[0])
-        if self.is_recurrent:
+        if self.acmodel.recurrent:
             self.memory = torch.zeros(shape[1], self.acmodel.memory_size, device=self.device)
             self.memories = torch.zeros(*shape, self.acmodel.memory_size, device=self.device)
         self.mask = torch.ones(shape[1], device=self.device)
@@ -73,7 +71,7 @@ class BaseAlgo(ABC):
 
             preprocessed_obs = self.preprocess_obss(self.obs, device=self.device)
             with torch.no_grad():
-                if self.is_recurrent:
+                if self.acmodel.recurrent:
                     dist, value, memory = self.acmodel(preprocessed_obs, self.memory * self.mask.unsqueeze(1))
                 else:
                     dist, value = self.acmodel(preprocessed_obs)
@@ -85,7 +83,7 @@ class BaseAlgo(ABC):
 
             self.obss[i] = self.obs
             self.obs = obs
-            if self.is_recurrent:
+            if self.acmodel.recurrent:
                 self.memories[i] = self.memory
                 self.memory = memory
             self.masks[i] = self.mask
@@ -122,7 +120,7 @@ class BaseAlgo(ABC):
 
         preprocessed_obs = self.preprocess_obss(self.obs, device=self.device)
         with torch.no_grad():
-            if self.is_recurrent:
+            if self.acmodel.recurrent:
                 _, next_value, _ = self.acmodel(preprocessed_obs, self.memory * self.mask.unsqueeze(1))
             else:
                 _, next_value = self.acmodel(preprocessed_obs)
@@ -139,7 +137,7 @@ class BaseAlgo(ABC):
 
         exps = DictList()
         exps.obs = [obs for obss in self.obss for obs in obss]
-        if self.is_recurrent:
+        if self.acmodel.recurrent:
             exps.memory = self.memories.view(-1, *self.memories.shape[2:])
             exps.mask = self.masks.view(-1, *self.masks.shape[2:]).unsqueeze(1)
         exps.action = self.actions.view(-1, *self.actions.shape[2:])

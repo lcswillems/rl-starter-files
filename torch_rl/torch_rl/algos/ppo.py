@@ -48,7 +48,7 @@ class PPOAlgo(BaseAlgo):
 
                 # Initialize memory
 
-                if self.is_recurrent:
+                if self.acmodel.recurrent:
                     memory = exps.memory[inds]
 
                 for i in range(self.recurrence):
@@ -58,7 +58,7 @@ class PPOAlgo(BaseAlgo):
 
                     # Compute loss
 
-                    if self.is_recurrent:
+                    if self.acmodel.recurrent:
                         dist, value, memory = self.acmodel(sb.obs, memory * sb.mask)
                     else:
                         dist, value = self.acmodel(sb.obs)
@@ -91,7 +91,7 @@ class PPOAlgo(BaseAlgo):
 
                     # Update memories for next epoch
 
-                    if self.is_recurrent and i < self.recurrence - 1:
+                    if self.acmodel.recurrent and i < self.recurrence - 1:
                         exps.memory[inds] = memory.detach()
 
                 # Update batch values
