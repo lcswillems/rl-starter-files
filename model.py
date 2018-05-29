@@ -61,9 +61,6 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
         return self.image_embedding_size
 
     def forward(self, obs, memory):
-        if self.use_instr:
-            embed_instr = self._get_embed_instr(obs.instr)
-
         x = self.image_fc(obs.image)
 
         if self.use_memory:
@@ -75,6 +72,7 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
             embedding = x
         
         if self.use_instr:
+            embed_instr = self._get_embed_instr(obs.instr)
             embedding = torch.cat((embedding, embed_instr), dim=1)
 
         x = self.a_fc1(embedding)
