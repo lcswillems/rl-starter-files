@@ -20,8 +20,8 @@ parser.add_argument("--env", required=True,
                     help="name of the environment to be run (REQUIRED)")
 parser.add_argument("--model", required=True,
                     help="name of the trained model (REQUIRED)")
-parser.add_argument("--episodes", type=int, default=100,
-                    help="number of episodes of evaluation (default: 100)")
+parser.add_argument("--episodes", type=int, default=1000,
+                    help="number of episodes of evaluation (default: 1000)")
 parser.add_argument("--seed", type=int, default=0,
                     help="random seed (default: 0)")
 parser.add_argument("--deterministic", action="store_true", default=False,
