@@ -4,7 +4,6 @@ import argparse
 import gym
 import time
 import datetime
-import torch
 
 try:
     import gym_minigrid

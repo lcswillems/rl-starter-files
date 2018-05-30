@@ -3,7 +3,6 @@
 import argparse
 import gym
 import time
-import torch
 
 try:
     import gym_minigrid
