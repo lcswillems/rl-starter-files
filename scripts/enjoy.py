@@ -22,6 +22,8 @@ parser.add_argument("--seed", type=int, default=0,
                     help="random seed (default: 0)")
 parser.add_argument("--deterministic", action="store_true", default=False,
                     help="action with highest probability is selected")
+parser.add_argument("--pause", type=float, default=0.1,
+                    help="pause duration between two consequent actions of the agent")
 args = parser.parse_args()
 
 # Set seed for all randomness sources
@@ -46,7 +48,7 @@ while True:
         obs = env.reset()
         print("Instr:", obs["mission"])
 
-    time.sleep(0.1)
+    time.sleep(args.pause)
     renderer = env.render("human")
 
     action = agent.get_action(obs)
