@@ -10,11 +10,16 @@ def get_model_dir(model_name):
 def get_model_path(model_name):
     return os.path.join(get_model_dir(model_name), "model.pt")
 
-def load_model(observation_space, action_space, model_name):
+def load_model(observation_space, action_space, model_name,
+               create_if_not_exists=False):
     path = get_model_path(model_name)
-    acmodel = ACModel(observation_space, action_space)
     if os.path.exists(path):
+        acmodel = ACModel(observation_space, action_space)
         acmodel.load_state_dict(torch.load(path))
+    elif create_if_not_exists:
+        acmodel = ACModel(observation_space, action_space)
+    else:
+        raise ValueError("No model at `{}`".format(path))
     acmodel.eval()
     return acmodel
 
