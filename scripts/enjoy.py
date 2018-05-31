@@ -39,19 +39,19 @@ agent = utils.Agent(args.model, env.observation_space, env.action_space, args.de
 
 # Run the agent
 
-obs = env.reset()
+done = True
 
 while True:
+    if done == True:
+        obs = env.reset()
+        print("Instr:", obs["mission"])
+
     time.sleep(0.1)
     renderer = env.render("human")
-    print("Mission:", obs["mission"])
 
     action = agent.get_action(obs)
     obs, reward, done, _ = env.step(action)
     agent.analyze_feedback(reward, done)
-
-    if done:
-        obs = env.reset()
 
     if renderer.window is None:
         break
