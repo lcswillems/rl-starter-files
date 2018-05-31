@@ -174,5 +174,6 @@ while num_frames < args.frames:
         if torch.cuda.is_available():
             acmodel.cpu()
         utils.save_model(acmodel, model_name)
+        log("Model successfully saved")
         if torch.cuda.is_available():
             acmodel.cuda()
