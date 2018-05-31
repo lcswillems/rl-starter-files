@@ -92,7 +92,7 @@ export OMP_NUM_THREADS=1
 ## `scripts`
 
 Along with the `torch_rl` package, I provide 3 general reinforcement learning scripts:
-- `train.py` for training a actor-critic model with A2C or PPO.
+- `train.py` for training an actor-critic model with A2C or PPO.
 - `enjoy.py` for visualizing your trained model acting.
 - `evaluate.py` for evaluating the performances of your trained model over X episodes.
 
@@ -107,7 +107,7 @@ These scripts assume that you have already installed the `gym` package (with `pi
 
 ### `train.py`
 
-`scripts/train.py` enables you to load a model, trains it with the actor-critic algorithm specified and save it in the `storage/models` folder.
+`scripts/train.py` enables you to load a model, trains it with the specified actor-critic algorithm and save it in the `storage/models` folder.
 
 2 arguments are required:
 - `--algo ALGO`: name of the actor-critic algorithm.
