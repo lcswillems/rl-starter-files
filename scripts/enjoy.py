@@ -42,7 +42,7 @@ agent = utils.Agent(args.model, env.observation_space, env.action_space, args.de
 done = True
 
 while True:
-    if done == True:
+    if done:
         obs = env.reset()
         print("Instr:", obs["mission"])
 
