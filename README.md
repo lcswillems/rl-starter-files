@@ -103,7 +103,7 @@ For your own purposes, you will probabily need to change:
 
 They were designed especially for the [MiniGrid environments](https://github.com/maximecb/gym-minigrid). These environments give an observation containing an image and a textual instruction to the agent and a reward of 1 if it successfully executes the instruction, 0 otherwise. They are used in what follows for illustrating purposes.
 
-These scripts assume that you have already installed the `gym` package (with `pip3 install gym` for example). If you have not installed `gym_minigrid` and don't want to install it, you will have to remove the `import gym_minigrid` lines in all the scripts.
+These scripts assume that you have already installed the `gym` package (with `pip3 install gym` for example). By default, models and logs are stored in the `storage` folder. You can define a different folder in the environment variable `torch_rl_storage_dir`.
 
 ### `train.py`
 
