@@ -16,34 +16,46 @@ def worker(conn, env):
             raise NotImplementedError
 
 class MultiEnv(gym.Env):
-    """An asynchronous multi-environment."""
+    """A multiprocess asynchronous multi-environment."""
 
     def __init__(self, envs):
+        assert len(envs) >= 1, "No environment."
+
         self.envs = envs
         self.observation_space = self.envs[0].observation_space
         self.action_space = self.envs[0].action_space
-        self.locals, self.remotes = zip(*[Pipe() for _ in self.envs])
-        self.ps = [Process(target=worker, args=(remote, env))
-                   for (remote, env) in zip(self.remotes, self.envs)]
-
-        for p in self.ps:
-            p.daemon = True
-            p.start()
-        for remote in self.remotes:
-            remote.close()
+        
+        self.unique_env = len(self.envs) == 1
+        if self.unique_env:
+            self.env = self.envs[0]
+        else:
+            self.locals, self.remotes = zip(*[Pipe() for _ in self.envs])
+            self.ps = [Process(target=worker, args=(remote, env))
+                    for (remote, env) in zip(self.remotes, self.envs)]
+            for p in self.ps:
+                p.daemon = True
+                p.start()
+            for remote in self.remotes:
+                remote.close()
 
     def reset(self):
-        for local in self.locals:
-            local.send(("reset", None))
-        obss = [local.recv() for local in self.locals]
-        return obss
+        if self.unique_env:
+            return [self.env.reset()]
+        else:
+            for local in self.locals:
+                local.send(("reset", None))
+            return [local.recv() for local in self.locals]
 
     def step(self, actions):
-        for local, action in zip(self.locals, actions):
-            local.send(("step", action))
-        results = [local.recv() for local in self.locals]
-        obss, rewards, dones, infos = zip(*results)
-        return obss, rewards, dones, infos
+        if self.unique_env:
+            obs, reward, done, info = self.env.step(actions[0])
+            if done:
+                obs = self.env.reset()
+            return zip(*[(obs, reward, done, info)])
+        else:
+            for local, action in zip(self.locals, actions):
+                local.send(("step", action))
+            return zip(*[local.recv() for local in self.locals])
 
     def render(self):
         raise NotImplementedError
