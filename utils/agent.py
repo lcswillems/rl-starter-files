@@ -3,9 +3,9 @@ import torch
 import utils
 
 class Agent:
-    def __init__(self, model_name, observation_space, action_space, deterministic=False):
+    def __init__(self, model_name, observation_space, deterministic=False):
         self.obss_preprocessor = utils.ObssPreprocessor(model_name, observation_space)
-        self.model = utils.load_model(self.obss_preprocessor.obs_space, action_space, model_name)
+        self.model = utils.load_model(model_name)
         self.deterministic = deterministic
 
         if self.model.recurrent:
