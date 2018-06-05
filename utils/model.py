@@ -5,7 +5,7 @@ from model import ACModel
 import utils
 
 def get_model_dir(model_name):
-    return os.path.join(utils.storage_dir(), "models", model_name)
+    return os.path.join(utils.get_storage_dir(), "models", model_name)
 
 def get_model_path(model_name):
     return os.path.join(get_model_dir(model_name), "model.pt")

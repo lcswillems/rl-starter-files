@@ -6,7 +6,7 @@ import logging
 import utils
 
 def get_log_dir(log_name):
-    return os.path.join(utils.storage_dir(), "logs", log_name)
+    return os.path.join(utils.get_storage_dir(), "logs", log_name)
 
 def get_log_path(log_name):
     return os.path.join(get_log_dir(log_name), "log.log")

@@ -3,7 +3,7 @@ import random
 import numpy
 import torch
 
-def storage_dir():
+def get_storage_dir():
     if "torch_rl_storage_dir" in os.environ:
         return os.environ["torch_rl_storage_dir"]
     return "storage"
