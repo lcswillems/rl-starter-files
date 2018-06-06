@@ -14,6 +14,7 @@ except ImportError:
     pass
 
 import utils
+from model import ACModel
 
 # Parse arguments
 
@@ -62,7 +63,26 @@ parser.add_argument("--epochs", type=int, default=4,
                     help="number of epochs for PPO (default: 4)")
 parser.add_argument("--batch-size", type=int, default=256,
                     help="batch size for PPO (default: 256)")
+parser.add_argument("--no-instr", action="store_true", default=False,
+                    help="don't use instructions in the model")
+parser.add_argument("--no-mem", action="store_true", default=False,
+                    help="don't use memory in the model")
 args = parser.parse_args()
+
+# Define model name
+
+suffix = datetime.datetime.now().strftime("%y-%m-%d-%H-%M-%S")
+default_model_name = "{}_{}_seed{}_{}".format(args.env, args.algo, args.seed, suffix)
+model_name = args.model or default_model_name
+
+# Define logger and Tensorboard writer and log script arguments
+
+logger = utils.get_logger(model_name)
+if args.tb:
+    from tensorboardX import SummaryWriter
+    writer = SummaryWriter(utils.get_log_dir(model_name))
+
+logger.info("{}\n".format(args))
 
 # Set seed for all randomness sources
 
@@ -76,24 +96,21 @@ for i in range(args.procs):
     env.seed(args.seed + i)
     envs.append(env)
 
-# Define model name
-
-suffix = datetime.datetime.now().strftime("%y-%m-%d-%H-%M-%S")
-default_model_name = "{}_{}_seed{}_{}".format(args.env, args.algo, args.seed, suffix)
-model_name = args.model or default_model_name
-
 # Define obss preprocessor
 
 obss_preprocessor = utils.ObssPreprocessor(model_name, envs[0].observation_space)
 
 # Define actor-critic model
 
-if os.path.exists(utils.get_model_path(model_name)):
-    acmodel = utils.load_model(model_name)
-else:
-    acmodel = utils.create_model(obss_preprocessor.obs_space, envs[0].action_space)
+acmodel = utils.load_model(model_name, raise_not_found=False)
+if acmodel is None:
+    acmodel = ACModel(obss_preprocessor.obs_space, envs[0].action_space, not args.no_instr, not args.no_mem)
+    logger.info("Model successfully created\n")
+logger.info("{}\n".format(acmodel))
+
 if torch.cuda.is_available():
     acmodel.cuda()
+logger.info("CUDA available: {}\n".format(torch.cuda.is_available()))
 
 # Define actor-critic algo
 
@@ -108,19 +125,6 @@ elif args.algo == "ppo":
                             utils.reshape_reward)
 else:
     raise ValueError("Incorrect algorithm name: {}".format(args.algo))
-
-# Define logger and Tensorboard writer
-
-logger = utils.get_logger(model_name)
-if args.tb:
-    from tensorboardX import SummaryWriter
-    writer = SummaryWriter(utils.get_log_dir(model_name))
-
-# Log command, availability of CUDA and model
-
-logger.info(args)
-logger.info("CUDA available: {}".format(torch.cuda.is_available()))
-logger.info(acmodel)
 
 # Train model
 

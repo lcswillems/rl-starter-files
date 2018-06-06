@@ -14,12 +14,12 @@ def initialize_parameters(m):
             m.bias.data.fill_(0)
 
 class ACModel(nn.Module, torch_rl.RecurrentACModel):
-    def __init__(self, obs_space, action_space):
+    def __init__(self, obs_space, action_space, use_instr=True, use_memory=True):
         super().__init__()
 
         # Decide which components are enabled
-        self.use_instr = "instr" in obs_space.keys()
-        self.use_memory = True
+        self.use_instr = use_instr
+        self.use_memory = use_memory
 
         # Define image embedding
         self.image_embedding_size = 64        
