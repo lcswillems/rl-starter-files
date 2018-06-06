@@ -4,8 +4,8 @@ import numpy
 import torch
 
 def get_storage_dir():
-    if "torch_rl_storage_dir" in os.environ:
-        return os.environ["torch_rl_storage_dir"]
+    if "TORCH_RL_STORAGE" in os.environ:
+        return os.environ["TORCH_RL_STORAGE"]
     return "storage"
 
 def create_folders_if_necessary(path):
