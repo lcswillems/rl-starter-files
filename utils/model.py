@@ -1,7 +1,6 @@
 import os
 import torch
 
-from model import ACModel
 import utils
 
 def get_model_dir(model_name):
