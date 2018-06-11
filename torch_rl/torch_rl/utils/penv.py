@@ -25,37 +25,29 @@ class ParallelEnv(gym.Env):
         self.observation_space = self.envs[0].observation_space
         self.action_space = self.envs[0].action_space
         
-        self.unique_env = len(self.envs) == 1
-        if self.unique_env:
-            self.env = self.envs[0]
-        else:
-            self.locals, self.remotes = zip(*[Pipe() for _ in self.envs])
-            self.ps = [Process(target=worker, args=(remote, env))
-                       for (remote, env) in zip(self.remotes, self.envs)]
-            for p in self.ps:
-                p.daemon = True
-                p.start()
-            for remote in self.remotes:
-                remote.close()
+        self.locals, self.remotes = zip(*[Pipe() for _ in self.envs[1:]])
+        self.ps = [Process(target=worker, args=(remote, env))
+                   for (remote, env) in zip(self.remotes, self.envs[1:])]
+        for p in self.ps:
+            p.daemon = True
+            p.start()
+        for remote in self.remotes:
+            remote.close()
 
     def reset(self):
-        if self.unique_env:
-            return [self.env.reset()]
-        else:
-            for local in self.locals:
-                local.send(("reset", None))
-            return [local.recv() for local in self.locals]
+        for local in self.locals:
+            local.send(("reset", None))
+        results = [self.envs[0].reset()] + [local.recv() for local in self.locals]
+        return results
 
     def step(self, actions):
-        if self.unique_env:
-            obs, reward, done, info = self.env.step(actions[0])
-            if done:
-                obs = self.env.reset()
-            return zip(*[(obs, reward, done, info)])
-        else:
-            for local, action in zip(self.locals, actions):
-                local.send(("step", action))
-            return zip(*[local.recv() for local in self.locals])
+        for local, action in zip(self.locals, actions[1:]):
+            local.send(("step", action))
+        obs, reward, done, info = self.envs[0].step(actions[0])
+        if done:
+            obs = self.envs[0].reset()
+        results = zip(*[(obs, reward, done, info)] + [local.recv() for local in self.locals])
+        return results
 
     def render(self):
         raise NotImplementedError
