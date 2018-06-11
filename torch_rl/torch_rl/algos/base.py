@@ -3,14 +3,14 @@ import torch
 import numpy
 
 from torch_rl.format import default_preprocess_obss
-from torch_rl.utils import DictList, MultiEnv
+from torch_rl.utils import DictList, ParallelEnv
 
 class BaseAlgo(ABC):
     def __init__(self, envs, acmodel, num_frames_per_proc, discount, lr, gae_tau, entropy_coef,
                  value_loss_coef, max_grad_norm, recurrence, preprocess_obss, reshape_reward):
         # Store parameters
 
-        self.env = MultiEnv(envs)
+        self.env = ParallelEnv(envs)
         self.acmodel = acmodel
         self.acmodel.train()
         self.num_frames_per_proc = num_frames_per_proc

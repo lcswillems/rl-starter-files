@@ -15,11 +15,11 @@ def worker(conn, env):
         else:
             raise NotImplementedError
 
-class MultiEnv(gym.Env):
-    """A multiprocess asynchronous multi-environment."""
+class ParallelEnv(gym.Env):
+    """A multiprocess execution of environments."""
 
     def __init__(self, envs):
-        assert len(envs) >= 1, "No environment."
+        assert len(envs) >= 1, "No environment given."
 
         self.envs = envs
         self.observation_space = self.envs[0].observation_space
@@ -31,7 +31,7 @@ class MultiEnv(gym.Env):
         else:
             self.locals, self.remotes = zip(*[Pipe() for _ in self.envs])
             self.ps = [Process(target=worker, args=(remote, env))
-                    for (remote, env) in zip(self.remotes, self.envs)]
+                       for (remote, env) in zip(self.remotes, self.envs)]
             for p in self.ps:
                 p.daemon = True
                 p.start()
