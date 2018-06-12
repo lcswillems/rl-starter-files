@@ -25,13 +25,13 @@ class ParallelEnv(gym.Env):
         self.observation_space = self.envs[0].observation_space
         self.action_space = self.envs[0].action_space
         
-        self.locals, self.remotes = zip(*[Pipe() for _ in self.envs[1:]])
-        self.ps = [Process(target=worker, args=(remote, env))
-                   for (remote, env) in zip(self.remotes, self.envs[1:])]
-        for p in self.ps:
+        self.locals = []
+        for env in self.envs[1:]:
+            local, remote = Pipe()
+            self.locals.append(local)
+            p = Process(target=worker, args=(remote, env))
             p.daemon = True
             p.start()
-        for remote in self.remotes:
             remote.close()
 
     def reset(self):
