@@ -23,7 +23,7 @@ class PPOAlgo(BaseAlgo):
         self.optimizer = torch.optim.Adam(self.acmodel.parameters(), lr, eps=adam_eps)
 
         self.batch_num = 0
-    
+
     def update_parameters(self):
         # Collect experiences
 
@@ -36,6 +36,7 @@ class PPOAlgo(BaseAlgo):
             log_values = []
             log_policy_losses = []
             log_value_losses = []
+            grad_norms = []
 
             for inds in self.batches_starting_indexes():
                 # Initialize batch values
@@ -106,6 +107,7 @@ class PPOAlgo(BaseAlgo):
 
                 self.optimizer.zero_grad()
                 batch_loss.backward()
+                grad_norm = sum(p.grad.data.norm(2) ** 2 for p in self.acmodel.parameters()) ** 0.5
                 torch.nn.utils.clip_grad_norm_(self.acmodel.parameters(), self.max_grad_norm)
                 self.optimizer.step()
 
@@ -115,16 +117,18 @@ class PPOAlgo(BaseAlgo):
                 log_values.append(batch_value)
                 log_policy_losses.append(batch_policy_loss)
                 log_value_losses.append(batch_value_loss)
-        
+                grad_norms.append(grad_norm)
+
         # Log some values
 
         logs["entropy"] = numpy.mean(log_entropies)
         logs["value"] = numpy.mean(log_values)
         logs["policy_loss"] = numpy.mean(log_policy_losses)
         logs["value_loss"] = numpy.mean(log_value_losses)
+        logs['grad_norm'] = numpy.mean(grad_norms)
 
         return logs
-    
+
     def batches_starting_indexes(self):
         indexes = numpy.arange(0, self.num_frames, self.recurrence)
         indexes = numpy.random.permutation(indexes)
@@ -134,8 +138,8 @@ class PPOAlgo(BaseAlgo):
             indexes = indexes[(indexes + self.recurrence) % self.batch_size != 0]
             indexes += self.recurrence // 2
         self.batch_num += 1
-        
+
         num_indexes = self.batch_size // self.recurrence
         batches_indexes = [indexes[i:i+num_indexes] for i in range(0, len(indexes), num_indexes)]
-        
+
         return batches_indexes
