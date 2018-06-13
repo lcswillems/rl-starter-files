@@ -18,17 +18,17 @@ class BaseAlgo(ABC):
         acmodel : torch.Module
             the model
         num_frames_per_proc : int
-            the number of frames collected by every process
-            for an update
+            the number of frames collected by every process for an update
         discount : float
             discount for future rewards
-        lr : the learning rate for Adam
-        gae_tau : float
-            ???
+        lr : the learning rate for optimizers
+        gae_lambda : float
+            the lambda coefficient in the GAE formula
+            ([Schulman et al., 2015](https://arxiv.org/abs/1506.02438))
         entropy_coef : float
             the weight of the entropy cost in the final objective
         value_loss_coef : float
-            the weight of the baseilne loss in the final objective
+            the weight of the value loss in the final objective
         max_grad_norm : float
             gradient will be clipped to be at most this value
         recurrence : int
@@ -39,7 +39,6 @@ class BaseAlgo(ABC):
         reshape_reward:
             a function that shapes the reward, takes an
             (observation, action, reward, done) tuple as an input
-
         """
         # Store parameters
 
