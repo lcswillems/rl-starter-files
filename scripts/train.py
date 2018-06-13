@@ -42,9 +42,9 @@ parser.add_argument("--frames-per-proc", type=int, default=None,
 parser.add_argument("--discount", type=float, default=0.99,
                     help="discount factor (default: 0.99)")
 parser.add_argument("--lr", type=float, default=7e-4,
-                    help="learning rate (default: 7e-4)")
-parser.add_argument("--gae-tau", type=float, default=0.95,
-                    help="tau coefficient in GAE formula (default: 0.95, 1 means no gae)")
+                    help="learning rate for optimizers (default: 7e-4)")
+parser.add_argument("--gae-lambda", type=float, default=0.95,
+                    help="lambda coefficient in GAE formula (default: 0.95, 1 means no gae)")
 parser.add_argument("--entropy-coef", type=float, default=0.01,
                     help="entropy term coefficient (default: 0.01)")
 parser.add_argument("--value-loss-coef", type=float, default=0.5,
@@ -52,7 +52,7 @@ parser.add_argument("--value-loss-coef", type=float, default=0.5,
 parser.add_argument("--max-grad-norm", type=float, default=0.5,
                     help="maximum norm of gradient (default: 0.5)")
 parser.add_argument("--recurrence", type=int, default=1,
-                    help="number of timesteps gradient is backpropagated (default: 1)")
+                    help="number of steps the gradient is propagated back in time (default: 1)")
 parser.add_argument("--optim-eps", type=float, default=1e-5,
                     help="Adam and RMSprop optimizer epsilon (default: 1e-5)")
 parser.add_argument("--optim-alpha", type=float, default=0.99,
@@ -115,11 +115,11 @@ logger.info("CUDA available: {}\n".format(torch.cuda.is_available()))
 # Define actor-critic algo
 
 if args.algo == "a2c":
-    algo = torch_rl.A2CAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_tau,
+    algo = torch_rl.A2CAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
                             args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
                             args.optim_alpha, args.optim_eps, obss_preprocessor, utils.reshape_reward)
 elif args.algo == "ppo":
-    algo = torch_rl.PPOAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_tau,
+    algo = torch_rl.PPOAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
                             args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
                             args.optim_eps, args.clip_eps, args.epochs, args.batch_size, obss_preprocessor,
                             utils.reshape_reward)
