@@ -6,7 +6,7 @@ from torch_rl.format import default_preprocess_obss
 from torch_rl.utils import DictList, MultiEnv
 
 class BaseAlgo(ABC):
-    def __init__(self, envs, acmodel, num_frames_per_proc, discount, lr, gae_tau, entropy_coef,
+    def __init__(self, envs, acmodel, num_frames_per_proc, discount, lr, gae_lambda, entropy_coef,
                  value_loss_coef, max_grad_norm, recurrence, preprocess_obss, reshape_reward):
         """
         The base class for RL algorithms.
@@ -49,7 +49,7 @@ class BaseAlgo(ABC):
         self.num_frames_per_proc = num_frames_per_proc
         self.discount = discount
         self.lr = lr
-        self.gae_tau = gae_tau
+        self.gae_lambda = gae_lambda
         self.entropy_coef = entropy_coef
         self.value_loss_coef = value_loss_coef
         self.max_grad_norm = max_grad_norm
@@ -164,7 +164,7 @@ class BaseAlgo(ABC):
             next_advantage = self.advantages[i+1] if i < self.num_frames_per_proc - 1 else 0
 
             delta = self.rewards[i] + self.discount * next_value * next_mask - self.values[i]
-            self.advantages[i] = delta + self.discount * self.gae_tau * next_advantage * next_mask
+            self.advantages[i] = delta + self.discount * self.gae_lambda * next_advantage * next_mask
 
         # Defines experiences
 
