@@ -66,6 +66,3 @@ class ObssPreprocessor:
             obs_.instr = instrs
 
         return obs_
-
-def reshape_reward(obs, action, reward, done):
-    return 5*reward

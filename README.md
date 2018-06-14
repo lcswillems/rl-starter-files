@@ -98,8 +98,7 @@ Along with the `torch_rl` package, I provide 3 general reinforcement learning sc
 
 For your own purposes, you will probabily need to change:
 - the model in `model.py`,
-- the `ObssPreprocessor.__call__` method in `utils.format`,
-- the `reshape_reward` function in `utils.format`.
+- the `ObssPreprocessor.__call__` method in `utils.format`.
 
 They were designed especially for the [MiniGrid environments](https://github.com/maximecb/gym-minigrid). These environments give an observation containing an image and a textual instruction to the agent and a reward of 1 if it successfully executes the instruction, 0 otherwise. They are used in what follows for illustrating purposes.
 
