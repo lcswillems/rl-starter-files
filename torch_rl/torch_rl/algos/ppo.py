@@ -89,7 +89,7 @@ class PPOAlgo(BaseAlgo):
                     # Update memories for next epoch
 
                     if self.acmodel.recurrent and i < self.recurrence - 1:
-                        exps.memory[inds] = memory.detach()
+                        exps.memory[inds + i + 1] = memory.detach()
 
                 # Update batch values
 
