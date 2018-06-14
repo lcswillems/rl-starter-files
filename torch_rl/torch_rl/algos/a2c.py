@@ -15,7 +15,7 @@ class A2CAlgo(BaseAlgo):
 
         self.optimizer = torch.optim.RMSprop(self.acmodel.parameters(), lr,
                                              alpha=rmsprop_alpha, eps=rmsprop_eps)
-    
+
     def update_parameters(self):
         # Collect experiences
 
@@ -55,7 +55,7 @@ class A2CAlgo(BaseAlgo):
             policy_loss = -(dist.log_prob(sb.action) * sb.advantage).mean()
 
             value_loss = (value - sb.returnn).pow(2).mean()
-            
+
             loss = policy_loss - self.entropy_coef * entropy + self.value_loss_coef * value_loss
 
             # Update batch values
@@ -95,6 +95,6 @@ class A2CAlgo(BaseAlgo):
         logs["grad_norm"] = update_grad_norm
 
         return logs
-    
+
     def starting_indexes(self):
         return numpy.arange(0, self.num_frames, self.recurrence)

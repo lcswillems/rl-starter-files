@@ -138,7 +138,7 @@ while num_frames < args.frames:
     update_start_time = time.time()
     logs = algo.update_parameters()
     update_end_time = time.time()
-    
+
     num_frames += logs["num_frames"]
     i += 1
 

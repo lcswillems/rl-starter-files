@@ -22,7 +22,7 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
         self.use_memory = use_memory
 
         # Define image embedding
-        self.image_embedding_size = 64        
+        self.image_embedding_size = 64
         self.image_conv = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=16, kernel_size=(2, 2)),
             nn.ReLU(),
@@ -86,7 +86,7 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
             memory = torch.cat(hidden, dim=1)
         else:
             embedding = x
-        
+
         if self.use_instr:
             embed_instr = self._get_embed_instr(obs.instr)
             embedding = torch.cat((embedding, embed_instr), dim=1)

@@ -59,10 +59,10 @@ for _ in range(args.episodes):
         action = agent.get_action(obs)
         obs, reward, done, _ = env.step(action)
         agent.analyze_feedback(reward, done)
-        
+
         num_frames += 1
         returnn += reward
-    
+
     logs["num_frames_per_episode"].append(num_frames)
     logs["return_per_episode"].append(returnn)
 
