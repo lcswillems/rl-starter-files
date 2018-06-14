@@ -38,6 +38,7 @@ class BaseAlgo(ABC):
         reshape_reward:
             a function that shapes the reward, takes an
             (observation, action, reward, done) tuple as an input
+
         """
         # Store parameters
 
