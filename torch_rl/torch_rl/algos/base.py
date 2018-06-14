@@ -3,20 +3,52 @@ import torch
 import numpy
 
 from torch_rl.format import default_preprocess_obss
-from torch_rl.utils import DictList, MultiEnv
+from torch_rl.utils import DictList, ParallelEnv
 
 class BaseAlgo(ABC):
-    def __init__(self, envs, acmodel, num_frames_per_proc, discount, lr, gae_tau, entropy_coef,
+    def __init__(self, envs, acmodel, num_frames_per_proc, discount, lr, gae_lambda, entropy_coef,
                  value_loss_coef, max_grad_norm, recurrence, preprocess_obss, reshape_reward):
+        """
+        The base class for RL algorithms.
+
+        Parameters:
+        ----------
+        envs : list
+            a list of environments that will be run in parallel
+        acmodel : torch.Module
+            the model
+        num_frames_per_proc : int
+            the number of frames collected by every process for an update
+        discount : float
+            discount for future rewards
+        lr : the learning rate for optimizers
+        gae_lambda : float
+            the lambda coefficient in the GAE formula
+            ([Schulman et al., 2015](https://arxiv.org/abs/1506.02438))
+        entropy_coef : float
+            the weight of the entropy cost in the final objective
+        value_loss_coef : float
+            the weight of the value loss in the final objective
+        max_grad_norm : float
+            gradient will be clipped to be at most this value
+        recurrence : int
+            the number of steps the gradient is propagated back in time
+        preprocess_obss : object
+            takes the observations returned by the environment and converts
+            them into the format that the model can handle
+        reshape_reward:
+            a function that shapes the reward, takes an
+            (observation, action, reward, done) tuple as an input
+        """
         # Store parameters
 
-        self.env = MultiEnv(envs)
+        self.env = ParallelEnv(envs)
         self.acmodel = acmodel
         self.acmodel.train()
         self.num_frames_per_proc = num_frames_per_proc
         self.discount = discount
         self.lr = lr
-        self.gae_tau = gae_tau
+        self.gae_lambda = gae_lambda
         self.entropy_coef = entropy_coef
         self.value_loss_coef = value_loss_coef
         self.max_grad_norm = max_grad_norm
@@ -65,7 +97,7 @@ class BaseAlgo(ABC):
         self.log_reshaped_return = [0] * self.num_procs
         self.log_num_frames = [0] * self.num_procs
 
-    def collect_experiences(self):        
+    def collect_experiences(self):
         for i in range(self.num_frames_per_proc):
             # Do one agent-environment interaction
 
@@ -78,7 +110,7 @@ class BaseAlgo(ABC):
             action = dist.sample()
 
             obs, reward, done, _ = self.env.step(action.cpu().numpy())
-            
+
             # Update experiences values
 
             self.obss[i] = self.obs
@@ -129,9 +161,9 @@ class BaseAlgo(ABC):
             next_mask = self.masks[i+1] if i < self.num_frames_per_proc - 1 else self.mask
             next_value = self.values[i+1] if i < self.num_frames_per_proc - 1 else next_value
             next_advantage = self.advantages[i+1] if i < self.num_frames_per_proc - 1 else 0
-            
+
             delta = self.rewards[i] + self.discount * next_value * next_mask - self.values[i]
-            self.advantages[i] = delta + self.discount * self.gae_tau * next_advantage * next_mask
+            self.advantages[i] = delta + self.discount * self.gae_lambda * next_advantage * next_mask
 
         # Defines experiences
 
@@ -149,7 +181,7 @@ class BaseAlgo(ABC):
 
         # Preprocess experiences
 
-        exps.obs = self.preprocess_obss(exps.obs, device=self.device)        
+        exps.obs = self.preprocess_obss(exps.obs, device=self.device)
 
         # Log some values
 

@@ -15,35 +15,39 @@ def worker(conn, env):
         else:
             raise NotImplementedError
 
-class MultiEnv(gym.Env):
-    """An asynchronous multi-environment."""
+class ParallelEnv(gym.Env):
+    """A multiprocess execution of environments."""
 
     def __init__(self, envs):
+        assert len(envs) >= 1, "No environment given."
+
         self.envs = envs
         self.observation_space = self.envs[0].observation_space
         self.action_space = self.envs[0].action_space
-        self.locals, self.remotes = zip(*[Pipe() for _ in self.envs])
-        self.ps = [Process(target=worker, args=(remote, env))
-                   for (remote, env) in zip(self.remotes, self.envs)]
-
-        for p in self.ps:
+        
+        self.locals = []
+        for env in self.envs[1:]:
+            local, remote = Pipe()
+            self.locals.append(local)
+            p = Process(target=worker, args=(remote, env))
             p.daemon = True
             p.start()
-        for remote in self.remotes:
             remote.close()
 
     def reset(self):
         for local in self.locals:
             local.send(("reset", None))
-        obss = [local.recv() for local in self.locals]
-        return obss
+        results = [self.envs[0].reset()] + [local.recv() for local in self.locals]
+        return results
 
     def step(self, actions):
-        for local, action in zip(self.locals, actions):
+        for local, action in zip(self.locals, actions[1:]):
             local.send(("step", action))
-        results = [local.recv() for local in self.locals]
-        obss, rewards, dones, infos = zip(*results)
-        return obss, rewards, dones, infos
+        obs, reward, done, info = self.envs[0].step(actions[0])
+        if done:
+            obs = self.envs[0].reset()
+        results = zip(*[(obs, reward, done, info)] + [local.recv() for local in self.locals])
+        return results
 
     def render(self):
         raise NotImplementedError

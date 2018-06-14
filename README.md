@@ -92,7 +92,7 @@ export OMP_NUM_THREADS=1
 ## `scripts`
 
 Along with the `torch_rl` package, I provide 3 general reinforcement learning scripts:
-- `train.py` for training a actor-critic model with A2C or PPO.
+- `train.py` for training an actor-critic model with A2C or PPO.
 - `enjoy.py` for visualizing your trained model acting.
 - `evaluate.py` for evaluating the performances of your trained model over X episodes.
 
@@ -103,11 +103,11 @@ For your own purposes, you will probabily need to change:
 
 They were designed especially for the [MiniGrid environments](https://github.com/maximecb/gym-minigrid). These environments give an observation containing an image and a textual instruction to the agent and a reward of 1 if it successfully executes the instruction, 0 otherwise. They are used in what follows for illustrating purposes.
 
-These scripts assume that you have already installed the `gym` package (with `pip3 install gym` for example). If you have not installed `gym_minigrid` and don't want to install it, you will have to remove the `import gym_minigrid` lines in all the scripts.
+These scripts assume that you have already installed the `gym` package (with `pip3 install gym` for example). By default, models and logs are stored in the `storage` folder. You can define a different folder in the environment variable `TORCH_RL_STORAGE`.
 
 ### `train.py`
 
-`scripts/train.py` enables you to load a model, trains it with the actor-critic algorithm specified and save it in the `storage/models` folder.
+`scripts/train.py` enables you to load a model, trains it with the specified actor-critic algorithm and save it in the `storage/models` folder.
 
 2 arguments are required:
 - `--algo ALGO`: name of the actor-critic algorithm.

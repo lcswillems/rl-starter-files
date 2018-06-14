@@ -14,12 +14,12 @@ def initialize_parameters(m):
             m.bias.data.fill_(0)
 
 class ACModel(nn.Module, torch_rl.RecurrentACModel):
-    def __init__(self, obs_space, action_space):
+    def __init__(self, obs_space, action_space, use_instr=True, use_memory=True):
         super().__init__()
 
         # Decide which components are enabled
-        self.use_instr = "instr" in obs_space.keys()
-        self.use_memory = True
+        self.use_instr = use_instr
+        self.use_memory = use_memory
 
         # Define image embedding
         self.image_embedding_size = 64        
@@ -50,12 +50,18 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
             self.embedding_size += self.instr_embedding_size
 
         # Define actor's model
-        self.a_fc1 = nn.Linear(self.embedding_size, 64)
-        self.a_fc2 = nn.Linear(64, action_space.n)
+        self.actor = nn.Sequential(
+            nn.Linear(self.embedding_size, 64),
+            nn.Tanh(),
+            nn.Linear(64, action_space.n)
+        )
 
         # Define critic's model
-        self.c_fc1 = nn.Linear(self.embedding_size, 64)
-        self.c_fc2 = nn.Linear(64, 1)
+        self.critic = nn.Sequential(
+            nn.Linear(self.embedding_size, 64),
+            nn.Tanh(),
+            nn.Linear(64, 1)
+        )
 
         # Initialize parameters correctly
         self.apply(initialize_parameters)
@@ -85,14 +91,10 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
             embed_instr = self._get_embed_instr(obs.instr)
             embedding = torch.cat((embedding, embed_instr), dim=1)
 
-        x = self.a_fc1(embedding)
-        x = F.tanh(x)
-        x = self.a_fc2(x)
+        x = self.actor(embedding)
         dist = Categorical(logits=F.log_softmax(x, dim=1))
 
-        x = self.c_fc1(embedding)
-        x = F.tanh(x)
-        x = self.c_fc2(x)
+        x = self.critic(embedding)
         value = x.squeeze(1)
 
         return dist, value, memory
