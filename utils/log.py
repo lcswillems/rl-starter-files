@@ -5,12 +5,6 @@ import logging
 
 import utils
 
-def get_log_dir(log_name):
-    return os.path.join(utils.get_storage_dir(), "logs", log_name)
-
-def get_log_path(log_name):
-    return os.path.join(get_log_dir(log_name), "log.log")
-
 def synthesize(array):
     return {
         "mean": numpy.mean(array),
@@ -19,8 +13,11 @@ def synthesize(array):
         "max": numpy.amax(array)
     }
 
-def get_logger(log_name):
-    path = get_log_path(log_name)
+def get_log_path(run_dir):
+    return os.path.join(run_dir, "log.log")
+
+def get_logger(run_dir):
+    path = get_log_path(run_dir)
     utils.create_folders_if_necessary(path)
 
     logging.basicConfig(

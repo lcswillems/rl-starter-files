@@ -7,12 +7,12 @@ import torch_rl
 
 import utils
 
-def get_vocab_path(model_name):
-    return os.path.join(utils.get_model_dir(model_name), "vocab.json")
+def get_vocab_path(run_dir):
+    return os.path.join(run_dir, "vocab.json")
 
 class Vocabulary:
-    def __init__(self, model_name):
-        self.path = get_vocab_path(model_name)
+    def __init__(self, run_dir):
+        self.path = get_vocab_path(run_dir)
         self.max_size = 100
         self.vocab = {}
         if os.path.exists(self.path):
@@ -30,8 +30,8 @@ class Vocabulary:
         json.dump(self.vocab, open(self.path, "w"))
 
 class ObssPreprocessor:
-    def __init__(self, model_name, obs_space):
-        self.vocab = Vocabulary(model_name)
+    def __init__(self, run_dir, obs_space):
+        self.vocab = Vocabulary(run_dir)
         self.obs_space = {
             "image": 147,
             "instr": self.vocab.max_size

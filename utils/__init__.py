@@ -8,6 +8,9 @@ def get_storage_dir():
         return os.environ["TORCH_RL_STORAGE"]
     return "storage"
 
+def get_run_dir(run_name):
+    return os.path.join(get_storage_dir(), run_name)
+
 def create_folders_if_necessary(path):
     dirname = os.path.dirname(path)
     if not(os.path.isdir(dirname)):
@@ -22,5 +25,5 @@ def seed(seed):
 
 from utils.agent import Agent
 from utils.format import ObssPreprocessor
-from utils.log import get_log_dir, synthesize, get_logger
-from utils.model import get_model_dir, load_model, save_model
+from utils.log import synthesize, get_logger
+from utils.model import load_model, save_model

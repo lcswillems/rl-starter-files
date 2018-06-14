@@ -69,18 +69,19 @@ parser.add_argument("--no-mem", action="store_true", default=False,
                     help="don't use memory in the model")
 args = parser.parse_args()
 
-# Define model name
+# Define run dir
 
 suffix = datetime.datetime.now().strftime("%y-%m-%d-%H-%M-%S")
 default_model_name = "{}_{}_seed{}_{}".format(args.env, args.algo, args.seed, suffix)
 model_name = args.model or default_model_name
+run_dir = utils.get_run_dir(model_name)
 
 # Define logger and Tensorboard writer and log script arguments
 
-logger = utils.get_logger(model_name)
+logger = utils.get_logger(run_dir)
 if args.tb:
     from tensorboardX import SummaryWriter
-    writer = SummaryWriter(utils.get_log_dir(model_name))
+    writer = SummaryWriter(run_dir)
 
 logger.info("{}\n".format(args))
 
@@ -98,11 +99,11 @@ for i in range(args.procs):
 
 # Define obss preprocessor
 
-obss_preprocessor = utils.ObssPreprocessor(model_name, envs[0].observation_space)
+obss_preprocessor = utils.ObssPreprocessor(run_dir, envs[0].observation_space)
 
 # Define actor-critic model
 
-acmodel = utils.load_model(model_name, raise_not_found=False)
+acmodel = utils.load_model(run_dir, raise_not_found=False)
 if acmodel is None:
     acmodel = ACModel(obss_preprocessor.obs_space, envs[0].action_space, not args.no_instr, not args.no_mem)
     logger.info("Model successfully created\n")
@@ -180,7 +181,7 @@ while num_frames < args.frames:
 
         if torch.cuda.is_available():
             acmodel.cpu()
-        utils.save_model(acmodel, model_name)
+        utils.save_model(acmodel, run_dir)
         logger.info("Model successfully saved")
         if torch.cuda.is_available():
             acmodel.cuda()
