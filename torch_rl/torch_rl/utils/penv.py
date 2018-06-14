@@ -24,7 +24,7 @@ class ParallelEnv(gym.Env):
         self.envs = envs
         self.observation_space = self.envs[0].observation_space
         self.action_space = self.envs[0].action_space
-        
+
         self.locals = []
         for env in self.envs[1:]:
             local, remote = Pipe()
