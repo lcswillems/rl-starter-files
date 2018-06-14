@@ -138,6 +138,7 @@ where:
 - "V" is for "Value".
 - "pL" is for "policy Loss".
 - "vL" is for "value Loss".
+- "∇" is for the gradient norm.
 
 These logs are also saved in a log file in `storage/logs`.
 

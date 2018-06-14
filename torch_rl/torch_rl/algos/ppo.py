@@ -36,7 +36,7 @@ class PPOAlgo(BaseAlgo):
             log_values = []
             log_policy_losses = []
             log_value_losses = []
-            grad_norms = []
+            log_grad_norms = []
 
             for inds in self.batches_starting_indexes():
                 # Initialize batch values
@@ -117,7 +117,7 @@ class PPOAlgo(BaseAlgo):
                 log_values.append(batch_value)
                 log_policy_losses.append(batch_policy_loss)
                 log_value_losses.append(batch_value_loss)
-                grad_norms.append(grad_norm)
+                log_grad_norms.append(grad_norm)
 
         # Log some values
 
@@ -125,7 +125,7 @@ class PPOAlgo(BaseAlgo):
         logs["value"] = numpy.mean(log_values)
         logs["policy_loss"] = numpy.mean(log_policy_losses)
         logs["value_loss"] = numpy.mean(log_value_losses)
-        logs['grad_norm'] = numpy.mean(grad_norms)
+        logs["grad_norm"] = numpy.mean(log_grad_norms)
 
         return logs
 
