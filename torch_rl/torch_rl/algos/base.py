@@ -8,8 +8,7 @@ from torch_rl.utils import DictList, ParallelEnv
 class BaseAlgo(ABC):
     def __init__(self, envs, acmodel, num_frames_per_proc, discount, lr, gae_lambda, entropy_coef,
                  value_loss_coef, max_grad_norm, recurrence, preprocess_obss, reshape_reward):
-        """
-        The base class for RL algorithms.
+        """The base class for RL algorithms.
 
         Parameters:
         ----------
@@ -98,6 +97,26 @@ class BaseAlgo(ABC):
         self.log_num_frames = [0] * self.num_procs
 
     def collect_experiences(self):
+        """Collects rollouts and computes advantages.
+
+        Runs several environments concurrently. The next actions are computed
+        in a batch mode for all environments at the same time. The rollouts
+        and advantages from all environments are concatenated together.
+
+        Returns
+        -------
+        exps : DictList
+            Contains actions, rewards, advantages etc as attributes.
+            Each attribute, e.g. `exps.reward` has a shape
+            (self.num_frames_per_proc * num_envs, ...). k-th block
+            of consecutive `self.num_frames_per_proc` frames contains
+            data obtained from the k-th environment. Be careful not to mix
+            data from different environments!
+        logs : dict
+            useful stats about the training process, including the average
+            reward, policy loss, value loss, etc.
+
+        """
         for i in range(self.num_frames_per_proc):
             # Do one agent-environment interaction
 
