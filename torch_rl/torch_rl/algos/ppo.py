@@ -55,7 +55,7 @@ class PPOAlgo(BaseAlgo):
                 for i in range(self.recurrence):
                     # Create a sub-batch of experience
 
-                    sb = exps[inds]
+                    sb = exps[inds + i]
 
                     # Compute loss
 
@@ -86,14 +86,10 @@ class PPOAlgo(BaseAlgo):
                     batch_value_loss += value_loss.item()
                     batch_loss += loss
 
-                    # Update indexes
-
-                    inds += 1
-
                     # Update memories for next epoch
 
                     if self.acmodel.recurrent and i < self.recurrence - 1:
-                        exps.memory[inds] = memory.detach()
+                        exps.memory[inds + i + 1] = memory.detach()
 
                 # Update batch values
 

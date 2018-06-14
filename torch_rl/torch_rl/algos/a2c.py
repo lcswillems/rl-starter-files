@@ -38,10 +38,10 @@ class A2CAlgo(BaseAlgo):
         if self.acmodel.recurrent:
             memory = exps.memory[inds]
 
-        for _ in range(self.recurrence):
+        for i in range(self.recurrence):
             # Create a sub-batch of experience
 
-            sb = exps[inds]
+            sb = exps[inds + i]
 
             # Compute loss
 
@@ -65,10 +65,6 @@ class A2CAlgo(BaseAlgo):
             update_policy_loss += policy_loss.item()
             update_value_loss += value_loss.item()
             update_loss += loss
-
-            # Update indexes
-
-            inds += 1
 
         # Update update values
 
