@@ -26,4 +26,4 @@ def seed(seed):
 from utils.agent import Agent
 from utils.format import ObssPreprocessor
 from utils.log import synthesize, get_logger
-from utils.model import load_model, save_model
+from utils.model import model_exists, load_model, save_model, load_status, save_status

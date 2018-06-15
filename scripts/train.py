@@ -103,9 +103,13 @@ obss_preprocessor = utils.ObssPreprocessor(run_dir, envs[0].observation_space)
 
 # Define actor-critic model
 
-acmodel = utils.load_model(run_dir, raise_not_found=False)
-if acmodel is None:
+if utils.model_exists(run_dir):
+    acmodel = utils.load_model(run_dir)
+    status = utils.load_status(run_dir)
+    logger.info("Model successfully loaded\n")
+else:
     acmodel = ACModel(obss_preprocessor.obs_space, envs[0].action_space, not args.no_instr, not args.no_mem)
+    status = {"num_frames": 0, "i": 0}
     logger.info("Model successfully created\n")
 logger.info("{}\n".format(acmodel))
 
@@ -128,9 +132,9 @@ else:
 
 # Train model
 
-num_frames = 0
+num_frames = status["num_frames"]
 total_start_time = time.time()
-i = 0
+i = status["i"]
 
 while num_frames < args.frames:
     # Update parameters
@@ -174,7 +178,7 @@ while num_frames < args.frames:
             writer.add_scalar("value_loss", logs["value_loss"], num_frames)
             writer.add_scalar("grad_norm", logs["grad_norm"], num_frames)
 
-    # Save obss preprocessor vocabulary and model
+    # Save obss preprocessor, vocabulary and model
 
     if args.save_interval > 0 and i % args.save_interval == 0:
         obss_preprocessor.vocab.save()
@@ -182,6 +186,8 @@ while num_frames < args.frames:
         if torch.cuda.is_available():
             acmodel.cpu()
         utils.save_model(acmodel, run_dir)
+        status = {"num_frames": num_frames, "i": i}
+        utils.save_status(status, run_dir)
         logger.info("Model successfully saved")
         if torch.cuda.is_available():
             acmodel.cuda()
