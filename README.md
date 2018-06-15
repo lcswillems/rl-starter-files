@@ -106,7 +106,7 @@ These scripts assume that you have already installed the `gym` package (with `pi
 
 ### `train.py`
 
-`scripts/train.py` enables you to load a model, trains it with the specified actor-critic algorithm and save it in the `storage/models` folder.
+`scripts/train.py` enables you to load a model, trains it with the specified actor-critic algorithm and save it in the `storage` folder.
 
 2 arguments are required:
 - `--algo ALGO`: name of the actor-critic algorithm.
@@ -139,11 +139,11 @@ where:
 - "vL" is for "value Loss".
 - "∇" is for the gradient norm.
 
-These logs are also saved in a log file in `storage/logs`.
+These logs are also saved in a log file in `storage`.
 
 If you add `--tb` to the command, logs are also plotted in Tensorboard using the `tensorboardX` package that you can install with `pip3 install tensorboardX`. Then, you just have to execute:
 
-```tensorboard --logdir storage/logs```
+```tensorboard --logdir storage```
 
 and you will get something like this:
 
