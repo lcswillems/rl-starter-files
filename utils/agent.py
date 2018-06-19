@@ -4,7 +4,7 @@ import utils
 
 class Agent:
     def __init__(self, run_dir, observation_space, deterministic=False):
-        self.obss_preprocessor = utils.ObssPreprocessor(run_dir, observation_space)
+        self.preprocess_obss = utils.ObssPreprocessor(run_dir, observation_space)
         self.model = utils.load_model(run_dir)
         self.deterministic = deterministic
 
@@ -15,13 +15,13 @@ class Agent:
         self.memory = torch.zeros(1, self.model.memory_size)
 
     def get_action(self, obs):
-        preprocessed_obs = self.obss_preprocessor([obs])
+        preprocessed_obss = self.preprocess_obss([obs])
 
         with torch.no_grad():
             if self.model.recurrent:
-                dist, _, self.memory = self.model(preprocessed_obs, self.memory)
+                dist, _, self.memory = self.model(preprocessed_obss, self.memory)
             else:
-                dist, _ = self.model(preprocessed_obs)
+                dist, _ = self.model(preprocessed_obss)
 
         if self.deterministic:
             action = dist.probs.max(1, keepdim=True)[1]
