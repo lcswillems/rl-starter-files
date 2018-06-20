@@ -6,9 +6,12 @@ from torch_rl.format import default_preprocess_obss
 from torch_rl.utils import DictList, ParallelEnv
 
 class BaseAlgo(ABC):
+    """The base class for RL algorithms."""
+
     def __init__(self, envs, acmodel, num_frames_per_proc, discount, lr, gae_lambda, entropy_coef,
                  value_loss_coef, max_grad_norm, recurrence, preprocess_obss, reshape_reward):
-        """The base class for RL algorithms.
+        """
+        Initializes a `BaseAlgo` instance.
 
         Parameters:
         ----------
@@ -19,8 +22,9 @@ class BaseAlgo(ABC):
         num_frames_per_proc : int
             the number of frames collected by every process for an update
         discount : float
-            discount for future rewards
-        lr : the learning rate for optimizers
+            the discount for future rewards
+        lr : float
+            the learning rate for optimizers
         gae_lambda : float
             the lambda coefficient in the GAE formula
             ([Schulman et al., 2015](https://arxiv.org/abs/1506.02438))
@@ -32,10 +36,10 @@ class BaseAlgo(ABC):
             gradient will be clipped to be at most this value
         recurrence : int
             the number of steps the gradient is propagated back in time
-        preprocess_obss : object
-            takes the observations returned by the environment and converts
-            them into the format that the model can handle
-        reshape_reward:
+        preprocess_obss : function
+            a function that takes observations returned by the environment
+            and converts them into the format that the model can handle
+        reshape_reward : function
             a function that shapes the reward, takes an
             (observation, action, reward, done) tuple as an input
 
@@ -69,7 +73,7 @@ class BaseAlgo(ABC):
 
         assert self.num_frames_per_proc % self.recurrence == 0
 
-        # Store experiences values
+        # Initialize experience values
 
         shape = (self.num_frames_per_proc, self.num_procs)
 
@@ -86,7 +90,7 @@ class BaseAlgo(ABC):
         self.advantages = torch.zeros(*shape, device=self.device)
         self.log_probs = torch.zeros(*shape, device=self.device)
 
-        # Store log values
+        # Initialize log values
 
         self.log_episode_return = torch.zeros(self.num_procs, device=self.device)
         self.log_episode_reshaped_return = torch.zeros(self.num_procs, device=self.device)
@@ -114,7 +118,7 @@ class BaseAlgo(ABC):
             data obtained from the k-th environment. Be careful not to mix
             data from different environments!
         logs : dict
-            useful stats about the training process, including the average
+            Useful stats about the training process, including the average
             reward, policy loss, value loss, etc.
 
         """

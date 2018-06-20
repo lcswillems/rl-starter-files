@@ -5,6 +5,8 @@ import torch.nn.functional as F
 from torch_rl.algos.base import BaseAlgo
 
 class A2CAlgo(BaseAlgo):
+    """The class for the Advantage Actor-Critic algorithm."""
+
     def __init__(self, envs, acmodel, num_frames_per_proc=None, discount=0.99, lr=7e-4, gae_lambda=0.95,
                  entropy_coef=0.01, value_loss_coef=0.5, max_grad_norm=0.5, recurrence=4,
                  rmsprop_alpha=0.99, rmsprop_eps=1e-5, preprocess_obss=None, reshape_reward=None):
@@ -23,7 +25,7 @@ class A2CAlgo(BaseAlgo):
 
         # Compute starting indexes
 
-        inds = self.starting_indexes()
+        inds = self._get_starting_indexes()
 
         # Initialize update values
 
@@ -92,5 +94,20 @@ class A2CAlgo(BaseAlgo):
 
         return logs
 
-    def starting_indexes(self):
-        return numpy.arange(0, self.num_frames, self.recurrence)
+    def _get_starting_indexes(self):
+        """Gives the indexes of the observations given to the model and the
+        experiences used to compute the loss at first.
+
+        The indexes are the integers from 0 to `self.num_frames` with a step of
+        `self.recurrence`. If the model is not recurrent, they are all the
+        integers from 0 to `self.num_frames`.
+
+        Returns
+        -------
+        starting_indexes : list of int
+            the indexes of the experiences to be used at first
+
+        """
+
+        starting_indexes = numpy.arange(0, self.num_frames, self.recurrence)
+        return starting_indexes

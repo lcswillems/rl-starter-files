@@ -5,6 +5,9 @@ import torch.nn.functional as F
 from torch_rl.algos.base import BaseAlgo
 
 class PPOAlgo(BaseAlgo):
+    """The class for the Proximal Policy Optimization algorithm
+    ([Schulman et al., 2015](https://arxiv.org/abs/1707.06347))."""
+
     def __init__(self, envs, acmodel, num_frames_per_proc=None, discount=0.99, lr=7e-4, gae_lambda=0.95,
                  entropy_coef=0.01, value_loss_coef=0.5, max_grad_norm=0.5, recurrence=4,
                  adam_eps=1e-5, clip_eps=0.2, epochs=4, batch_size=256, preprocess_obss=None,
@@ -21,7 +24,6 @@ class PPOAlgo(BaseAlgo):
         assert self.batch_size % self.recurrence == 0
 
         self.optimizer = torch.optim.Adam(self.acmodel.parameters(), lr, eps=adam_eps)
-
         self.batch_num = 0
 
     def update_parameters(self):
@@ -38,7 +40,7 @@ class PPOAlgo(BaseAlgo):
             log_value_losses = []
             log_grad_norms = []
 
-            for inds in self.batches_starting_indexes():
+            for inds in self._get_batches_starting_indexes():
                 # Initialize batch values
 
                 batch_entropy = 0
@@ -125,7 +127,21 @@ class PPOAlgo(BaseAlgo):
 
         return logs
 
-    def batches_starting_indexes(self):
+    def _get_batches_starting_indexes(self):
+        """Gives, for each batch, the indexes of the observations given to
+        the model and the experiences used to compute the loss at first.
+
+        First, the indexes are the integers from 0 to `self.num_frames` with a step of
+        `self.recurrence`, shifted by `self.recurrence//2` one time in two for having
+        more diverse batches. Then, the indexes are splited into the different batches.
+
+        Returns
+        -------
+        batches_starting_indexes : list of list of int
+            the indexes of the experiences to be used at first for each batch
+
+        """
+
         indexes = numpy.arange(0, self.num_frames, self.recurrence)
         indexes = numpy.random.permutation(indexes)
 
@@ -136,6 +152,6 @@ class PPOAlgo(BaseAlgo):
         self.batch_num += 1
 
         num_indexes = self.batch_size // self.recurrence
-        batches_indexes = [indexes[i:i+num_indexes] for i in range(0, len(indexes), num_indexes)]
+        batches_starting_indexes = [indexes[i:i+num_indexes] for i in range(0, len(indexes), num_indexes)]
 
-        return batches_indexes
+        return batches_starting_indexes

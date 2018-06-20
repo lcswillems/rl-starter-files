@@ -16,7 +16,7 @@ def worker(conn, env):
             raise NotImplementedError
 
 class ParallelEnv(gym.Env):
-    """A multiprocess execution of environments."""
+    """A concurrent execution of environments in multiple processes."""
 
     def __init__(self, envs):
         assert len(envs) >= 1, "No environment given."
