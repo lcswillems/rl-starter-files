@@ -11,6 +11,9 @@ def get_vocab_path(run_dir):
     return os.path.join(run_dir, "vocab.json")
 
 class Vocabulary:
+    """A mapping from tokens to ids with a capacity of `max_size` words.
+    It can be saved in a `vocab.json` file."""
+
     def __init__(self, run_dir):
         self.path = get_vocab_path(run_dir)
         self.max_size = 100
@@ -30,6 +33,10 @@ class Vocabulary:
         json.dump(self.vocab, open(self.path, "w"))
 
 class ObssPreprocessor:
+    """A preprocessor of observations returned by the environment.
+    It gives an observation space and converts MiniGrid observations
+    into the format that the model can handle."""
+
     def __init__(self, run_dir, obs_space):
         self.vocab = Vocabulary(run_dir)
         self.obs_space = {
@@ -38,13 +45,27 @@ class ObssPreprocessor:
         }
 
     def __call__(self, obss, device=None):
-        obs_ = torch_rl.DictList()
+        """Converts a list of MiniGrid observations, i.e. a list of
+        (image, instruction) tuples into two PyTorch tensors.
+
+        The images are concatenated. The instructions are tokenified, then
+        tokens are converted into lists of ids using a Vocabulary object, and
+        finally, the lists of ids are concatenated.
+
+        Returns
+        -------
+        preprocessed_obss : DictList
+            Contains preprocessed images and preprocessed instructions.
+
+        """
+
+        preprocessed_obss = torch_rl.DictList()
 
         if "image" in self.obs_space.keys():
             images = numpy.array([obs["image"] for obs in obss])
             images = torch.tensor(images, device=device, dtype=torch.float)
 
-            obs_.image = images
+            preprocessed_obss.image = images
 
         if "instr" in self.obs_space.keys():
             raw_instrs = []
@@ -63,6 +84,6 @@ class ObssPreprocessor:
 
             instrs = torch.tensor(instrs, device=device, dtype=torch.long)
 
-            obs_.instr = instrs
+            preprocessed_obss.instr = instrs
 
-        return obs_
+        return preprocessed_obss

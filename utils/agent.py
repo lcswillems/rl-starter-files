@@ -3,6 +3,10 @@ import torch
 import utils
 
 class Agent:
+    """An abstraction of the behavior of an agent. The agent is able:
+    - to choose an action given an observation,
+    - to analyze the feedback (i.e. reward and done state) of its action."""
+
     def __init__(self, run_dir, observation_space, deterministic=False):
         self.preprocess_obss = utils.ObssPreprocessor(run_dir, observation_space)
         self.model = utils.load_model(run_dir)
