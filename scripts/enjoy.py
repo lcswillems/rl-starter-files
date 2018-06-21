@@ -20,7 +20,7 @@ parser.add_argument("--model", required=True,
                     help="name of the trained model (REQUIRED)")
 parser.add_argument("--seed", type=int, default=0,
                     help="random seed (default: 0)")
-parser.add_argument("--deterministic", action="store_true", default=False,
+parser.add_argument("--argmax", action="store_true", default=False,
                     help="action with highest probability is selected")
 parser.add_argument("--pause", type=float, default=0.1,
                     help="pause duration between two consequent actions of the agent")
@@ -38,7 +38,7 @@ env.seed(args.seed)
 # Define agent
 
 run_dir = utils.get_run_dir(args.model)
-agent = utils.Agent(run_dir, env.observation_space, args.deterministic)
+agent = utils.Agent(run_dir, env.observation_space, args.argmax)
 
 # Run the agent
 

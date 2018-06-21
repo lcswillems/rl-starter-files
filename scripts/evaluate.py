@@ -23,7 +23,7 @@ parser.add_argument("--episodes", type=int, default=1000,
                     help="number of episodes of evaluation (default: 1000)")
 parser.add_argument("--seed", type=int, default=0,
                     help="random seed (default: 0)")
-parser.add_argument("--deterministic", action="store_true", default=False,
+parser.add_argument("--argmax", action="store_true", default=False,
                     help="action with highest probability is selected")
 args = parser.parse_args()
 
@@ -39,7 +39,7 @@ env.seed(args.seed)
 # Define agent
 
 run_dir = utils.get_run_dir(args.model)
-agent = utils.Agent(run_dir, env.observation_space, args.deterministic)
+agent = utils.Agent(run_dir, env.observation_space, args.argmax)
 
 # Initialize logs
 

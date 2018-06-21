@@ -7,10 +7,10 @@ class Agent:
     - to choose an action given an observation,
     - to analyze the feedback (i.e. reward and done state) of its action."""
 
-    def __init__(self, run_dir, observation_space, deterministic=False):
+    def __init__(self, run_dir, observation_space, argmax=False):
         self.preprocess_obss = utils.ObssPreprocessor(run_dir, observation_space)
         self.model = utils.load_model(run_dir)
-        self.deterministic = deterministic
+        self.argmax = argmax
 
         if self.model.recurrent:
             self._initialize_memory()
@@ -27,7 +27,7 @@ class Agent:
             else:
                 dist, _ = self.model(preprocessed_obss)
 
-        if self.deterministic:
+        if self.argmax:
             action = dist.probs.max(1, keepdim=True)[1]
         else:
             action = dist.sample()
