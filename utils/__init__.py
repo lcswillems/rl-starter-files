@@ -3,7 +3,7 @@ import random
 import numpy
 import torch
 
-from utils.agent import *
-from utils.format import *
-from utils.general import *
-from utils.run import *
+from .agent import *
+from .format import *
+from .general import *
+from .run import *
