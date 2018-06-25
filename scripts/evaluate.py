@@ -73,8 +73,7 @@ end_time = time.time()
 
 num_frames = sum(logs["num_frames_per_episode"])
 fps = num_frames/(end_time - start_time)
-ellapsed_time = int(end_time - start_time)
-duration = datetime.timedelta(seconds=ellapsed_time)
+duration = int(end_time - start_time)
 return_per_episode = utils.synthesize(logs["return_per_episode"])
 num_frames_per_episode = utils.synthesize(logs["num_frames_per_episode"])
 

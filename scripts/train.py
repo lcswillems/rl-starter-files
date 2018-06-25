@@ -154,9 +154,8 @@ while num_frames < args.frames:
     # Print logs
 
     if update % args.log_interval == 0:
-        total_ellapsed_time = int(time.time() - total_start_time)
         fps = logs["num_frames"]/(update_end_time - update_start_time)
-        duration = datetime.timedelta(seconds=total_ellapsed_time)
+        duration = int(time.time() - total_start_time)
         return_per_episode = utils.synthesize(logs["return_per_episode"])
         rreturn_per_episode = utils.synthesize(logs["reshaped_return_per_episode"])
         num_frames_per_episode = utils.synthesize(logs["num_frames_per_episode"])
