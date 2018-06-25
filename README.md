@@ -139,7 +139,7 @@ where:
 - "vL" is for "value Loss".
 - "∇" is for the gradient norm.
 
-These logs are also saved in a log file in `storage`.
+These logs are also saved in a logging format in `log.log` and in a CSV format in `log.csv` in the `storage` folder.
 
 If you add `--tb` to the command, logs are also plotted in Tensorboard using the `tensorboardX` package that you can install with `pip3 install tensorboardX`. Then, you just have to execute:
 

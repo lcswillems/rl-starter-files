@@ -7,15 +7,12 @@ import torch_rl
 
 import utils
 
-def get_vocab_path(run_dir):
-    return os.path.join(run_dir, "vocab.json")
-
 class Vocabulary:
     """A mapping from tokens to ids with a capacity of `max_size` words.
     It can be saved in a `vocab.json` file."""
 
     def __init__(self, run_dir):
-        self.path = get_vocab_path(run_dir)
+        self.path = utils.get_vocab_path(run_dir)
         self.max_size = 100
         self.vocab = {}
         if os.path.exists(self.path):
