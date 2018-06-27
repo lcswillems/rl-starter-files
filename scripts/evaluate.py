@@ -38,8 +38,8 @@ env.seed(args.seed)
 
 # Define agent
 
-run_dir = utils.get_run_dir(args.model)
-agent = utils.Agent(run_dir, env.observation_space, args.argmax)
+save_dir = utils.get_save_dir(args.model)
+agent = utils.Agent(save_dir, env.observation_space, args.argmax)
 
 # Initialize logs
 

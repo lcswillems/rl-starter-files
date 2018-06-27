@@ -8,8 +8,8 @@ def get_storage_dir():
         return os.environ["TORCH_RL_STORAGE"]
     return "storage"
 
-def get_run_dir(run_name):
-    return os.path.join(get_storage_dir(), run_name)
+def get_save_dir(save_name):
+    return os.path.join(get_storage_dir(), save_name)
 
 def create_folders_if_necessary(path):
     dirname = os.path.dirname(path)

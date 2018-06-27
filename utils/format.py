@@ -11,8 +11,8 @@ class Vocabulary:
     """A mapping from tokens to ids with a capacity of `max_size` words.
     It can be saved in a `vocab.json` file."""
 
-    def __init__(self, run_dir):
-        self.path = utils.get_vocab_path(run_dir)
+    def __init__(self, save_dir):
+        self.path = utils.get_vocab_path(save_dir)
         self.max_size = 100
         self.vocab = {}
         if os.path.exists(self.path):
@@ -34,8 +34,8 @@ class ObssPreprocessor:
     It gives an observation space and converts MiniGrid observations
     into the format that the model can handle."""
 
-    def __init__(self, run_dir, obs_space):
-        self.vocab = Vocabulary(run_dir)
+    def __init__(self, save_dir, obs_space):
+        self.vocab = Vocabulary(save_dir)
         self.obs_space = {
             "image": 147,
             "instr": self.vocab.max_size
