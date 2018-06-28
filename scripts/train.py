@@ -187,7 +187,7 @@ while num_frames < args.frames:
         status = {"num_frames": num_frames, "update": update}
         utils.save_status(status, save_dir)
 
-    # Save obss preprocessor, vocabulary and model
+    # Save vocabulary and model
 
     if args.save_interval > 0 and update % args.save_interval == 0:
         preprocess_obss.vocab.save()
