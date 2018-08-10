@@ -127,7 +127,7 @@ and a bunch of optional arguments are available among which:
 
 Here is an example of command:
 ```
-python3 -m scripts.train --algo ppo --env MiniGrid-DoorKey-5x5-v0 --model DoorKey --save-interval 10 --frames 1000000
+python3 -m scripts.train --algo ppo --env MiniGrid-DoorKey-5x5-v0 --no-instr --no-mem --model DoorKey --save-interval 10
 ```
 
 This will print some logs in your terminal:
