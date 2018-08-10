@@ -8,7 +8,7 @@ A recurrent, multi-process and readable PyTorch implementation of the deep reinf
 inspired by 3 repositories:
 
 1. [pytorch-a2c-ppo-acktr](https://github.com/ikostrikov/pytorch-a2c-ppo-acktr)
-2. [Pytorch RL](https://github.com/Khrylx/PyTorch-RL)
+2. [PyTorch RL](https://github.com/Khrylx/PyTorch-RL)
 3. [OpenAI Baselines](https://github.com/openai/baselines)
 
 ## Features
@@ -22,7 +22,7 @@ inspired by 3 repositories:
     - Multiprocessing for collection trajectories in multiple environments simultaneously
     - GPU (CUDA) for tensor operations
 - Tensorboard
-- Pytorch 0.4.0
+- PyTorch 0.4.0
 
 ## Installation
 
