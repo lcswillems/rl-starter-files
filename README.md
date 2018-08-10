@@ -42,7 +42,7 @@ The module consists of:
 
 ### How to use?
 
-I will detail here the points that can't be understood immediately by looking at the definition files of the classes, or by looking at the arguments of `scripts/train.py` with `scripts/train.py --help` command.
+Here are detailed the points that can't be understood immediately by looking at the definition files of the classes, or by looking at the arguments of `scripts/train.py` with `scripts/train.py --help` command.
 
 `torch_rl.A2CAlgo` and `torch_rl.PPOAlgo` have 2 methods:
 - `__init__` that may take, among the other parameters :
@@ -91,7 +91,7 @@ export OMP_NUM_THREADS=1
 
 ## `scripts`
 
-Along with the `torch_rl` package, I provide 3 general reinforcement learning scripts:
+Along with the `torch_rl` package are provided 3 general reinforcement learning scripts:
 - `train.py` for training an actor-critic model with A2C or PPO.
 - `enjoy.py` for visualizing your trained model acting.
 - `evaluate.py` for evaluating the performances of your trained model over X episodes.
