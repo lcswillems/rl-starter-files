@@ -100,6 +100,5 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
         return dist, value, memory
 
     def _get_embed_instr(self, instr):
-        self.instr_rnn.flatten_parameters()
         _, hidden = self.instr_rnn(self.word_embedding(instr))
         return hidden[-1]
