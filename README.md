@@ -13,8 +13,8 @@ inspired by 3 repositories:
 
 ## Features
 
-- General observation space: tensor or dict of tensors
-- General action space: discrete or continuous
+- General kinds of observation spaces: tensors and dict of tensors
+- General kinds of action spaces: discrete and continuous
 - Recurrent policy with `--recurrence` argument
 - Observation preprocessing
 - Reward shaping
