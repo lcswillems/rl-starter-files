@@ -22,7 +22,7 @@ inspired by 3 repositories:
 - Fast:
     - Multiprocessing for collection trajectories in multiple environments simultaneously
     - GPU (CUDA) for tensor operations
-- Logging:
+- Training logs:
     - CSV
     - Tensorboard
 - PyTorch 0.4.0
