@@ -13,15 +13,18 @@ inspired by 3 repositories:
 
 ## Features
 
-- Tensor or dict of tensors observation space
-- Discrete & continuous action space
-- Entropy regularization
+- General observation space: tensor or dict of tensors
+- General action space: discrete or continuous
+- Recurrent policy with `--recurrence` argument
+- Observation preprocessing
 - Reward shaping
-- Recurrent policy by specifying the recurrence
+- Entropy regularization
 - Fast:
     - Multiprocessing for collection trajectories in multiple environments simultaneously
     - GPU (CUDA) for tensor operations
-- Tensorboard
+- Logging:
+    - CSV
+    - Tensorboard
 - PyTorch 0.4.0
 
 ## Installation
