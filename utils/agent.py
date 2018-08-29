@@ -12,6 +12,7 @@ class Agent:
         self.model = utils.load_model(save_dir)
         self.argmax = argmax
         self.num_envs = num_envs
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         if self.model.recurrent:
             self.memories = torch.zeros(self.num_envs, self.model.memory_size)
@@ -29,6 +30,9 @@ class Agent:
             actions = dist.probs.max(1, keepdim=True)[1]
         else:
             actions = dist.sample()
+
+        if torch.cuda.is_available():
+            actions = actions.cpu().numpy()
 
         return actions
 
