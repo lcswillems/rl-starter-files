@@ -2,6 +2,7 @@ import random
 import os
 import numpy
 import torch
+import collections
 
 def get_storage_dir():
     if "TORCH_RL_STORAGE" in os.environ:
@@ -24,9 +25,9 @@ def seed(seed):
         torch.cuda.manual_seed_all(seed)
 
 def synthesize(array):
-    return {
-        "mean": numpy.mean(array),
-        "std": numpy.std(array),
-        "min": numpy.amin(array),
-        "max": numpy.amax(array)
-    }
+    d = collections.OrderedDict()
+    d["mean"] = numpy.mean(array)
+    d["std"] = numpy.std(array)
+    d["min"] = numpy.amin(array)
+    d["max"] = numpy.amax(array)
+    return d
