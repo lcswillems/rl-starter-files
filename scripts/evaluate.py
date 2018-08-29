@@ -3,7 +3,6 @@
 import argparse
 import gym
 import time
-import datetime
 
 try:
     import gym_minigrid

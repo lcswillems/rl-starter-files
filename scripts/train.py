@@ -6,7 +6,6 @@ import time
 import datetime
 import torch
 import torch_rl
-import os
 import sys
 
 try:
