@@ -53,7 +53,6 @@ class ObssPreprocessor:
         -------
         preprocessed_obss : DictList
             Contains preprocessed images and preprocessed instructions.
-
         """
 
         preprocessed_obss = torch_rl.DictList()

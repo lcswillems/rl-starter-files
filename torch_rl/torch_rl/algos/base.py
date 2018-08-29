@@ -42,8 +42,8 @@ class BaseAlgo(ABC):
         reshape_reward : function
             a function that shapes the reward, takes an
             (observation, action, reward, done) tuple as an input
-
         """
+
         # Store parameters
 
         self.env = ParallelEnv(envs)
@@ -120,8 +120,8 @@ class BaseAlgo(ABC):
         logs : dict
             Useful stats about the training process, including the average
             reward, policy loss, value loss, etc.
-
         """
+
         for i in range(self.num_frames_per_proc):
             # Do one agent-environment interaction
 

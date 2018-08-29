@@ -139,7 +139,6 @@ class PPOAlgo(BaseAlgo):
         -------
         batches_starting_indexes : list of list of int
             the indexes of the experiences to be used at first for each batch
-
         """
 
         indexes = numpy.arange(0, self.num_frames, self.recurrence)

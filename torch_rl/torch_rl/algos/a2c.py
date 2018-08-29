@@ -106,7 +106,6 @@ class A2CAlgo(BaseAlgo):
         -------
         starting_indexes : list of int
             the indexes of the experiences to be used at first
-
         """
 
         starting_indexes = numpy.arange(0, self.num_frames, self.recurrence)
