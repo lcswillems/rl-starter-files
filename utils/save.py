@@ -10,10 +10,6 @@ import utils
 def get_model_path(save_dir):
     return os.path.join(save_dir, "model.pt")
 
-def model_exists(save_dir):
-    path = get_model_path(save_dir)
-    return os.path.exists(path)
-
 def load_model(save_dir):
     path = get_model_path(save_dir)
     model = torch.load(path)
