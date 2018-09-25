@@ -74,15 +74,15 @@ args = parser.parse_args()
 suffix = datetime.datetime.now().strftime("%y-%m-%d-%H-%M-%S")
 default_model_name = "{}_{}_seed{}_{}".format(args.env, args.algo, args.seed, suffix)
 model_name = args.model or default_model_name
-save_dir = utils.get_save_dir(model_name)
+model_dir = utils.get_model_dir(model_name)
 
 # Define logger, CSV writer and Tensorboard writer
 
-logger = utils.get_logger(save_dir)
-csv_file, csv_writer = utils.get_csv_writer(save_dir)
+logger = utils.get_logger(model_dir)
+csv_file, csv_writer = utils.get_csv_writer(model_dir)
 if args.tb:
     from tensorboardX import SummaryWriter
-    tb_writer = SummaryWriter(save_dir)
+    tb_writer = SummaryWriter(model_dir)
 
 # Log command and all script arguments
 
@@ -103,19 +103,19 @@ for i in range(args.procs):
 
 # Define obss preprocessor
 
-preprocess_obss = utils.ObssPreprocessor(save_dir, envs[0].observation_space)
+preprocess_obss = utils.ObssPreprocessor(model_dir, envs[0].observation_space)
 
 # Load training status
 
 try:
-    status = utils.load_status(save_dir)
+    status = utils.load_status(model_dir)
 except OSError:
     status = {"num_frames": 0, "update": 0}
 
 # Define actor-critic model
 
 try:
-    acmodel = utils.load_model(save_dir)
+    acmodel = utils.load_model(model_dir)
     logger.info("Model successfully loaded\n")
 except OSError:
     acmodel = ACModel(preprocess_obss.obs_space, envs[0].action_space, not args.no_instr, not args.no_mem)
@@ -190,7 +190,7 @@ while num_frames < args.frames:
                 tb_writer.add_scalar(field, value, num_frames)
 
         status = {"num_frames": num_frames, "update": update}
-        utils.save_status(status, save_dir)
+        utils.save_status(status, model_dir)
 
     # Save vocabulary and model
 
@@ -199,7 +199,7 @@ while num_frames < args.frames:
 
         if torch.cuda.is_available():
             acmodel.cpu()
-        utils.save_model(acmodel, save_dir)
+        utils.save_model(acmodel, model_dir)
         logger.info("Model successfully saved")
         if torch.cuda.is_available():
             acmodel.cuda()

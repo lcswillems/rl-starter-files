@@ -7,9 +7,9 @@ class Agent:
     - to choose an action given an observation,
     - to analyze the feedback (i.e. reward and done state) of its action."""
 
-    def __init__(self, save_dir, observation_space, argmax=False, num_envs=1):
-        self.preprocess_obss = utils.ObssPreprocessor(save_dir, observation_space)
-        self.model = utils.load_model(save_dir)
+    def __init__(self, model_dir, observation_space, argmax=False, num_envs=1):
+        self.preprocess_obss = utils.ObssPreprocessor(model_dir, observation_space)
+        self.model = utils.load_model(model_dir)
         self.argmax = argmax
         self.num_envs = num_envs
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

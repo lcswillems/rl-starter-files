@@ -37,8 +37,8 @@ env.seed(args.seed)
 
 # Define agent
 
-save_dir = utils.get_save_dir(args.model)
-agent = utils.Agent(save_dir, env.observation_space, args.argmax)
+model_dir = utils.get_model_dir(args.model)
+agent = utils.Agent(model_dir, env.observation_space, args.argmax)
 
 # Run the agent
 
