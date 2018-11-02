@@ -31,13 +31,13 @@ class Vocabulary:
 
 class ObssPreprocessor:
     """A preprocessor of observations returned by the environment.
-    It gives an observation space and converts MiniGrid observations
+    It converts MiniGrid observation space and MiniGrid observations
     into the format that the model can handle."""
 
     def __init__(self, model_dir, obs_space):
         self.vocab = Vocabulary(model_dir)
         self.obs_space = {
-            "image": 147,
+            "image": obs_space.spaces['image'].shape,
             "instr": self.vocab.max_size
         }
 
