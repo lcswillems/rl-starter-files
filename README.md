@@ -25,6 +25,9 @@ inspired by 3 repositories:
 - Training logs:
     - CSV
     - Tensorboard
+    
+## Requirements
+
 - PyTorch 0.4.0
 
 ## Installation
