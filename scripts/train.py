@@ -19,10 +19,10 @@ from model import ACModel
 # Parse arguments
 
 parser = argparse.ArgumentParser()
+parser.add_argument("--algo", required=True,
+                    help="algorithm to use: a2c | ppo (REQUIRED)")
 parser.add_argument("--env", required=True,
                     help="name of the environment to train on (REQUIRED)")
-parser.add_argument("--algo", default="ppo",
-                    help="algorithm to use: a2c | ppo (default: ppo)")
 parser.add_argument("--model", default=None,
                     help="name of the model (default: {ENV}_{ALGO}_{TIME})")
 parser.add_argument("--seed", type=int, default=1,
