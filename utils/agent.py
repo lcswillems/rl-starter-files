@@ -9,22 +9,22 @@ class Agent:
 
     def __init__(self, model_dir, observation_space, argmax=False, num_envs=1):
         self.preprocess_obss = utils.ObssPreprocessor(model_dir, observation_space)
-        self.model = utils.load_model(model_dir)
+        self.acmodel = utils.load_model(model_dir)
         self.argmax = argmax
         self.num_envs = num_envs
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        if self.model.recurrent:
-            self.memories = torch.zeros(self.num_envs, self.model.memory_size)
+        if self.acmodel.recurrent:
+            self.memories = torch.zeros(self.num_envs, self.acmodel.memory_size)
 
     def get_actions(self, obss):
         preprocessed_obss = self.preprocess_obss(obss)
 
         with torch.no_grad():
-            if self.model.recurrent:
-                dist, _, self.memories = self.model(preprocessed_obss, self.memories)
+            if self.acmodel.recurrent:
+                dist, _, self.memories = self.acmodel(preprocessed_obss, self.memories)
             else:
-                dist, _ = self.model(preprocessed_obss)
+                dist, _ = self.acmodel(preprocessed_obss)
 
         if self.argmax:
             actions = dist.probs.max(1, keepdim=True)[1]
@@ -40,7 +40,7 @@ class Agent:
         return self.get_actions([obs]).item()
 
     def analyze_feedbacks(self, rewards, dones):
-        if self.model.recurrent:
+        if self.acmodel.recurrent:
             masks = 1 - torch.tensor(dones, dtype=torch.float).unsqueeze(1)
             self.memories *= masks
 
