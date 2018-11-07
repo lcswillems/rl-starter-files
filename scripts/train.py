@@ -18,7 +18,7 @@ from model import ACModel
 
 # Parse arguments
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("--algo", required=True,
                     help="algorithm to use: a2c | ppo (REQUIRED)")
 parser.add_argument("--env", required=True,
@@ -51,8 +51,6 @@ parser.add_argument("--value-loss-coef", type=float, default=0.5,
                     help="value loss term coefficient (default: 0.5)")
 parser.add_argument("--max-grad-norm", type=float, default=0.5,
                     help="maximum norm of gradient (default: 0.5)")
-parser.add_argument("--recurrence", type=int, default=1,
-                    help="number of steps the gradient is propagated back in time (default: 1)")
 parser.add_argument("--optim-eps", type=float, default=1e-5,
                     help="Adam and RMSprop optimizer epsilon (default: 1e-5)")
 parser.add_argument("--optim-alpha", type=float, default=0.99,
@@ -63,11 +61,12 @@ parser.add_argument("--epochs", type=int, default=4,
                     help="number of epochs for PPO (default: 4)")
 parser.add_argument("--batch-size", type=int, default=256,
                     help="batch size for PPO (default: 256)")
-parser.add_argument("--no-instr", action="store_true", default=False,
-                    help="don't use instructions in the model")
-parser.add_argument("--no-mem", action="store_true", default=False,
-                    help="don't use memory in the model")
+parser.add_argument("--recurrence", type=int, default=1,
+                    help="number of timesteps gradient is backpropagated (default: 1)\nIf > 1, a LSTM is added to the model to have memory")
+parser.add_argument("--instr", action="store_true", default=False,
+                    help="add a GRU to the model to handle instructions")
 args = parser.parse_args()
+args.mem = args.recurrence > 1
 
 # Define run dir
 
@@ -118,7 +117,7 @@ try:
     acmodel = utils.load_model(model_dir)
     logger.info("Model successfully loaded\n")
 except OSError:
-    acmodel = ACModel(preprocess_obss.obs_space, envs[0].action_space, not args.no_instr, not args.no_mem)
+    acmodel = ACModel(preprocess_obss.obs_space, envs[0].action_space, args.mem, args.instr)
     logger.info("Model successfully created\n")
 logger.info("{}\n".format(acmodel))
 

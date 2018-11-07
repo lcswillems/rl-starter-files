@@ -14,7 +14,7 @@ def initialize_parameters(m):
             m.bias.data.fill_(0)
 
 class ACModel(nn.Module, torch_rl.RecurrentACModel):
-    def __init__(self, obs_space, action_space, use_instr=True, use_memory=True):
+    def __init__(self, obs_space, action_space, use_memory=False, use_instr=False):
         super().__init__()
 
         # Decide which components are enabled
