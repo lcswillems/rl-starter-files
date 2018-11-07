@@ -19,7 +19,7 @@ class Vocabulary:
             self.vocab = json.load(open(self.path))
 
     def __getitem__(self, token):
-        if not(token in self.vocab.keys()):
+        if not token in self.vocab.keys():
             if len(self.vocab) >= self.max_size:
                 raise ValueError("Maximum vocabulary capacity reached")
             self.vocab[token] = len(self.vocab) + 1

@@ -14,7 +14,7 @@ def get_model_dir(model_name):
 
 def create_folders_if_necessary(path):
     dirname = os.path.dirname(path)
-    if not(os.path.isdir(dirname)):
+    if not os.path.isdir(dirname):
         os.makedirs(dirname)
 
 def seed(seed):
