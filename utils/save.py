@@ -36,7 +36,7 @@ def save_status(status, model_dir):
         json.dump(status, file)
 
 def get_log_path(model_dir):
-    return os.path.join(model_dir, "log.log")
+    return os.path.join(model_dir, "log.txt")
 
 def get_logger(model_dir):
     path = get_log_path(model_dir)
