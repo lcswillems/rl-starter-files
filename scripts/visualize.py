@@ -38,7 +38,7 @@ env.seed(args.seed)
 # Define agent
 
 model_dir = utils.get_model_dir(args.model)
-agent = utils.Agent(model_dir, env.observation_space, args.argmax)
+agent = utils.Agent(args.env, env.observation_space, model_dir, args.argmax)
 
 # Run the agent
 
@@ -47,10 +47,9 @@ done = True
 while True:
     if done:
         obs = env.reset()
-        print("Instr:", obs["mission"])
 
     time.sleep(args.pause)
-    renderer = env.render("human")
+    renderer = env.render()
 
     action = agent.get_action(obs)
     obs, reward, done, _ = env.step(action)

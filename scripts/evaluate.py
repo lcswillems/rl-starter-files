@@ -46,7 +46,7 @@ env = ParallelEnv(envs)
 # Define agent
 
 model_dir = utils.get_model_dir(args.model)
-agent = utils.Agent(model_dir, env.observation_space, args.argmax, args.procs)
+agent = utils.Agent(args.env, env.observation_space, model_dir, args.argmax, args.procs)
 print("CUDA available: {}\n".format(torch.cuda.is_available()))
 
 # Initialize logs

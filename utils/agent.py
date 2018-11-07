@@ -7,8 +7,8 @@ class Agent:
     - to choose an action given an observation,
     - to analyze the feedback (i.e. reward and done state) of its action."""
 
-    def __init__(self, model_dir, observation_space, argmax=False, num_envs=1):
-        self.preprocess_obss = utils.ObssPreprocessor(model_dir, observation_space)
+    def __init__(self, env_id, obs_space, model_dir, argmax=False, num_envs=1):
+        _, self.preprocess_obss = utils.get_obss_preprocessor(env_id, obs_space, model_dir)
         self.acmodel = utils.load_model(model_dir)
         self.argmax = argmax
         self.num_envs = num_envs

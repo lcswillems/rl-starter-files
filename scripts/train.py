@@ -102,7 +102,7 @@ for i in range(args.procs):
 
 # Define obss preprocessor
 
-preprocess_obss = utils.ObssPreprocessor(model_dir, envs[0].observation_space)
+obs_space, preprocess_obss = utils.get_obss_preprocessor(args.env, envs[0].observation_space, model_dir)
 
 # Load training status
 
@@ -117,7 +117,7 @@ try:
     acmodel = utils.load_model(model_dir)
     logger.info("Model successfully loaded\n")
 except OSError:
-    acmodel = ACModel(preprocess_obss.obs_space, envs[0].action_space, args.mem, args.instr)
+    acmodel = ACModel(obs_space, envs[0].action_space, args.mem, args.instr)
     logger.info("Model successfully created\n")
 logger.info("{}\n".format(acmodel))
 
