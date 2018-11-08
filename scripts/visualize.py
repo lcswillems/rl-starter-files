@@ -21,7 +21,7 @@ parser.add_argument("--model", required=True,
 parser.add_argument("--seed", type=int, default=0,
                     help="random seed (default: 0)")
 parser.add_argument("--argmax", action="store_true", default=False,
-                    help="action with highest probability is selected")
+                    help="select the action with highest probability")
 parser.add_argument("--pause", type=float, default=0.1,
                     help="pause duration between two consequent actions of the agent")
 args = parser.parse_args()
