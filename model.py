@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions.categorical import Categorical
 import torch_rl
+import gym
 
 # Function from https://github.com/ikostrikov/pytorch-a2c-ppo-acktr/blob/master/model.py
 def initialize_parameters(m):
@@ -52,11 +53,14 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
             self.embedding_size += self.instr_embedding_size
 
         # Define actor's model
-        self.actor = nn.Sequential(
-            nn.Linear(self.embedding_size, 64),
-            nn.Tanh(),
-            nn.Linear(64, action_space.n)
-        )
+        if isinstance(action_space, gym.spaces.Discrete):
+            self.actor = nn.Sequential(
+                nn.Linear(self.embedding_size, 64),
+                nn.Tanh(),
+                nn.Linear(64, action_space.n)
+            )
+        else:
+            raise "Unknown action space: " + action_space
 
         # Define critic's model
         self.critic = nn.Sequential(
