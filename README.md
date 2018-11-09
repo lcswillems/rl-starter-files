@@ -60,7 +60,7 @@ The `torch_rl` package comes out of the box with starter files:
 
 To adapt these files to your needs, you may want to modify:
 - `model.py`
-- `utils/preprocess.py`
+- `utils/format.py`
 
 ### `scripts/train.py`
 
@@ -183,8 +183,8 @@ DictList({"a": [1, 2], "b": [5]})
 
 An example of use of `torch_rl.A2CAlgo` and `torch_rl.PPOAlgo` classes is given in `scripts/train.py`.
 
-An example of use of `torch_rl.DictList` is given in the `preprocess_obss` functions of `utils/preprocess.py`.
+An example of use of `torch_rl.DictList` is given in the `preprocess_obss` functions of `utils/format.py`.
 
 An example of implementation of `torch_rl.RecurrentACModel` abstract class is defined in `model.py`
 
-Examples of `preprocess_obss` functions are given in `utils/preprocess.py`.
+Examples of `preprocess_obss` functions are given in `utils/format.py`.
