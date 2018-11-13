@@ -60,7 +60,7 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
                 nn.Linear(64, action_space.n)
             )
         else:
-            raise "Unknown action space: " + action_space
+            raise ValueError("Unknown action space: " + str(action_space))
 
         # Define critic's model
         self.critic = nn.Sequential(

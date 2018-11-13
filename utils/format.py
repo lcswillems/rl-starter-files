@@ -30,7 +30,7 @@ def get_obss_preprocessor(env_id, obs_space, model_dir):
             })
 
     else:
-        raise "Unknown observation space: " + obs_space
+        raise ValueError("Unknown observation space: " + str(obs_space))
 
     return obs_space, preprocess_obss
 
