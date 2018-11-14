@@ -15,11 +15,11 @@ def initialize_parameters(m):
             m.bias.data.fill_(0)
 
 class ACModel(nn.Module, torch_rl.RecurrentACModel):
-    def __init__(self, obs_space, action_space, use_memory=False, use_instr=False):
+    def __init__(self, obs_space, action_space, use_memory=False, use_text=False):
         super().__init__()
 
         # Decide which components are enabled
-        self.use_instr = use_instr
+        self.use_text = use_text
         self.use_memory = use_memory
 
         # Define image embedding
@@ -40,17 +40,17 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
         if self.use_memory:
             self.memory_rnn = nn.LSTMCell(self.image_embedding_size, self.semi_memory_size)
 
-        # Define instruction embedding
-        if self.use_instr:
+        # Define text embedding
+        if self.use_text:
             self.word_embedding_size = 32
-            self.word_embedding = nn.Embedding(obs_space["instr"], self.word_embedding_size)
-            self.instr_embedding_size = 128
-            self.instr_rnn = nn.GRU(self.word_embedding_size, self.instr_embedding_size, batch_first=True)
+            self.word_embedding = nn.Embedding(obs_space["text"], self.word_embedding_size)
+            self.text_embedding_size = 128
+            self.text_rnn = nn.GRU(self.word_embedding_size, self.text_embedding_size, batch_first=True)
 
         # Resize image embedding
         self.embedding_size = self.semi_memory_size
-        if self.use_instr:
-            self.embedding_size += self.instr_embedding_size
+        if self.use_text:
+            self.embedding_size += self.text_embedding_size
 
         # Define actor's model
         if isinstance(action_space, gym.spaces.Discrete):
@@ -93,9 +93,9 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
         else:
             embedding = x
 
-        if self.use_instr:
-            embed_instr = self._get_embed_instr(obs.instr)
-            embedding = torch.cat((embedding, embed_instr), dim=1)
+        if self.use_text:
+            embed_text = self._get_embed_text(obs.text)
+            embedding = torch.cat((embedding, embed_text), dim=1)
 
         x = self.actor(embedding)
         dist = Categorical(logits=F.log_softmax(x, dim=1))
@@ -105,6 +105,6 @@ class ACModel(nn.Module, torch_rl.RecurrentACModel):
 
         return dist, value, memory
 
-    def _get_embed_instr(self, instr):
-        _, hidden = self.instr_rnn(self.word_embedding(instr))
+    def _get_embed_text(self, text):
+        _, hidden = self.text_rnn(self.word_embedding(text))
         return hidden[-1]

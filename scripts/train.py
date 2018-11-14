@@ -63,8 +63,8 @@ parser.add_argument("--batch-size", type=int, default=256,
                     help="batch size for PPO (default: 256)")
 parser.add_argument("--recurrence", type=int, default=1,
                     help="number of timesteps gradient is backpropagated (default: 1)\nIf > 1, a LSTM is added to the model to have memory")
-parser.add_argument("--instr", action="store_true", default=False,
-                    help="add a GRU to the model to handle instructions")
+parser.add_argument("--text", action="store_true", default=False,
+                    help="add a GRU to the model to handle text input")
 args = parser.parse_args()
 args.mem = args.recurrence > 1
 
@@ -117,7 +117,7 @@ try:
     acmodel = utils.load_model(model_dir)
     logger.info("Model successfully loaded\n")
 except OSError:
-    acmodel = ACModel(obs_space, envs[0].action_space, args.mem, args.instr)
+    acmodel = ACModel(obs_space, envs[0].action_space, args.mem, args.text)
     logger.info("Model successfully created\n")
 logger.info("{}\n".format(acmodel))
 

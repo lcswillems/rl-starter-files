@@ -78,7 +78,7 @@ More generally, the script has 2 required arguments:
 
 and a bunch of optional arguments among which:
 - `--recurrence N`: gradient will be backpropagated over N timesteps. By default, N = 1. If N > 1, a LSTM is added to the model to have memory.
-- `--instr`: a GRU is added to the model to handle instructions.
+- `--text`: a GRU is added to the model to handle text input.
 - ... (see more using `--help`)
 
 During training, logs are printed in your terminal (and saved in text and CSV format):
@@ -135,7 +135,7 @@ The default model is discribed by the following schema:
 
 <p align="center"><img src="README-src/model.png"></p>
 
-By default, the langage part (in blue) and the memory part (in red) are disabled. They can be enabled by setting to `True` the `use_memory` and `use_instr` parameters of the model constructor.
+By default, the memory part (in red) and the langage part (in blue) are disabled. They can be enabled by setting to `True` the `use_memory` and `use_text` parameters of the model constructor.
 
 This model can be easily adapted to your needs.
 

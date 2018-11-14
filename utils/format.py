@@ -11,13 +11,13 @@ import utils
 def get_obss_preprocessor(env_id, obs_space, model_dir):
     # Check if it is a MiniGrid environment
     if re.match("MiniGrid-.*", env_id):
-        obs_space = {"image": obs_space.spaces['image'].shape, "instr": 100}
+        obs_space = {"image": obs_space.spaces['image'].shape, "text": 100}
 
-        vocab = Vocabulary(model_dir, obs_space["instr"])
+        vocab = Vocabulary(model_dir, obs_space["text"])
         def preprocess_obss(obss, device=None):
             return torch_rl.DictList({
                 "image": preprocess_images([obs["image"] for obs in obss], device=device),
-                "instr": preprocess_instrs([obs["mission"] for obs in obss], vocab, device=device)
+                "text": preprocess_texts([obs["mission"] for obs in obss], vocab, device=device)
             })
 
     # Check if the obs_space is of type Box([X, Y, 3])
@@ -39,22 +39,22 @@ def preprocess_images(images, device=None):
     images = numpy.array(images)
     return torch.tensor(images, device=device, dtype=torch.float)
 
-def preprocess_instrs(instrs, vocab, device=None):
-    var_indexed_instrs = []
-    max_instr_len = 0
+def preprocess_texts(texts, vocab, device=None):
+    var_indexed_texts = []
+    max_text_len = 0
 
-    for instr in instrs:
-        tokens = re.findall("([a-z]+)", instr.lower())
-        var_indexed_instr = numpy.array([vocab[token] for token in tokens])
-        var_indexed_instrs.append(var_indexed_instr)
-        max_instr_len = max(len(var_indexed_instr), max_instr_len)
+    for text in texts:
+        tokens = re.findall("([a-z]+)", text.lower())
+        var_indexed_text = numpy.array([vocab[token] for token in tokens])
+        var_indexed_texts.append(var_indexed_text)
+        max_text_len = max(len(var_indexed_text), max_text_len)
 
-    indexed_instrs = numpy.zeros((len(instrs), max_instr_len))
+    indexed_texts = numpy.zeros((len(texts), max_text_len))
 
-    for i, indexed_instr in enumerate(var_indexed_instrs):
-        indexed_instrs[i, :len(indexed_instr)] = indexed_instr
+    for i, indexed_text in enumerate(var_indexed_texts):
+        indexed_texts[i, :len(indexed_text)] = indexed_text
 
-    return torch.tensor(indexed_instrs, device=device, dtype=torch.long)
+    return torch.tensor(indexed_texts, device=device, dtype=torch.long)
 
 class Vocabulary:
     """A mapping from tokens to ids with a capacity of `max_size` words.
