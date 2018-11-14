@@ -68,9 +68,7 @@ class BaseAlgo(ABC):
 
         # Control parameters
 
-        if not(self.acmodel.recurrent):
-            self.recurrence = 1
-
+        assert self.acmodel.recurrent or self.recurrence == 1
         assert self.num_frames_per_proc % self.recurrence == 0
 
         # Initialize experience values
