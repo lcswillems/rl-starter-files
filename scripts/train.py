@@ -189,7 +189,6 @@ while num_frames < args.frames:
                 tb_writer.add_scalar(field, value, num_frames)
 
         status = {"num_frames": num_frames, "update": update}
-        utils.save_status(status, model_dir)
 
     # Save vocabulary and model
 
@@ -202,3 +201,5 @@ while num_frames < args.frames:
         logger.info("Model successfully saved")
         if torch.cuda.is_available():
             acmodel.cuda()
+
+        utils.save_status(status, model_dir)

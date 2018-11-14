@@ -19,6 +19,7 @@ def get_obss_preprocessor(env_id, obs_space, model_dir):
                 "image": preprocess_images([obs["image"] for obs in obss], device=device),
                 "text": preprocess_texts([obs["mission"] for obs in obss], vocab, device=device)
             })
+        preprocess_obss.vocab = vocab
 
     # Check if the obs_space is of type Box([X, Y, 3])
     elif isinstance(obs_space, gym.spaces.Box) and len(obs_space.shape) == 3 and obs_space.shape[2] == 3:
