@@ -85,7 +85,7 @@ During training, logs are printed in your terminal (and saved in text and CSV fo
 
 <p align="center"><img src="README-src/train-terminal-logs.png"></p>
 
-**Note:** `U` gives the update number, `F` the total number of frames, `FPS` the number of frames per second, `D` the total duration, `rR:x̄σmM` the mean, std, min and max reshaped return per episode, `F:x̄σmM` the mean, std, min and max number of frames per episode, `H` the entropy, `V` the value, `pL` the policy loss, `vL` the value loss and `∇` the gradient norm.
+**Note:** `U` gives the update number, `F` the total number of frames, `FPS` the number of frames per second, `D` the total duration, `rR:μσmM` the mean, std, min and max reshaped return per episode, `F:μσmM` the mean, std, min and max number of frames per episode, `H` the entropy, `V` the value, `pL` the policy loss, `vL` the value loss and `∇` the gradient norm.
 
 During training, logs might also be plotted in Tensorboard if `--tb` is added.
 
