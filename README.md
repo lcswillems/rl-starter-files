@@ -13,7 +13,7 @@ The package comes out of the box with starter files:
 These files use the `torch_rl` package to allow you to immediatly train an agent on [MiniGrid](https://github.com/maximecb/gym-minigrid) environments **without having to write any line of code** and they can be easily adapted to other environments.
 
 <p align="center">
-    <img width="300" src="README-src/visualize-keycorridor.gif">
+    <img width="300" src="README-rsrc/visualize-keycorridor.gif">
 </p>
 
 ## Features of `torch_rl`
@@ -83,13 +83,13 @@ and a bunch of optional arguments among which:
 
 During training, logs are printed in your terminal (and saved in text and CSV format):
 
-<p align="center"><img src="README-src/train-terminal-logs.png"></p>
+<p align="center"><img src="README-rsrc/train-terminal-logs.png"></p>
 
 **Note:** `U` gives the update number, `F` the total number of frames, `FPS` the number of frames per second, `D` the total duration, `rR:μσmM` the mean, std, min and max reshaped return per episode, `F:μσmM` the mean, std, min and max number of frames per episode, `H` the entropy, `V` the value, `pL` the policy loss, `vL` the value loss and `∇` the gradient norm.
 
 During training, logs might also be plotted in Tensorboard if `--tb` is added.
 
-<p><img src="README-src/train-tensorboard.png"></p>
+<p><img src="README-rsrc/train-tensorboard.png"></p>
 
 **Note:** `tensorboardX` package is required and can be installed with `pip3 install tensorboardX`.
 
@@ -99,7 +99,7 @@ An example of use:
 
 `python3 -m scripts.visualize --env MiniGrid-DoorKey-5x5-v0 --model DoorKey`
 
-<p align="center"><img src="README-src/visualize-doorkey.gif"></p>
+<p align="center"><img src="README-rsrc/visualize-doorkey.gif"></p>
 
 In this use case, the script displays how the model in `storage/DoorKey` behaves on the MiniGrid DoorKey environment.
 
@@ -117,7 +117,7 @@ An example of use:
 
 `python3 -m scripts.evaluate --env MiniGrid-DoorKey-5x5-v0 --model DoorKey`
 
-<p align="center"><img src="README-src/evaluate-terminal-logs.png"></p>
+<p align="center"><img src="README-rsrc/evaluate-terminal-logs.png"></p>
 
 In this use case, the script prints in the terminal the performance among 100 episodes of the model in `storage/DoorKey`.
 
@@ -133,7 +133,7 @@ and a bunch of optional arguments among which:
 
 The default model is discribed by the following schema:
 
-<p align="center"><img src="README-src/model.png"></p>
+<p align="center"><img src="README-rsrc/model.png"></p>
 
 By default, the memory part (in red) and the langage part (in blue) are disabled. They can be enabled by setting to `True` the `use_memory` and `use_text` parameters of the model constructor.
 
