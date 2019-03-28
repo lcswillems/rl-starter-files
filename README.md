@@ -33,7 +33,7 @@ These files use the `torch_rl` package to allow you to immediatly train an agent
 You have to clone the repository and then install the package:
 ```
 git clone https://github.com/lcswillems/torch-rl.git
-cd torch_rl
+cd torch-rl
 pip3 install -e torch_rl
 ```
 
