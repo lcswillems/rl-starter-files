@@ -1,12 +1,12 @@
 # RL Starter Files
 
+RL starter files in order to immediatly train, visualize and evaluate an agent **without writing any line of code**.
+
 <p align="center">
     <img width="300" src="README-rsrc/visualize-keycorridor.gif">
 </p>
 
-The package contains generic RL starter files in order to immediatly train, visualize and evaluate an agent **without writing any line of code**.
-
-More precisely, this package contains:
+This package contains:
 - scripts (in `scripts`) to:
   - train an agent
   - visualize agent's behavior
