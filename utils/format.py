@@ -3,7 +3,7 @@ import json
 import numpy
 import re
 import torch
-import torch_rl
+import torch_ac
 import gym
 
 import utils
@@ -15,7 +15,7 @@ def get_obss_preprocessor(env_id, obs_space, model_dir):
 
         vocab = Vocabulary(model_dir, obs_space["text"])
         def preprocess_obss(obss, device=None):
-            return torch_rl.DictList({
+            return torch_ac.DictList({
                 "image": preprocess_images([obs["image"] for obs in obss], device=device),
                 "text": preprocess_texts([obs["mission"] for obs in obss], vocab, device=device)
             })
@@ -26,7 +26,7 @@ def get_obss_preprocessor(env_id, obs_space, model_dir):
         obs_space = {"image": obs_space.shape}
 
         def preprocess_obss(obss, device=None):
-            return torch_rl.DictList({
+            return torch_ac.DictList({
                 "image": preprocess_images(obss, device=device)
             })
 

@@ -5,7 +5,7 @@ import gym
 import time
 import datetime
 import torch
-import torch_rl
+import torch_ac
 import sys
 
 try:
@@ -128,11 +128,11 @@ logger.info("CUDA available: {}\n".format(torch.cuda.is_available()))
 # Define actor-critic algo
 
 if args.algo == "a2c":
-    algo = torch_rl.A2CAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
+    algo = torch_ac.A2CAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
                             args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
                             args.optim_alpha, args.optim_eps, preprocess_obss)
 elif args.algo == "ppo":
-    algo = torch_rl.PPOAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
+    algo = torch_ac.PPOAlgo(envs, acmodel, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
                             args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
                             args.optim_eps, args.clip_eps, args.epochs, args.batch_size, preprocess_obss)
 else:
@@ -190,7 +190,7 @@ while num_frames < args.frames:
 
         status = {"num_frames": num_frames, "update": update}
 
-    # Save vocabulary and model
+    # Save vocabulary, model and status
 
     if args.save_interval > 0 and update % args.save_interval == 0:
         preprocess_obss.vocab.save()

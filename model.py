@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions.categorical import Categorical
-import torch_rl
+import torch_ac
 import gym
 
 # Function from https://github.com/ikostrikov/pytorch-a2c-ppo-acktr/blob/master/model.py
@@ -14,7 +14,7 @@ def initialize_parameters(m):
         if m.bias is not None:
             m.bias.data.fill_(0)
 
-class ACModel(nn.Module, torch_rl.RecurrentACModel):
+class ACModel(nn.Module, torch_ac.RecurrentACModel):
     def __init__(self, obs_space, action_space, use_memory=False, use_text=False):
         super().__init__()
 

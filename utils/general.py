@@ -5,8 +5,8 @@ import torch
 import collections
 
 def get_storage_dir():
-    if "TORCH_RL_STORAGE" in os.environ:
-        return os.environ["TORCH_RL_STORAGE"]
+    if "PROJECT_STORAGE" in os.environ:
+        return os.environ["PROJECT_STORAGE"]
     return "storage"
 
 def get_model_dir(model_name):
