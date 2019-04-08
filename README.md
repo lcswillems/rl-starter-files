@@ -23,12 +23,19 @@ They are easy to adapt to other environments and RL algorithms by modifying:
 
 ## Installation
 
-First, you need to clone this repository.
+1. Clone this repository.
 
-Second, you need to install the `gym-minigrid` environments and `torch-ac` RL algorithms:
+2. Install `gym-minigrid` environments and `torch-ac` RL algorithms:
 
 ```
 pip3 install gym-minigrid torch-ac
+```
+
+**Note:** If you want to modify `torch-ac` algorithms, you will need to rather install a cloned version, i.e.:
+```
+git clone https://github.com/lcswillems/torch-ac.git
+cd torch-ac
+pip3 install -e .
 ```
 
 ## `scripts/train.py`
