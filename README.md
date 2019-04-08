@@ -6,14 +6,20 @@ RL starter files in order to immediatly train, visualize and evaluate an agent *
     <img width="300" src="README-rsrc/visualize-keycorridor.gif">
 </p>
 
+## Files
+
 This package contains:
-- scripts (in `scripts`) to:
-  - train an agent
-  - visualize agent's behavior
-  - evaluate agent's performances
-- a default agent's model (in `model.py`)
-- CSV and Tensorboard logging for easy debugging
-- utilitarian classes and functions (in `utils`) used by the scripts
+- scripts to:
+  - train an agent, with CSV and Tensorboard logging \
+  in `script/train.py`
+  - visualize agent's behavior \
+  in `script/visualize.py`
+  - evaluate agent's performances \
+  in `script/evaluate.py`
+- a default agent's model \
+in `model.py`
+- utilitarian classes and functions used by the scripts \
+in `utils`
 
 These files are suited for [`gym-minigrid`](https://github.com/maximecb/gym-minigrid) environments and [`torch-ac`](https://github.com/lcswillems/torch-ac) RL algorithms.
 
@@ -28,7 +34,7 @@ They are easy to adapt to other environments and RL algorithms by modifying:
 2. Install `gym-minigrid` environments and `torch-ac` RL algorithms:
 
 ```
-pip3 install gym-minigrid torch-ac
+pip3 install -r requirements.pip
 ```
 
 **Note:** If you want to modify `torch-ac` algorithms, you will need to rather install a cloned version, i.e.:
@@ -38,13 +44,45 @@ cd torch-ac
 pip3 install -e .
 ```
 
+## Example of use
+
+Train, visualize and evaluate an agent on the `MiniGrid-DoorKey-5x5-v0` environment:
+
+1. Train the agent on the `MiniGrid-DoorKey-5x5-v0` environment with PPO algorithm:
+
+```
+python3 -m scripts.train --algo ppo --env MiniGrid-DoorKey-5x5-v0 --model DoorKey --save-interval 10 --frames 80000
+```
+
+<p align="center"><img src="README-rsrc/train-terminal-logs.png"></p>
+
+2. Visualize agent's behavior:
+
+```
+python3 -m scripts.visualize --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
+```
+
+<p align="center"><img src="README-rsrc/visualize-doorkey.gif"></p>
+
+3. Evaluate agent's performance:
+
+```
+python3 -m scripts.evaluate --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
+```
+
+<p align="center"><img src="README-rsrc/evaluate-terminal-logs.png"></p>
+
+**Note:** More details on the commands are given below.
+
 ## `scripts/train.py`
 
 An example of use:
 
-`python3 -m scripts.train --algo ppo --env MiniGrid-DoorKey-5x5-v0 --model DoorKey --save-interval 10`
+```bash
+python3 -m scripts.train --algo ppo --env MiniGrid-DoorKey-5x5-v0 --model DoorKey --save-interval 10 --frames 80000
+```
 
-In this use case, the script loads the model in `storage/DoorKey` or creates it if it doesn't exist, then trains it with the PPO algorithm on the MiniGrid DoorKey environment, and saves it every 10 updates in the `storage/DoorKey` directory.
+The script loads the model in `storage/DoorKey` or creates it if it doesn't exist, then trains it with the PPO algorithm on the MiniGrid DoorKey environment, and saves it every 10 updates in `storage/DoorKey`. It stops after 80 000 frames.
 
 **Note:** You can define a different storage location in the environment variable `PROJECT_STORAGE`.
 
@@ -73,7 +111,9 @@ During training, logs might also be plotted in Tensorboard if `--tb` is added.
 
 An example of use:
 
-`python3 -m scripts.visualize --env MiniGrid-DoorKey-5x5-v0 --model DoorKey`
+```
+python3 -m scripts.visualize --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
+```
 
 <p align="center"><img src="README-rsrc/visualize-doorkey.gif"></p>
 
@@ -91,7 +131,9 @@ and a bunch of optional arguments among which:
 
 An example of use:
 
-`python3 -m scripts.evaluate --env MiniGrid-DoorKey-5x5-v0 --model DoorKey`
+```
+python3 -m scripts.evaluate --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
+```
 
 <p align="center"><img src="README-rsrc/evaluate-terminal-logs.png"></p>
 
