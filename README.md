@@ -6,26 +6,17 @@ RL starter files in order to immediatly train, visualize and evaluate an agent *
     <img width="300" src="README-rsrc/visualize-keycorridor.gif">
 </p>
 
-## Files
+These files are suited for [`gym-minigrid`](https://github.com/maximecb/gym-minigrid) environments and [`torch-ac`](https://github.com/lcswillems/torch-ac) RL algorithms. They are easy to adapt to other environments and RL algorithms.
 
-This package contains:
-- scripts to:
-  - train an agent, with CSV and Tensorboard logging \
-  in `script/train.py`
-  - visualize agent's behavior \
-  in `script/visualize.py`
-  - evaluate agent's performances \
-  in `script/evaluate.py`
-- a default agent's model \
-in `model.py`
-- utilitarian classes and functions used by the scripts \
-in `utils`
+## Features
 
-These files are suited for [`gym-minigrid`](https://github.com/maximecb/gym-minigrid) environments and [`torch-ac`](https://github.com/lcswillems/torch-ac) RL algorithms.
-
-They are easy to adapt to other environments and RL algorithms by modifying:
-- `model.py`
-- `utils/format.py`
+- Script to train the agent, with possibility to:
+  - Log in txt, CSV and Tensorboard
+  - Save model
+  - Stop and restart training
+  - Use A2C or PPO algorithms
+- Script to visualize agent's behavior
+- Script to evaluate agent's performance
 
 ## Installation
 
@@ -73,6 +64,25 @@ python3 -m scripts.evaluate --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
 <p align="center"><img src="README-rsrc/evaluate-terminal-logs.png"></p>
 
 **Note:** More details on the commands are given below.
+
+## Files
+
+This package contains:
+- scripts to:
+  - train an agent \
+  in `script/train.py`
+  - visualize agent's behavior \
+  in `script/visualize.py`
+  - evaluate agent's performances \
+  in `script/evaluate.py`
+- a default agent's model \
+in `model.py`
+- utilitarian classes and functions used by the scripts \
+in `utils`
+
+These files are suited for [`gym-minigrid`](https://github.com/maximecb/gym-minigrid) environments and [`torch-ac`](https://github.com/lcswillems/torch-ac) RL algorithms. They are easy to adapt to other environments and RL algorithms by modifying:
+- `model.py`
+- `utils/format.py`
 
 ## `scripts/train.py`
 
