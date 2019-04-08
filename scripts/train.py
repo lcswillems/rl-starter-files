@@ -2,16 +2,12 @@
 
 import argparse
 import gym
+import gym_minigrid
 import time
 import datetime
 import torch
 import torch_ac
 import sys
-
-try:
-    import gym_minigrid
-except ImportError:
-    pass
 
 import utils
 from model import ACModel
@@ -148,7 +144,9 @@ while num_frames < args.frames:
     # Update model parameters
 
     update_start_time = time.time()
-    logs = algo.update_parameters()
+    exps, logs1 = algo.collect_experiences()
+    logs2 = algo.update_parameters()
+    logs = {**logs1, **logs2}
     update_end_time = time.time()
 
     num_frames += logs["num_frames"]

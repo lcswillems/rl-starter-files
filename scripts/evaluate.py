@@ -2,14 +2,10 @@
 
 import argparse
 import gym
+import gym_minigrid
 import time
 import torch
 from torch_ac.utils.penv import ParallelEnv
-
-try:
-    import gym_minigrid
-except ImportError:
-    pass
 
 import utils
 

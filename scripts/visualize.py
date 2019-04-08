@@ -2,12 +2,8 @@
 
 import argparse
 import gym
+import gym_minigrid
 import time
-
-try:
-    import gym_minigrid
-except ImportError:
-    pass
 
 import utils
 
