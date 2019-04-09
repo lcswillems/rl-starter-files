@@ -39,6 +39,8 @@ pip3 install -e .
 
 Train, visualize and evaluate an agent on the `MiniGrid-DoorKey-5x5-v0` environment:
 
+<p align="center"><img src="README-rsrc/doorkey.png"></p>
+
 1. Train the agent on the `MiniGrid-DoorKey-5x5-v0` environment with PPO algorithm:
 
 ```
@@ -70,13 +72,13 @@ python3 -m scripts.evaluate --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
 This package contains:
 - scripts to:
   - train an agent \
-  in `script/train.py`
+  in `script/train.py` ([more details](#scripts-train))
   - visualize agent's behavior \
-  in `script/visualize.py`
+  in `script/visualize.py` ([more details](#scripts-visualize))
   - evaluate agent's performances \
-  in `script/evaluate.py`
+  in `script/evaluate.py` ([more details](#scripts-evaluate))
 - a default agent's model \
-in `model.py`
+in `model.py` ([more details](#model))
 - utilitarian classes and functions used by the scripts \
 in `utils`
 
@@ -84,7 +86,7 @@ These files are suited for [`gym-minigrid`](https://github.com/maximecb/gym-mini
 - `model.py`
 - `utils/format.py`
 
-## `scripts/train.py`
+<h2 id="scripts-train">scripts/train.py</h2>
 
 An example of use:
 
@@ -117,7 +119,7 @@ During training, logs might also be plotted in Tensorboard if `--tb` is added.
 
 **Note:** `tensorboardX` package is required and can be installed with `pip3 install tensorboardX`.
 
-## `scripts/visualize.py`
+<h2 id="scripts-visualize">scripts/visualize.py</h2>
 
 An example of use:
 
@@ -137,7 +139,7 @@ and a bunch of optional arguments among which:
 - `--argmax`: select the action with highest probability
 - ... (see more using `--help`)
 
-## `scripts/evaluate.py`
+<h2 id="scripts-evaluate">scripts/evaluate.py</h2>
 
 An example of use:
 
@@ -157,7 +159,7 @@ and a bunch of optional arguments among which:
 - `--episodes N`: number of episodes of evaluation. By default, N = 100.
 - ... (see more using `--help`)
 
-## `model.py`
+<h2 id="model">model.py</h2>
 
 The default model is discribed by the following schema:
 
