@@ -145,7 +145,7 @@ while num_frames < args.frames:
 
     update_start_time = time.time()
     exps, logs1 = algo.collect_experiences()
-    logs2 = algo.update_parameters()
+    logs2 = algo.update_parameters(exps)
     logs = {**logs1, **logs2}
     update_end_time = time.time()
 
