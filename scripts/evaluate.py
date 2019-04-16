@@ -25,7 +25,7 @@ parser.add_argument("--procs", type=int, default=16,
 parser.add_argument("--argmax", action="store_true", default=False,
                     help="action with highest probability is selected")
 parser.add_argument("--worst-episodes-to-show", type=int, default=10,
-                    help="The number of worse episodes to show")
+                    help="how many worst episodes to show")
 args = parser.parse_args()
 
 # Set seed for all randomness sources
