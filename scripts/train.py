@@ -191,7 +191,8 @@ while num_frames < args.frames:
     # Save vocabulary, model and status
 
     if args.save_interval > 0 and update % args.save_interval == 0:
-        preprocess_obss.vocab.save()
+        if hasattr(preprocess_obss, 'vocab'):
+            preprocess_obss.vocab.save()
 
         if torch.cuda.is_available():
             acmodel.cpu()
