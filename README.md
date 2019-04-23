@@ -67,6 +67,28 @@ python3 -m scripts.evaluate --env MiniGrid-DoorKey-5x5-v0 --model DoorKey
 
 **Note:** More details on the commands are given below.
 
+## Other examples
+
+### Handle textual instructions
+
+In the `GoToDoor` environment, the agent receives an image along with a textual instruction. To handle the latter, add `--text` to the command:
+
+```
+python3 -m scripts.train --algo ppo --env MiniGrid-GoToDoor-5x5-v0 --model GoToDoor --text --save-interval 10 --frames 1000000
+```
+
+<p align="center"><img src="README-rsrc/visualize-gotodoor.gif"></p>
+
+### Add memory
+
+In the `RedBlueDoors` environment, the agent has to open the red door then the blue one. To solve it efficiently, when it opens the red door, it has to remember it. To add memory to the agent, add `--recurrence X` to the command:
+
+```
+python3 -m scripts.train --algo ppo --env MiniGrid-RedBlueDoors-5x5-v0 --model RedBlueDoors --recurrence 4 --save-interval 10 --frames 1000000
+```
+
+<p align="center"><img src="README-rsrc/visualize-redbluedoors.gif"></p>
+
 ## Files
 
 This package contains:
