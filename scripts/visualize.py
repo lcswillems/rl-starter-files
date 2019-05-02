@@ -5,8 +5,6 @@ import gym
 import gym_minigrid
 import time
 import numpy as np
-from array2gif import write_gif
-
 
 import utils
 
@@ -48,6 +46,7 @@ agent = utils.Agent(args.env, env.observation_space, model_dir, args.argmax)
 # Run the agent
 
 if args.gif is not None:
+   from array2gif import write_gif
    frames = []
 
 done = True
@@ -58,7 +57,7 @@ while True:
 
     time.sleep(args.pause)
     renderer = env.render()
-    if args.gif:
+    if args.gif is not None:
         frames.append(np.moveaxis(env.render("rgb_array"), 2, 0))
 
     action = agent.get_action(obs)
@@ -66,7 +65,7 @@ while True:
     agent.analyze_feedback(reward, done)
 
     if renderer.window is None:
-        if args.gif:
+        if args.gif is not None:
             print("Saving gif... ",end='', flush=True)
             write_gif(np.array(frames), args.gif+".gif", fps=10)
             print("Done.")
