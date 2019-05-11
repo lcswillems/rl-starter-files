@@ -15,8 +15,12 @@ These files are suited for [`gym-minigrid`](https://github.com/maximecb/gym-mini
   - Save model
   - Stop and restart training
   - Use A2C or PPO algorithms
-- Script to visualize agent's behavior
+- Script to visualize agent's behavior, with possibility to:
+  - Act by sampling or argmax
+  - Save as Gif
 - Script to evaluate agent's performance
+  - Act by sampling or argmax
+  - List the worst performed episodes
 
 ## Installation
 
