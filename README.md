@@ -84,7 +84,7 @@ python3 -m scripts.train --algo ppo --env MiniGrid-GoToDoor-5x5-v0 --model GoToD
 In the `RedBlueDoors` environment, the agent has to open the red door then the blue one. To solve it efficiently, when it opens the red door, it has to remember it. To add memory to the agent, add `--recurrence X` to the command:
 
 ```
-python3 -m scripts.train --algo ppo --env MiniGrid-RedBlueDoors-5x5-v0 --model RedBlueDoors --recurrence 4 --save-interval 10 --frames 1000000
+python3 -m scripts.train --algo ppo --env MiniGrid-RedBlueDoors-6x6-v0 --model RedBlueDoors --recurrence 4 --save-interval 10 --frames 1000000
 ```
 
 <p align="center"><img src="README-rsrc/visualize-redbluedoors.gif"></p>
