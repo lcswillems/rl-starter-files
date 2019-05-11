@@ -4,7 +4,7 @@ import argparse
 import gym
 import gym_minigrid
 import time
-import numpy as np
+import numpy
 
 import utils
 
@@ -22,8 +22,8 @@ parser.add_argument("--shift", type=int, default=0,
 parser.add_argument("--argmax", action="store_true", default=False,
                     help="select the action with highest probability")
 parser.add_argument("--pause", type=float, default=0.1,
-                    help="pause duration between two consequent actions of the agent")
-parser.add_argument("--gif", type=str,
+                    help="pause duration between two consequent actions of the agent (default: 0.1)")
+parser.add_argument("--gif", type=str, default=None,
                     help="store output as gif with the given filename")
 args = parser.parse_args()
 
@@ -45,7 +45,7 @@ agent = utils.Agent(args.env, env.observation_space, model_dir, args.argmax)
 
 # Run the agent
 
-if args.gif is not None:
+if args.gif:
    from array2gif import write_gif
    frames = []
 
@@ -57,16 +57,16 @@ while True:
 
     time.sleep(args.pause)
     renderer = env.render()
-    if args.gif is not None:
-        frames.append(np.moveaxis(env.render("rgb_array"), 2, 0))
+    if args.gif:
+        frames.append(numpy.moveaxis(env.render("rgb_array"), 2, 0))
 
     action = agent.get_action(obs)
     obs, reward, done, _ = env.step(action)
     agent.analyze_feedback(reward, done)
 
     if renderer.window is None:
-        if args.gif is not None:
-            print("Saving gif... ",end='', flush=True)
-            write_gif(np.array(frames), args.gif+".gif", fps=10)
+        if args.gif:
+            print("Saving gif... ", end="", flush=True)
+            write_gif(numpy.array(frames), args.gif+".gif", fps=1/args.pause)
             print("Done.")
         break
