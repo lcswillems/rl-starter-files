@@ -10,15 +10,15 @@ These files are suited for [`gym-minigrid`](https://github.com/maximecb/gym-mini
 
 ## Features
 
-- Script to train the agent, with possibility to:
+- **Script to train**, including:
   - Log in txt, CSV and Tensorboard
   - Save model
   - Stop and restart training
   - Use A2C or PPO algorithms
-- Script to visualize agent's behavior, with possibility to:
+- **Script to visualize**, including:
   - Act by sampling or argmax
   - Save as Gif
-- Script to evaluate agent's performance
+- **Script to evaluate**, including:
   - Act by sampling or argmax
   - List the worst performed episodes
 
