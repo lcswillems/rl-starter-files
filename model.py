@@ -6,7 +6,7 @@ import torch_ac
 import gym
 
 # Function from https://github.com/ikostrikov/pytorch-a2c-ppo-acktr/blob/master/model.py
-def initialize_parameters(m):
+def init_params(m):
     classname = m.__class__.__name__
     if classname.find('Linear') != -1:
         m.weight.data.normal_(0, 1)
@@ -70,7 +70,7 @@ class ACModel(nn.Module, torch_ac.RecurrentACModel):
         )
 
         # Initialize parameters correctly
-        self.apply(initialize_parameters)
+        self.apply(init_params)
 
     @property
     def memory_size(self):
