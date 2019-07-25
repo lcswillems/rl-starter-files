@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-
 import argparse
-import gym
-import gym_minigrid
 import time
 import numpy
+import torch
 
 import utils
+
 
 # Parse arguments
 
@@ -20,7 +18,7 @@ parser.add_argument("--seed", type=int, default=0,
 parser.add_argument("--shift", type=int, default=0,
                     help="number of times the environment is reset at the beginning (default: 0)")
 parser.add_argument("--argmax", action="store_true", default=False,
-                    help="select the action with highest probability")
+                    help="select the action with highest probability (default: False)")
 parser.add_argument("--pause", type=float, default=0.1,
                     help="pause duration between two consequent actions of the agent (default: 0.1)")
 parser.add_argument("--gif", type=str, default=None,
@@ -31,17 +29,23 @@ args = parser.parse_args()
 
 utils.seed(args.seed)
 
-# Generate environment
+# Set device
 
-env = gym.make(args.env)
-env.seed(args.seed)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Device: {device}\n")
+
+# Load environment
+
+env = utils.make_env(args.env, args.seed)
 for _ in range(args.shift):
     env.reset()
+print("Environment loaded\n")
 
-# Define agent
+# Load agent
 
 model_dir = utils.get_model_dir(args.model)
-agent = utils.Agent(args.env, env.observation_space, model_dir, args.argmax)
+agent = utils.Agent(env.observation_space, env.action_space, model_dir, device, args.argmax)
+print("Agent loaded\n")
 
 # Run the agent
 
@@ -66,7 +70,7 @@ while True:
 
     if renderer.window is None:
         if args.gif:
-            print("Saving gif... ", end="", flush=True)
+            print("Saving gif... ", end="")
             write_gif(numpy.array(frames), args.gif+".gif", fps=1/args.pause)
             print("Done.")
         break

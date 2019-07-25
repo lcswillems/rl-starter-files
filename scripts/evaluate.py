@@ -1,19 +1,16 @@
-#!/usr/bin/env python3
-
 import argparse
-import gym
-import gym_minigrid
 import time
 import torch
 from torch_ac.utils.penv import ParallelEnv
 
 import utils
 
+
 # Parse arguments
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--env", required=True,
-                    help="name of the environment to be run (REQUIRED)")
+                    help="name of the environment (REQUIRED)")
 parser.add_argument("--model", required=True,
                     help="name of the trained model (REQUIRED)")
 parser.add_argument("--episodes", type=int, default=100,
@@ -32,42 +29,47 @@ args = parser.parse_args()
 
 utils.seed(args.seed)
 
-# Generate environment
+# Set device
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Device: {device}\n")
+
+# Load environments
 
 envs = []
 for i in range(args.procs):
-    env = gym.make(args.env)
-    env.seed(args.seed + 10000*i)
+    env = utils.make_env(args.env, args.seed + 10000 * i)
     envs.append(env)
 env = ParallelEnv(envs)
+print("Environments loaded\n")
 
-# Define agent
+# Load agent
 
 model_dir = utils.get_model_dir(args.model)
-agent = utils.Agent(args.env, env.observation_space, model_dir, args.argmax, args.procs)
-print("CUDA available: {}\n".format(torch.cuda.is_available()))
+agent = utils.Agent(env.observation_space, env.action_space, model_dir, device, args.argmax, args.procs)
+print("Agent loaded\n")
 
 # Initialize logs
 
 logs = {"num_frames_per_episode": [], "return_per_episode": []}
 
-# Run the agent
+# Run agent
 
 start_time = time.time()
 
 obss = env.reset()
 
 log_done_counter = 0
-log_episode_return = torch.zeros(args.procs, device=agent.device)
-log_episode_num_frames = torch.zeros(args.procs, device=agent.device)
+log_episode_return = torch.zeros(args.procs, device=device)
+log_episode_num_frames = torch.zeros(args.procs, device=device)
 
 while log_done_counter < args.episodes:
     actions = agent.get_actions(obss)
     obss, rewards, dones, _ = env.step(actions)
     agent.analyze_feedbacks(rewards, dones)
 
-    log_episode_return += torch.tensor(rewards, device=agent.device, dtype=torch.float)
-    log_episode_num_frames += torch.ones(args.procs, device=agent.device)
+    log_episode_return += torch.tensor(rewards, device=device, dtype=torch.float)
+    log_episode_num_frames += torch.ones(args.procs, device=device)
 
     for i, done in enumerate(dones):
         if done:
@@ -75,7 +77,7 @@ while log_done_counter < args.episodes:
             logs["return_per_episode"].append(log_episode_return[i].item())
             logs["num_frames_per_episode"].append(log_episode_num_frames[i].item())
 
-    mask = 1 - torch.tensor(dones, device=agent.device, dtype=torch.float)
+    mask = 1 - torch.tensor(dones, device=device, dtype=torch.float)
     log_episode_return *= mask
     log_episode_num_frames *= mask
 

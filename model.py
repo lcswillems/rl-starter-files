@@ -3,16 +3,17 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions.categorical import Categorical
 import torch_ac
-import gym
+
 
 # Function from https://github.com/ikostrikov/pytorch-a2c-ppo-acktr/blob/master/model.py
 def init_params(m):
     classname = m.__class__.__name__
-    if classname.find('Linear') != -1:
+    if classname.find("Linear") != -1:
         m.weight.data.normal_(0, 1)
         m.weight.data *= 1 / torch.sqrt(m.weight.data.pow(2).sum(1, keepdim=True))
         if m.bias is not None:
             m.bias.data.fill_(0)
+
 
 class ACModel(nn.Module, torch_ac.RecurrentACModel):
     def __init__(self, obs_space, action_space, use_memory=False, use_text=False):
@@ -53,14 +54,11 @@ class ACModel(nn.Module, torch_ac.RecurrentACModel):
             self.embedding_size += self.text_embedding_size
 
         # Define actor's model
-        if isinstance(action_space, gym.spaces.Discrete):
-            self.actor = nn.Sequential(
-                nn.Linear(self.embedding_size, 64),
-                nn.Tanh(),
-                nn.Linear(64, action_space.n)
-            )
-        else:
-            raise ValueError("Unknown action space: " + str(action_space))
+        self.actor = nn.Sequential(
+            nn.Linear(self.embedding_size, 64),
+            nn.Tanh(),
+            nn.Linear(64, action_space.n)
+        )
 
         # Define critic's model
         self.critic = nn.Sequential(
@@ -81,7 +79,7 @@ class ACModel(nn.Module, torch_ac.RecurrentACModel):
         return self.image_embedding_size
 
     def forward(self, obs, memory):
-        x = torch.transpose(torch.transpose(obs.image, 1, 3), 2, 3)
+        x = obs.image.transpose(1, 3).transpose(2, 3)
         x = self.image_conv(x)
         x = x.reshape(x.shape[0], -1)
 

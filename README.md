@@ -139,11 +139,9 @@ During training, logs are printed in your terminal (and saved in text and CSV fo
 
 **Note:** `U` gives the update number, `F` the total number of frames, `FPS` the number of frames per second, `D` the total duration, `rR:μσmM` the mean, std, min and max reshaped return per episode, `F:μσmM` the mean, std, min and max number of frames per episode, `H` the entropy, `V` the value, `pL` the policy loss, `vL` the value loss and `∇` the gradient norm.
 
-During training, logs might also be plotted in Tensorboard if `--tb` is added.
+During training, logs are also plotted in Tensorboard:
 
 <p><img src="README-rsrc/train-tensorboard.png"></p>
-
-**Note:** `tensorboardX` package is required and can be installed with `pip3 install tensorboardX`.
 
 <h2 id="scripts-visualize">scripts/visualize.py</h2>
 

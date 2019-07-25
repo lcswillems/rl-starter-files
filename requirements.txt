@@ -1,0 +1,4 @@
+torch-ac>=1.1.0
+gym-minigrid
+tensorboardX>=1.6
+numpy>=1.3
