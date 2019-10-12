@@ -29,7 +29,7 @@ These files are suited for [`gym-minigrid`](https://github.com/maximecb/gym-mini
 2. Install `gym-minigrid` environments and `torch-ac` RL algorithms:
 
 ```
-pip3 install -r requirements.pip
+pip3 install -r requirements.txt
 ```
 
 **Note:** If you want to modify `torch-ac` algorithms, you will need to rather install a cloned version, i.e.:
