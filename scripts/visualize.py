@@ -2,7 +2,6 @@ import argparse
 import time
 import numpy
 import torch
-
 import utils
 
 
@@ -23,6 +22,9 @@ parser.add_argument("--pause", type=float, default=0.1,
                     help="pause duration between two consequent actions of the agent (default: 0.1)")
 parser.add_argument("--gif", type=str, default=None,
                     help="store output as gif with the given filename")
+parser.add_argument("--episodes", type=int, default=1000000,
+                    help="number of episodes to visualize")
+
 args = parser.parse_args()
 
 # Set seed for all randomness sources
@@ -55,22 +57,24 @@ if args.gif:
 
 done = True
 
-while True:
-    if done:
-        obs = env.reset()
+for episode in range(args.episodes):
+    obs = env.reset()
 
-    time.sleep(args.pause)
-    renderer = env.render()
-    if args.gif:
-        frames.append(numpy.moveaxis(env.render("rgb_array"), 2, 0))
-
-    action = agent.get_action(obs)
-    obs, reward, done, _ = env.step(action)
-    agent.analyze_feedback(reward, done)
-
-    if renderer.window is None:
+    while True:
+        time.sleep(args.pause)
+        env.render('human')
         if args.gif:
-            print("Saving gif... ", end="")
-            write_gif(numpy.array(frames), args.gif+".gif", fps=1/args.pause)
-            print("Done.")
-        break
+            frames.append(numpy.moveaxis(env.render("rgb_array"), 2, 0))
+
+        action = agent.get_action(obs)
+        obs, reward, done, _ = env.step(action)
+        agent.analyze_feedback(reward, done)
+
+        if done:
+            break
+
+if args.gif:
+    print("Saving gif... ", end="")
+    write_gif(numpy.array(frames), args.gif+".gif", fps=1/args.pause)
+
+print("Done.")
