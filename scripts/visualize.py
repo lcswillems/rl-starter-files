@@ -54,15 +54,16 @@ print("Agent loaded\n")
 if args.gif:
    from array2gif import write_gif
    frames = []
-
-done = True
+  
+# Create a window to view the environment
+env.render('human')
 
 for episode in range(args.episodes):
     obs = env.reset()
 
     while True:
-        time.sleep(args.pause)
         env.render('human')
+
         if args.gif:
             frames.append(numpy.moveaxis(env.render("rgb_array"), 2, 0))
 
@@ -70,8 +71,11 @@ for episode in range(args.episodes):
         obs, reward, done, _ = env.step(action)
         agent.analyze_feedback(reward, done)
 
-        if done:
+        if done or env.window.closed:
             break
+
+    if env.window.closed:
+        break
 
 if args.gif:
     print("Saving gif... ", end="")
