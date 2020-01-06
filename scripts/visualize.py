@@ -2,6 +2,7 @@ import argparse
 import time
 import numpy
 import torch
+
 import utils
 
 
@@ -54,7 +55,7 @@ print("Agent loaded\n")
 if args.gif:
    from array2gif import write_gif
    frames = []
-  
+
 # Create a window to view the environment
 env.render('human')
 
@@ -63,7 +64,6 @@ for episode in range(args.episodes):
 
     while True:
         env.render('human')
-
         if args.gif:
             frames.append(numpy.moveaxis(env.render("rgb_array"), 2, 0))
 
@@ -80,5 +80,4 @@ for episode in range(args.episodes):
 if args.gif:
     print("Saving gif... ", end="")
     write_gif(numpy.array(frames), args.gif+".gif", fps=1/args.pause)
-
-print("Done.")
+    print("Done.")
