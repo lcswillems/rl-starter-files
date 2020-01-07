@@ -24,7 +24,8 @@ class Agent:
         self.acmodel.load_state_dict(utils.get_model_state(model_dir))
         self.acmodel.to(self.device)
         self.acmodel.eval()
-        self.preprocess_obss.vocab.load_vocab(utils.get_vocab(model_dir))
+        if hasattr(self.preprocess_obss, "vocab"):
+            self.preprocess_obss.vocab.load_vocab(utils.get_vocab(model_dir))
 
     def get_actions(self, obss):
         preprocessed_obss = self.preprocess_obss(obss, device=self.device)
