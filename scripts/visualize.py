@@ -17,6 +17,8 @@ parser.add_argument("--seed", type=int, default=0,
                     help="random seed (default: 0)")
 parser.add_argument("--shift", type=int, default=0,
                     help="number of times the environment is reset at the beginning (default: 0)")
+parser.add_argument("--use_memory", action="store_true", default=False,
+                    help="the model include a memory layer")
 parser.add_argument("--argmax", action="store_true", default=False,
                     help="select the action with highest probability (default: False)")
 parser.add_argument("--pause", type=float, default=0.1,
@@ -47,7 +49,7 @@ print("Environment loaded\n")
 # Load agent
 
 model_dir = utils.get_model_dir(args.model)
-agent = utils.Agent(env.observation_space, env.action_space, model_dir, device, args.argmax)
+agent = utils.Agent(env.observation_space, env.action_space, model_dir, device, args.argmax, use_memory=args.use_memory)
 print("Agent loaded\n")
 
 # Run the agent
