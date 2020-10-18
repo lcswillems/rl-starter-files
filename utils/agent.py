@@ -20,7 +20,7 @@ class Agent:
         self.num_envs = num_envs
 
         if self.acmodel.recurrent:
-            self.memories = torch.zeros(self.num_envs, self.acmodel.memory_size)
+            self.memories = torch.zeros(self.num_envs, self.acmodel.memory_size, device=self.device)
 
         self.acmodel.load_state_dict(utils.get_model_state(model_dir))
         self.acmodel.to(self.device)
@@ -49,7 +49,7 @@ class Agent:
 
     def analyze_feedbacks(self, rewards, dones):
         if self.acmodel.recurrent:
-            masks = 1 - torch.tensor(dones, dtype=torch.float).unsqueeze(1)
+            masks = 1 - torch.tensor(dones, dtype=torch.float, device=self.device).unsqueeze(1)
             self.memories *= masks
 
     def analyze_feedback(self, reward, done):
