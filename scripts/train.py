@@ -159,9 +159,6 @@ def main():
     start_time = time.time()
 
     while num_frames < args.frames:
-#        old_parameters = {}
-#        for name, param in acmodel.named_parameters():
-#            old_parameters[name] = param
             
         # Update model parameters
 
@@ -216,19 +213,6 @@ def main():
                 status["vocab"] = preprocess_obss.vocab.vocab
             utils.save_status(status, model_dir)
             txt_logger.info("Status saved")
-            
-#        new_parameters = {}
-#        for name, param in acmodel.named_parameters():
-#            new_parameters[name] = param
-#
-##        for index in range(len(old_parameters.keys())):
-#        for index in range(1):
-#            key = list(old_parameters.keys())[index]
-#            old_weights = old_parameters[key].detach().numpy()
-#            new_weights = new_parameters[key].detach().numpy()
-#            print("Old Norm", numpy.linalg.norm(old_weights))
-#            print("New Norm", numpy.linalg.norm(new_weights))
-#            print(key + " diff       \t", numpy.sum(old_weights - new_weights))
 
 if __name__ == '__main__':
     main()
