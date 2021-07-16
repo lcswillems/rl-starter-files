@@ -28,8 +28,12 @@ def get_status_path(model_dir):
 
 
 def get_status(model_dir):
+    if torch.cuda.is_available():
+        map_location=lambda storage, loc: storage.cuda()
+    else:
+        map_location='cpu'
     path = get_status_path(model_dir)
-    return torch.load(path)
+    return torch.load(path, map_location=map_location)
 
 
 def save_status(status, model_dir):
