@@ -1,9 +1,8 @@
 import argparse
-import time
 import numpy
-import torch
 
 import utils
+from utils import device
 
 
 # Parse arguments
@@ -38,7 +37,6 @@ utils.seed(args.seed)
 
 # Set device
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Device: {device}\n")
 
 # Load environment
@@ -52,7 +50,7 @@ print("Environment loaded\n")
 
 model_dir = utils.get_model_dir(args.model)
 agent = utils.Agent(env.observation_space, env.action_space, model_dir,
-                    device=device, argmax=args.argmax, use_memory=args.memory, use_text=args.text)
+                    argmax=args.argmax, use_memory=args.memory, use_text=args.text)
 print("Agent loaded\n")
 
 # Run the agent

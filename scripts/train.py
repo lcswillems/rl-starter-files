@@ -1,12 +1,12 @@
 import argparse
 import time
 import datetime
-import torch
 import torch_ac
 import tensorboardX
 import sys
 
 import utils
+from utils import device
 from model import ACModel
 
 
@@ -91,7 +91,6 @@ utils.seed(args.seed)
 
 # Set device
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 txt_logger.info(f"Device: {device}\n")
 
 # Load environments
