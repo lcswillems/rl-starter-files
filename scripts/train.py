@@ -111,8 +111,7 @@ if __name__ == '__main__':
 
     # Load observations preprocessor
 
-    obs_space, preprocess_obss = utils.get_obss_preprocessor(
-        envs[0].observation_space)
+    obs_space, preprocess_obss = utils.get_obss_preprocessor(envs[0].observation_space)
     if "vocab" in status:
         preprocess_obss.vocab.load_vocab(status["vocab"])
     txt_logger.info("Observations preprocessor loaded")
@@ -167,22 +166,17 @@ if __name__ == '__main__':
             fps = logs["num_frames"]/(update_end_time - update_start_time)
             duration = int(time.time() - start_time)
             return_per_episode = utils.synthesize(logs["return_per_episode"])
-            rreturn_per_episode = utils.synthesize(
-                logs["reshaped_return_per_episode"])
-            num_frames_per_episode = utils.synthesize(
-                logs["num_frames_per_episode"])
+            rreturn_per_episode = utils.synthesize(logs["reshaped_return_per_episode"])
+            num_frames_per_episode = utils.synthesize(logs["num_frames_per_episode"])
 
             header = ["update", "frames", "FPS", "duration"]
             data = [update, num_frames, fps, duration]
             header += ["rreturn_" + key for key in rreturn_per_episode.keys()]
             data += rreturn_per_episode.values()
-            header += ["num_frames_" +
-                       key for key in num_frames_per_episode.keys()]
+            header += ["num_frames_" + key for key in num_frames_per_episode.keys()]
             data += num_frames_per_episode.values()
-            header += ["entropy", "value",
-                       "policy_loss", "value_loss", "grad_norm"]
-            data += [logs["entropy"], logs["value"], logs["policy_loss"],
-                     logs["value_loss"], logs["grad_norm"]]
+            header += ["entropy", "value", "policy_loss", "value_loss", "grad_norm"]
+            data += [logs["entropy"], logs["value"], logs["policy_loss"], logs["value_loss"], logs["grad_norm"]]
 
             txt_logger.info(
                 "U {} | F {:06} | FPS {:04.0f} | D {} | rR:μσmM {:.2f} {:.2f} {:.2f} {:.2f} | F:μσmM {:.1f} {:.1f} {} {} | H {:.3f} | V {:.3f} | pL {:.3f} | vL {:.3f} | ∇ {:.3f}"

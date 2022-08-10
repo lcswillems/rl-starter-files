@@ -41,6 +41,7 @@ if __name__ == '__main__':
     print(f"Device: {device}\n")
 
     # Load environments
+
     envs = []
     for i in range(args.procs):
         env = utils.make_env(args.env, args.seed + 10000 * i)
@@ -75,16 +76,14 @@ if __name__ == '__main__':
         obss, rewards, dones, _ = env.step(actions)
         agent.analyze_feedbacks(rewards, dones)
 
-        log_episode_return += torch.tensor(rewards,
-                                           device=device, dtype=torch.float)
+        log_episode_return += torch.tensor(rewards, device=device, dtype=torch.float)
         log_episode_num_frames += torch.ones(args.procs, device=device)
 
         for i, done in enumerate(dones):
             if done:
                 log_done_counter += 1
                 logs["return_per_episode"].append(log_episode_return[i].item())
-                logs["num_frames_per_episode"].append(
-                    log_episode_num_frames[i].item())
+                logs["num_frames_per_episode"].append(log_episode_num_frames[i].item())
 
         mask = 1 - torch.tensor(dones, device=device, dtype=torch.float)
         log_episode_return *= mask
@@ -111,8 +110,6 @@ if __name__ == '__main__':
     if n > 0:
         print("\n{} worst episodes:".format(n))
 
-        indexes = sorted(range(
-            len(logs["return_per_episode"])), key=lambda k: logs["return_per_episode"][k])
+        indexes = sorted(range(len(logs["return_per_episode"])), key=lambda k: logs["return_per_episode"][k])
         for i in indexes[:n]:
-            print("- episode {}: R={}, F={}".format(i,
-                  logs["return_per_episode"][i], logs["num_frames_per_episode"][i]))
+            print("- episode {}: R={}, F={}".format(i, logs["return_per_episode"][i], logs["num_frames_per_episode"][i]))
