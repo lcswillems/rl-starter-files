@@ -10,26 +10,40 @@ from utils import device
 # Parse arguments
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--env", required=True,
-                    help="name of the environment (REQUIRED)")
-parser.add_argument("--model", required=True,
-                    help="name of the trained model (REQUIRED)")
-parser.add_argument("--episodes", type=int, default=100,
-                    help="number of episodes of evaluation (default: 100)")
-parser.add_argument("--seed", type=int, default=0,
-                    help="random seed (default: 0)")
-parser.add_argument("--procs", type=int, default=16,
-                    help="number of processes (default: 16)")
-parser.add_argument("--argmax", action="store_true", default=False,
-                    help="action with highest probability is selected")
-parser.add_argument("--worst-episodes-to-show", type=int, default=10,
-                    help="how many worst episodes to show")
-parser.add_argument("--memory", action="store_true", default=False,
-                    help="add a LSTM to the model")
-parser.add_argument("--text", action="store_true", default=False,
-                    help="add a GRU to the model")
+parser.add_argument("--env", required=True, help="name of the environment (REQUIRED)")
+parser.add_argument(
+    "--model", required=True, help="name of the trained model (REQUIRED)"
+)
+parser.add_argument(
+    "--episodes",
+    type=int,
+    default=100,
+    help="number of episodes of evaluation (default: 100)",
+)
+parser.add_argument("--seed", type=int, default=0, help="random seed (default: 0)")
+parser.add_argument(
+    "--procs", type=int, default=16, help="number of processes (default: 16)"
+)
+parser.add_argument(
+    "--argmax",
+    action="store_true",
+    default=False,
+    help="action with highest probability is selected",
+)
+parser.add_argument(
+    "--worst-episodes-to-show",
+    type=int,
+    default=10,
+    help="how many worst episodes to show",
+)
+parser.add_argument(
+    "--memory", action="store_true", default=False, help="add a LSTM to the model"
+)
+parser.add_argument(
+    "--text", action="store_true", default=False, help="add a GRU to the model"
+)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = parser.parse_args()
 
     # Set seed for all randomness sources
@@ -52,9 +66,15 @@ if __name__ == '__main__':
     # Load agent
 
     model_dir = utils.get_model_dir(args.model)
-    agent = utils.Agent(env.observation_space, env.action_space, model_dir,
-                        argmax=args.argmax, num_envs=args.procs,
-                        use_memory=args.memory, use_text=args.text)
+    agent = utils.Agent(
+        env.observation_space,
+        env.action_space,
+        model_dir,
+        argmax=args.argmax,
+        num_envs=args.procs,
+        use_memory=args.memory,
+        use_text=args.text,
+    )
     print("Agent loaded\n")
 
     # Initialize logs
@@ -73,19 +93,19 @@ if __name__ == '__main__':
 
     while log_done_counter < args.episodes:
         actions = agent.get_actions(obss)
-        obss, rewards, dones, _ = env.step(actions)
-        agent.analyze_feedbacks(rewards, dones)
+        obss, rewards, terminateds, truncateds, _ = env.step(actions)
+        agent.analyze_feedbacks(rewards, terminateds)
 
         log_episode_return += torch.tensor(rewards, device=device, dtype=torch.float)
         log_episode_num_frames += torch.ones(args.procs, device=device)
 
-        for i, done in enumerate(dones):
+        for i, done in enumerate(terminateds):
             if done:
                 log_done_counter += 1
                 logs["return_per_episode"].append(log_episode_return[i].item())
                 logs["num_frames_per_episode"].append(log_episode_num_frames[i].item())
 
-        mask = 1 - torch.tensor(dones, device=device, dtype=torch.float)
+        mask = 1 - torch.tensor(terminateds, device=device, dtype=torch.float)
         log_episode_return *= mask
         log_episode_num_frames *= mask
 
@@ -94,15 +114,20 @@ if __name__ == '__main__':
     # Print logs
 
     num_frames = sum(logs["num_frames_per_episode"])
-    fps = num_frames/(end_time - start_time)
+    fps = num_frames / (end_time - start_time)
     duration = int(end_time - start_time)
     return_per_episode = utils.synthesize(logs["return_per_episode"])
     num_frames_per_episode = utils.synthesize(logs["num_frames_per_episode"])
 
-    print("F {} | FPS {:.0f} | D {} | R:μσmM {:.2f} {:.2f} {:.2f} {:.2f} | F:μσmM {:.1f} {:.1f} {} {}"
-          .format(num_frames, fps, duration,
-                  *return_per_episode.values(),
-                  *num_frames_per_episode.values()))
+    print(
+        "F {} | FPS {:.0f} | D {} | R:μσmM {:.2f} {:.2f} {:.2f} {:.2f} | F:μσmM {:.1f} {:.1f} {} {}".format(
+            num_frames,
+            fps,
+            duration,
+            *return_per_episode.values(),
+            *num_frames_per_episode.values(),
+        )
+    )
 
     # Print worst episodes
 
@@ -110,6 +135,13 @@ if __name__ == '__main__':
     if n > 0:
         print("\n{} worst episodes:".format(n))
 
-        indexes = sorted(range(len(logs["return_per_episode"])), key=lambda k: logs["return_per_episode"][k])
+        indexes = sorted(
+            range(len(logs["return_per_episode"])),
+            key=lambda k: logs["return_per_episode"][k],
+        )
         for i in indexes[:n]:
-            print("- episode {}: R={}, F={}".format(i, logs["return_per_episode"][i], logs["num_frames_per_episode"][i]))
+            print(
+                "- episode {}: R={}, F={}".format(
+                    i, logs["return_per_episode"][i], logs["num_frames_per_episode"][i]
+                )
+            )
