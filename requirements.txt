@@ -1,4 +1,4 @@
-torch-ac>=1.1.0
+torch-ac>=1.2.0
 minigrid
 tensorboardX>=1.6
 numpy>=1.3
