@@ -72,7 +72,8 @@ for episode in range(args.episodes):
             frames.append(numpy.moveaxis(env.get_frame(), 2, 0))
 
         action = agent.get_action(obs)
-        obs, reward, done, _, _ = env.step(action)
+        obs, reward, terminated, truncated, _ = env.step(action)
+        done = terminated | truncated
         agent.analyze_feedback(reward, done)
 
         if done or env.window.closed:
