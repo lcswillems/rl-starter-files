@@ -29,7 +29,7 @@ parser.add_argument("--memory", action="store_true", default=False,
 parser.add_argument("--text", action="store_true", default=False,
                     help="add a GRU to the model")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = parser.parse_args()
 
     # Set seed for all randomness sources
@@ -73,7 +73,8 @@ if __name__ == '__main__':
 
     while log_done_counter < args.episodes:
         actions = agent.get_actions(obss)
-        obss, rewards, dones, _ = env.step(actions)
+        obss, rewards, terminateds, truncateds, _ = env.step(actions)
+        dones = tuple(a | b for a, b in zip(terminateds, truncateds))
         agent.analyze_feedbacks(rewards, dones)
 
         log_episode_return += torch.tensor(rewards, device=device, dtype=torch.float)
@@ -94,7 +95,7 @@ if __name__ == '__main__':
     # Print logs
 
     num_frames = sum(logs["num_frames_per_episode"])
-    fps = num_frames/(end_time - start_time)
+    fps = num_frames / (end_time - start_time)
     duration = int(end_time - start_time)
     return_per_episode = utils.synthesize(logs["return_per_episode"])
     num_frames_per_episode = utils.synthesize(logs["num_frames_per_episode"])

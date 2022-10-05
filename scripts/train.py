@@ -62,7 +62,7 @@ parser.add_argument("--recurrence", type=int, default=1,
 parser.add_argument("--text", action="store_true", default=False,
                     help="add a GRU to the model to handle text input")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = parser.parse_args()
 
     args.mem = args.recurrence > 1
@@ -150,7 +150,6 @@ if __name__ == '__main__':
 
     while num_frames < args.frames:
         # Update model parameters
-
         update_start_time = time.time()
         exps, logs1 = algo.collect_experiences()
         logs2 = algo.update_parameters(exps)
@@ -163,7 +162,7 @@ if __name__ == '__main__':
         # Print logs
 
         if update % args.log_interval == 0:
-            fps = logs["num_frames"]/(update_end_time - update_start_time)
+            fps = logs["num_frames"] / (update_end_time - update_start_time)
             duration = int(time.time() - start_time)
             return_per_episode = utils.synthesize(logs["return_per_episode"])
             rreturn_per_episode = utils.synthesize(logs["reshaped_return_per_episode"])

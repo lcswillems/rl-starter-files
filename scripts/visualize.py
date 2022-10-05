@@ -41,7 +41,7 @@ print(f"Device: {device}\n")
 
 # Load environment
 
-env = utils.make_env(args.env, args.seed)
+env = utils.make_env(args.env, args.seed, render_mode="human")
 for _ in range(args.shift):
     env.reset()
 print("Environment loaded\n")
@@ -56,22 +56,24 @@ print("Agent loaded\n")
 # Run the agent
 
 if args.gif:
-   from array2gif import write_gif
-   frames = []
+    from array2gif import write_gif
+
+    frames = []
 
 # Create a window to view the environment
-env.render('human')
+env.render()
 
 for episode in range(args.episodes):
-    obs = env.reset()
+    obs, _ = env.reset()
 
     while True:
-        env.render('human')
+        env.render()
         if args.gif:
-            frames.append(numpy.moveaxis(env.render("rgb_array"), 2, 0))
+            frames.append(numpy.moveaxis(env.get_frame(), 2, 0))
 
         action = agent.get_action(obs)
-        obs, reward, done, _ = env.step(action)
+        obs, reward, terminated, truncated, _ = env.step(action)
+        done = terminated | truncated
         agent.analyze_feedback(reward, done)
 
         if done or env.window.closed:
