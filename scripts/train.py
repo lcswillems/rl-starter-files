@@ -1,3 +1,5 @@
+
+
 import argparse
 import time
 import datetime
@@ -8,6 +10,7 @@ import sys
 import utils
 from utils import device
 from model import ACModel
+from model import ACModelDrop
 
 
 # Parse arguments
@@ -30,6 +33,8 @@ parser.add_argument("--save-interval", type=int, default=10,
 parser.add_argument("--procs", type=int, default=16,
                     help="number of processes (default: 16)")
 parser.add_argument("--frames", type=int, default=10**7,
+                    help="number of frames of training (default: 1e7)")
+parser.add_argument("--drop", type=int, default=0,
                     help="number of frames of training (default: 1e7)")
 
 # Parameters for main algorithm
@@ -118,6 +123,9 @@ if __name__ == "__main__":
 
     # Load model
 
+    if args.drop == 1:
+        acmodel = ACModelDrop(obs_space, envs[0].action_space, args.mem, args.text)
+
     acmodel = ACModel(obs_space, envs[0].action_space, args.mem, args.text)
     if "model_state" in status:
         acmodel.load_state_dict(status["model_state"])
@@ -131,6 +139,7 @@ if __name__ == "__main__":
         algo = torch_ac.A2CAlgo(envs, acmodel, device, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
                                 args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
                                 args.optim_alpha, args.optim_eps, preprocess_obss)
+                            
     elif args.algo == "ppo":
         algo = torch_ac.PPOAlgo(envs, acmodel, device, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
                                 args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
@@ -201,3 +210,5 @@ if __name__ == "__main__":
                 status["vocab"] = preprocess_obss.vocab.vocab
             utils.save_status(status, model_dir)
             txt_logger.info("Status saved")
+
+
