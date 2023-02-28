@@ -5,84 +5,62 @@ import utils
 from utils import device
 
 
-# Parse arguments
+def visualize(args):
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--env", required=True,
-                    help="name of the environment to be run (REQUIRED)")
-parser.add_argument("--model", required=True,
-                    help="name of the trained model (REQUIRED)")
-parser.add_argument("--seed", type=int, default=0,
-                    help="random seed (default: 0)")
-parser.add_argument("--shift", type=int, default=0,
-                    help="number of times the environment is reset at the beginning (default: 0)")
-parser.add_argument("--argmax", action="store_true", default=False,
-                    help="select the action with highest probability (default: False)")
-parser.add_argument("--pause", type=float, default=0.1,
-                    help="pause duration between two consequent actions of the agent (default: 0.1)")
-parser.add_argument("--gif", type=str, default=None,
-                    help="store output as gif with the given filename")
-parser.add_argument("--episodes", type=int, default=1000000,
-                    help="number of episodes to visualize")
-parser.add_argument("--memory", action="store_true", default=False,
-                    help="add a LSTM to the model")
-parser.add_argument("--text", action="store_true", default=False,
-                    help="add a GRU to the model")
+    # Set seed for all randomness sources
 
-args = parser.parse_args()
+    utils.seed(args.get('seed'))
 
-# Set seed for all randomness sources
+    # Set device
 
-utils.seed(args.seed)
+    print(f"Device: {device}\n")
 
-# Set device
+    # Load environment
+    env = args.get('envs')
 
-print(f"Device: {device}\n")
+    # env = utils.make_env(args.get('env'), args.get('seed'), render_mode="human")
+    # for _ in range(args.get('shift')):
+    #     env.reset()
+    # print("Environment loaded\n")
 
-# Load environment
+    # Load agent
 
-env = utils.make_env(args.env, args.seed, render_mode="human")
-for _ in range(args.shift):
-    env.reset()
-print("Environment loaded\n")
+    model_dir = utils.get_model_dir(args.get('model'))
+    agent = utils.Agent(env.observation_space, env.action_space, model_dir,
+                        argmax=args.get('argmax'), use_memory=args.get('memory'), use_text=args.get('text'))
+    print("Agent loaded\n")
 
-# Load agent
+    # Run the agent
 
-model_dir = utils.get_model_dir(args.model)
-agent = utils.Agent(env.observation_space, env.action_space, model_dir,
-                    argmax=args.argmax, use_memory=args.memory, use_text=args.text)
-print("Agent loaded\n")
+    if args.get('gif'):
+        from array2gif import write_gif
 
-# Run the agent
+        frames = []
 
-if args.gif:
-    from array2gif import write_gif
+    # Create a window to view the environment
+    env.render()
 
-    frames = []
+    for episode in range(int(args.get('episodes'))):
 
-# Create a window to view the environment
-env.render()
+        obs, _ = env.reset()
 
-for episode in range(args.episodes):
-    obs, _ = env.reset()
+        while True:
+            env.render()
+            if args.get('gif'):
+                frames.append(numpy.moveaxis(env.get_frame(), 2, 0))
 
-    while True:
-        env.render()
-        if args.gif:
-            frames.append(numpy.moveaxis(env.get_frame(), 2, 0))
+            action = agent.get_action(obs)
+            obs, reward, terminated, truncated, _ = env.step(action)
+            done = terminated | truncated
+            agent.analyze_feedback(reward, done)
 
-        action = agent.get_action(obs)
-        obs, reward, terminated, truncated, _ = env.step(action)
-        done = terminated | truncated
-        agent.analyze_feedback(reward, done)
+            if done: # or env.window.closed: #NOTE: throws error
+                break
 
-        if done or env.window.closed:
+        if env.window.closed:
             break
 
-    if env.window.closed:
-        break
-
-if args.gif:
-    print("Saving gif... ", end="")
-    write_gif(numpy.array(frames), args.gif+".gif", fps=1/args.pause)
-    print("Done.")
+    if args.get('gif'):
+        print("Saving gif... ", end="")
+        write_gif(numpy.array(frames), args.get('gif')+".gif", fps=1/args.get('pause'))
+        print("Done.")

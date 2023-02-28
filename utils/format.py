@@ -1,13 +1,14 @@
-import os
-import json
+# import os
+# import json
 import numpy
 import re
 import torch
 import torch_ac
 import gymnasium as gym
 
-import utils
-
+# import utils
+def horse():
+    pass
 
 def get_obss_preprocessor(obs_space):
     # Check if obs_space is an image space
@@ -80,3 +81,58 @@ class Vocabulary:
                 raise ValueError("Maximum vocabulary capacity reached")
             self.vocab[token] = len(self.vocab) + 1
         return self.vocab[token]
+
+def train_arg_parser(algo, envs, model: str = None, seed: int = 1,
+               log_interval: int = 1, save_interval: int = 10, procs: int = 16,
+               frames: int = 10**7, epochs: int = 4, batch_size: int = 256,
+               frames_per_proc: int = None, discount: float = 0.99, lr: float = 0.001,
+               gae_lambda: float = 0.95, entropy_coef: float = 0.01,
+               value_loss_coef: float = 0.5, max_grad_norm: float = 0.5,
+               optim_eps: float = 1e-8, optim_alpha: float = 0.99,
+               clip_eps: float = 0.2, recurrence: int = 1, text: bool = False):
+    
+    args = {
+        'algo': algo,
+        'envs': envs,
+        'model': model,
+        'seed': seed,
+        'log_interval': log_interval,
+        'save_interval': save_interval,
+        'procs': procs,
+        'frames': frames,
+        'epochs': epochs,
+        'batch_size': batch_size,
+        'frames_per_proc': frames_per_proc,
+        'discount': discount,
+        'lr': lr,
+        'gae_lambda': gae_lambda,
+        'entropy_coef': entropy_coef,
+        'value_loss_coef': value_loss_coef,
+        'max_grad_norm': max_grad_norm,
+        'optim_eps': optim_eps,
+        'optim_alpha': optim_alpha,
+        'clip_eps': clip_eps,
+        'recurrence': recurrence,
+        'text': text,
+    }
+    
+    return args
+
+
+def visualize_arg_parser(envs, model, seed=0, shift=0, 
+                         argmax=False, pause=0.1, gif=None, episodes: int = 1e6, 
+                         memory=False, text=False):
+        
+    args = {
+        'envs': envs,
+        'model': model,
+        'seed': seed,
+        "shift": shift,
+        "argmax": argmax,
+        "pause": pause,
+        "gif": gif,
+        "episodes": episodes,
+        "memory": memory,
+        'text': text,
+    }
+    return args
