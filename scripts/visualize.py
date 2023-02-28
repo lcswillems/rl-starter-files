@@ -6,32 +6,24 @@ from utils import device
 
 
 def visualize(args):
-
     # Set seed for all randomness sources
-
     utils.seed(args.get('seed'))
 
     # Set device
-
     print(f"Device: {device}\n")
 
     # Load environment
-    env = args.get('envs')
-
-    # env = utils.make_env(args.get('env'), args.get('seed'), render_mode="human")
-    # for _ in range(args.get('shift')):
-    #     env.reset()
-    # print("Environment loaded\n")
+    env = args.get('envs') #NOTE: I am quite sure that render mode must be human 
+    for _ in range(args.get('shift')):
+        env.reset()
 
     # Load agent
-
     model_dir = utils.get_model_dir(args.get('model'))
     agent = utils.Agent(env.observation_space, env.action_space, model_dir,
                         argmax=args.get('argmax'), use_memory=args.get('memory'), use_text=args.get('text'))
     print("Agent loaded\n")
 
     # Run the agent
-
     if args.get('gif'):
         from array2gif import write_gif
 
@@ -41,6 +33,7 @@ def visualize(args):
     env.render()
 
     for episode in range(int(args.get('episodes'))):
+        print(f"Episode {episode}")
 
         obs, _ = env.reset()
 
@@ -54,7 +47,7 @@ def visualize(args):
             done = terminated | truncated
             agent.analyze_feedback(reward, done)
 
-            if done: # or env.window.closed: #NOTE: throws error
+            if done or env.window.closed: 
                 break
 
         if env.window.closed:
