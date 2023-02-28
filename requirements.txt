@@ -1,5 +1,7 @@
 torch-ac>=1.4.0
-minigrid
+minigrid==2.0.0 # 2.1.0 raises error with minigrid.core
 tensorboardX>=1.6
 numpy>=1.3
 gymnasium>=0.26
+array2gif
+pandas
