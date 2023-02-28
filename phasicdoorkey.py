@@ -115,26 +115,3 @@ class PhasicDoorKeyEnv(MiniGridEnv):
             self.place_obj(obj=Key("yellow"), top=(0, 0), size=(splitIdx, height))
 
         self.mission = "use the key to open the door and then get to the goal"
-
-
-
-
-env_p1_l = PhasicDoorKeyEnv(phase=1, door_locked=True, size=7, max_steps=100, render_mode="rgb_array")
-env_p1_u = PhasicDoorKeyEnv(phase=1, door_locked=False, size=7, max_steps=100, render_mode="rgb_array")
-env_p2_l = PhasicDoorKeyEnv(phase=2, door_locked=True, size=7, max_steps=100, render_mode="rgb_array")
-env_p2_u = PhasicDoorKeyEnv(phase=2, door_locked=False, size=7, max_steps=100, render_mode="rgb_array")
-env_p3_l = PhasicDoorKeyEnv(phase=3, door_locked=True, size=7, max_steps=100, render_mode="rgb_array")
-env_p3_u = PhasicDoorKeyEnv(phase=3, door_locked=False, size=7, max_steps=100, render_mode="rgb_array")
-
-envs = [env_p1_l, env_p1_u, env_p2_l, env_p2_u, env_p3_l, env_p3_u]
-names = ["Phase 1 locked", "Phase 1 unlocked", "Phase 2 locked", "Phase 2 unlocked", "Phase 3 locked", "Phase 3 unlocked"]
-
-
-for name, env in zip(names, envs):
-    env.reset()
-    img = env.render()
-
-    # Plot the rendered image
-    plt.imshow(img)
-    plt.title(name)
-    plt.show()
