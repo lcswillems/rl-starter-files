@@ -1,6 +1,7 @@
-# RL Starter Files
+# RL Shutdownability
+This repo is a fork of https://github.com/lcswillems/rl-starter-files. 
 
-RL starter files in order to immediatly train, visualize and evaluate an agent **without writing any line of code**.
+RL starter files in order to immediately train, visualize and evaluate an agent **without writing any line of code**.
 
 <p align="center">
     <img width="300" src="README-rsrc/visualize-keycorridor.gif">
