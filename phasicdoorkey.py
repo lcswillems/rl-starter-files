@@ -5,8 +5,6 @@ from minigrid.core.mission import MissionSpace
 from minigrid.core.world_object import Door, Goal, Key
 from minigrid.minigrid_env import MiniGridEnv
 
-import matplotlib.pyplot as plt
-
 class PhasicDoorKeyEnv(MiniGridEnv):
 
     """
@@ -60,10 +58,9 @@ class PhasicDoorKeyEnv(MiniGridEnv):
     - `MiniGrid-PhasicDoorKey-16x16-v0`
 
     """
-    def __init__(self, phase, door_locked, size=8, max_steps: int | None = None, **kwargs):
-        # self.size = size
+    def __init__(self, phase, size=7, max_steps: int | None = None, **kwargs):
+        self.size = size
         self.phase = phase
-        self.door_locked = door_locked
         # if phase == 1:
         #     self.has_goal = 
 
@@ -82,24 +79,27 @@ class PhasicDoorKeyEnv(MiniGridEnv):
         # Create an empty grid
         self.grid = Grid(width, height)
 
-        # select if it has a goal or not (alternatively it has a key)
-        # has_goal = self._rand_bool()
-        has_goal = False if self.phase == 1 else True
-
         # Generate the surrounding walls
         self.grid.wall_rect(0, 0, width, height)
 
+        # select if it has a goal or not (alternatively it has a key)
+        has_goal = False if self.phase == 1 else True
+
         # Place a goal in the bottom-right corner
+        #NOTE: maybe randomize this to avoid goal misgeneralization? 
         if has_goal:
             self.put_obj(Goal(), width - 2, height - 2)
 
+        # NOTE: still decide whether we want to have a short cut through a hole in the wall. 
         # wall opening idx
-        wallOpeningIdx = self._rand_int(1, height - 2)
+        # wallOpeningIdx = self._rand_int(1, height - 2)
 
         # Create a vertical splitting wall
         splitIdx = self._rand_int(2, width - 2)
-        self.grid.vert_wall(splitIdx, 0, length=wallOpeningIdx)
-        self.grid.vert_wall(splitIdx, wallOpeningIdx + 1, length=height - wallOpeningIdx - 1)
+        self.grid.vert_wall(splitIdx, 0, length=self.height)
+        # self.grid.vert_wall(splitIdx, 0, length=wallOpeningIdx)
+        # self.grid.vert_wall(splitIdx, wallOpeningIdx + 1, length=height - wallOpeningIdx - 1)
+
 
         # Place the agent at a random position and orientation
         # on the left side of the splitting wall
@@ -110,8 +110,19 @@ class PhasicDoorKeyEnv(MiniGridEnv):
         self.put_obj(Door("yellow", is_locked=True), splitIdx, doorIdx)
 
         # Place a yellow key on the left side
-        # if not has_goal:
-        if self.phase==1 or self.phase==3:
+        if self.phase != 2:
             self.place_obj(obj=Key("yellow"), top=(0, 0), size=(splitIdx, height))
 
-        self.mission = "use the key to open the door and then get to the goal"
+        self.mission = "Get to the goal, maybe you have to use a key to open a door"
+
+    def step(self, action):
+        """
+        Here we can change the status of the door, see dynamicobstacles.py for inspiration
+
+        For now it's just a place holder
+        """
+
+        obs, reward, terminated, truncated, info = super().step(action)
+
+        return obs, reward, terminated, truncated, info
+
