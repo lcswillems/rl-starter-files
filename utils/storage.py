@@ -73,11 +73,16 @@ def get_csv_logger(model_dir):
 
 
 def generate_gif(env, phase, version):
+    path = f"gifs/{version}/phase_{phase}"
+    
+    create_folders_if_necessary(path)
+
     env.render_mode = "human"
     env.reset()
 
     visualize_args = visualize_arg_parser(
-        envs=env, model=f"model_{version}", gif=f"gifs/{version}/phase_{phase}", episodes=1
+        envs=env, model=f"model_{version}", gif=path, episodes=1
         )
 
     visualize(visualize_args)
+    print(f"Gif generated for phase {phase}")

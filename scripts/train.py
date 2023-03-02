@@ -28,10 +28,9 @@ def train(args):
     csv_file, csv_logger = utils.get_csv_logger(model_dir)
     tb_writer = tensorboardX.SummaryWriter(model_dir)
 
-    # Log command and all script arguments
-
-    txt_logger.info("{}\n".format(" ".join(sys.argv)))
-    txt_logger.info("{}\n".format(args))
+    # Log command and all script arguments #NOTE: see if this removes unneeded output
+    # txt_logger.info("{}\n".format(" ".join(sys.argv)))
+    # txt_logger.info("{}\n".format(args))
 
     # Set seed for all randomness sources
 

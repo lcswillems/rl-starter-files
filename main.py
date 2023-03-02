@@ -1,33 +1,50 @@
-# largely inspired by https://github.com/lcswillems/rl-starter-files
-
-# import random 
-# import time
+from phasicdoorkey import PhasicDoorKeyEnv
+import matplotlib.pyplot as plt
 
 from scripts.train import train
-from utils.format import train_arg_parser
+from utils.format import train_arg_parser, visualize_arg_parser
 
-from model import ACModel
-from phasicdoorkey import PhasicDoorKeyEnv
-# from torch_ac import PPOAlgo
+from utils.storage import generate_gif
+from utils.env import plot_env
 
-num_episodes = 100
+def main():
+    version = "v0.6"
 
-# env_p1_l means the environment in phase 1 with the door locked, _u is unlocked
-env_p1_l = PhasicDoorKeyEnv(phase=1, door_locked=True, size=7, max_steps=100, render_mode="rgb_array")
-env_p1_u = PhasicDoorKeyEnv(phase=1, door_locked=False, size=7, max_steps=100, render_mode="rgb_array")
-env_p2_l = PhasicDoorKeyEnv(phase=2, door_locked=True, size=7, max_steps=100, render_mode="rgb_array")
-env_p2_u = PhasicDoorKeyEnv(phase=2, door_locked=False, size=7, max_steps=100, render_mode="rgb_array")
-env_p3_l = PhasicDoorKeyEnv(phase=3, door_locked=True, size=7, max_steps=100, render_mode="rgb_array")
-env_p3_u = PhasicDoorKeyEnv(phase=3, door_locked=False, size=7, max_steps=100, render_mode="rgb_array")
+    # only have short gif with 100 steps max
+    env_p1 = PhasicDoorKeyEnv(phase=1, size=7, max_steps=100, render_mode="rgb_array")
+    env_p2 = PhasicDoorKeyEnv(phase=2, size=7, max_steps=100, render_mode="rgb_array")
+    env_p3 = PhasicDoorKeyEnv(phase=3, size=7, max_steps=100, render_mode="rgb_array")
 
-envs = [env_p1_l, env_p1_u, env_p2_l, env_p2_u, env_p3_l, env_p3_u]
+    # show_envs = [env_p1, env_p2, env_p3]
 
-# how they do it in original repo
-# obs_space = {"image": envs[0].observation_space['image'].shape} 
+    # for i, env in enumerate(show_envs):
+    #     plot_env(env, str(i+1))
 
-# agent = ACModel(obs_space, envs[0].action_space, use_memory=False, use_text=False)
+    envs = []
+    for i in range(3):
+        environments = [PhasicDoorKeyEnv(phase=i+1, size=7) for _ in range(100)]
+        envs.append(environments)
 
-# train on first two envs
-train_args = train_arg_parser("ppo", envs[:2], model="model_v0.0", frames=1e6)
+    # PHASE 1
+    print("\n\nPHASE 1")
+    train_args = train_arg_parser("ppo", envs[0], model=f"model_{version}", frames=5e5)
+    train(train_args)
 
-train(train_args)
+    generate_gif(env_p1, phase=1, version=version)
+
+    # PHASE 2
+    print("\n\nPHASE 2")
+    train_args = train_arg_parser("ppo", envs[1], model=f"model_{version}", frames=5e5)
+    train(train_args)
+
+    generate_gif(env_p2, phase=2, version=version)
+
+    # PHASE 3
+    # the agent does not train anymore 
+    print("\n\nPHASE 3")
+    generate_gif(env_p3, phase=3, version=version)
+
+
+
+if __name__ == "__main__":
+    main()
