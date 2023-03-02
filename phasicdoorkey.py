@@ -129,11 +129,15 @@ class PhasicDoorKeyEnv(MiniGridEnv):
             # if the door is locked there is a 0.2 probability that the door will unlock
             if self._rand_float(0, 1) <= 0.2: 
                 self.put_obj(Door("yellow", is_locked=False), self.splitIdx, self.doorIdx)
+                self.door_is_locked = False
+                print("Unlocked the door!")
         
         else:
             # if the door is unlocked, there's a 0.1 probability that the door will lock
             if self._rand_float(0, 1) <= 0.1:
                 self.put_obj(Door("yellow", is_locked=True), self.splitIdx, self.doorIdx)
+                self.door_is_locked = True
+                print("Locked the door!")
         
         if self.door_is_locked:
             reward = 0 if action == self.actions.done else -0.1
