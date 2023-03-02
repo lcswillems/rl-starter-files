@@ -95,23 +95,24 @@ class PhasicDoorKeyEnv(MiniGridEnv):
         # wallOpeningIdx = self._rand_int(1, height - 2)
 
         # Create a vertical splitting wall
-        splitIdx = self._rand_int(2, width - 2)
-        self.grid.vert_wall(splitIdx, 0, length=self.height)
-        # self.grid.vert_wall(splitIdx, 0, length=wallOpeningIdx)
-        # self.grid.vert_wall(splitIdx, wallOpeningIdx + 1, length=height - wallOpeningIdx - 1)
+        self.splitIdx = self._rand_int(2, width - 2)
+        self.grid.vert_wall(self.splitIdx, 0, length=self.height)
+        # self.grid.vert_wall(self.splitIdx, 0, length=wallOpeningIdx)
+        # self.grid.vert_wall(self.splitIdx, wallOpeningIdx + 1, length=height - wallOpeningIdx - 1)
 
 
         # Place the agent at a random position and orientation
         # on the left side of the splitting wall
-        self.place_agent(size=(splitIdx, height))
+        self.place_agent(size=(self.splitIdx, height))
 
         # Place a door in the wall
-        doorIdx = self._rand_int(1, width - 2)
-        self.put_obj(Door("yellow", is_locked=True), splitIdx, doorIdx)
+        self.doorIdx = self._rand_int(1, width - 2)
+        self.put_obj(Door("yellow", is_locked=False), self.splitIdx, self.doorIdx)
+        self.door_is_locked = False
 
         # Place a yellow key on the left side
         if self.phase != 2:
-            self.place_obj(obj=Key("yellow"), top=(0, 0), size=(splitIdx, height))
+            self.place_obj(obj=Key("yellow"), top=(0, 0), size=(self.splitIdx, height))
 
         self.mission = "Get to the goal, maybe you have to use a key to open a door"
 
@@ -121,8 +122,21 @@ class PhasicDoorKeyEnv(MiniGridEnv):
 
         For now it's just a place holder
         """
-
+        # first execute step as 
         obs, reward, terminated, truncated, info = super().step(action)
+
+        if self.door_is_locked: 
+            # if the door is locked there is a 0.2 probability that the door will unlock
+            if self._rand_float(0, 1) <= 0.2: 
+                self.put_obj(Door("yellow", is_locked=False), self.splitIdx, self.doorIdx)
+        
+        else:
+            # if the door is unlocked, there's a 0.1 probability that the door will lock
+            if self._rand_float(0, 1) <= 0.1:
+                self.put_obj(Door("yellow", is_locked=True), self.splitIdx, self.doorIdx)
+        
+        if self.door_is_locked:
+            reward = 0 if action == self.actions.done else -0.1
 
         return obs, reward, terminated, truncated, info
 
