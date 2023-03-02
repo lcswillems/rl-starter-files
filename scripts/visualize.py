@@ -36,6 +36,7 @@ def visualize(args):
         print(f"Episode {episode}")
 
         obs, _ = env.reset()
+        actions, rewards = [], []
 
         while True:
             env.render()
@@ -47,6 +48,8 @@ def visualize(args):
             done = terminated | truncated
             agent.analyze_feedback(reward, done)
 
+            actions.append(action)
+            rewards.append(reward)
             if done or env.window.closed: 
                 break
 
@@ -57,3 +60,6 @@ def visualize(args):
         print("Saving gif... ", end="")
         write_gif(numpy.array(frames), args.get('gif')+".gif", fps=1/args.get('pause'))
         print("Done.")
+
+        print(f"\n\nActions: {actions}")
+        print(f"\n\nRewards: {rewards}")
