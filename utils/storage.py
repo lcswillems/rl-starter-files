@@ -7,6 +7,8 @@ import sys
 import utils
 from .other import device
 
+from utils.format import visualize_arg_parser
+from scripts.visualize import visualize 
 
 def create_folders_if_necessary(path):
     dirname = os.path.dirname(path)
@@ -68,3 +70,14 @@ def get_csv_logger(model_dir):
     utils.create_folders_if_necessary(csv_path)
     csv_file = open(csv_path, "a")
     return csv_file, csv.writer(csv_file)
+
+
+def generate_gif(env, phase, version):
+    env.render_mode = "human"
+    env.reset()
+
+    visualize_args = visualize_arg_parser(
+        envs=env, model=f"model_{version}", gif=f"gifs/{version}/phase_{phase}", episodes=1
+        )
+
+    visualize(visualize_args)
