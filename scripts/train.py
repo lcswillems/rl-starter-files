@@ -28,7 +28,7 @@ def train(args):
     csv_file, csv_logger = utils.get_csv_logger(model_dir)
     tb_writer = tensorboardX.SummaryWriter(model_dir)
 
-    # Log command and all script arguments #NOTE: see if this removes unneeded output
+    # Log command and all script arguments 
     # txt_logger.info("{}\n".format(" ".join(sys.argv)))
     # txt_logger.info("{}\n".format(args))
 
@@ -69,7 +69,7 @@ def train(args):
         acmodel.load_state_dict(status["model_state"])
     acmodel.to(device)
     txt_logger.info("Model loaded\n")
-    txt_logger.info("{}\n".format(acmodel))
+    # txt_logger.info("{}\n".format(acmodel))
 
     # Load algo
 
@@ -147,5 +147,13 @@ def train(args):
                 status["vocab"] = preprocess_obss.vocab.vocab
             utils.save_status(status, model_dir)
             txt_logger.info("Status saved")
+
+    # save again when all number of frames are exceeded
+    status = {"num_frames": num_frames, "update": update,
+                "model_state": acmodel.state_dict(), "optimizer_state": algo.optimizer.state_dict()}
+    if hasattr(preprocess_obss, "vocab"):
+        status["vocab"] = preprocess_obss.vocab.vocab
+    utils.save_status(status, model_dir)
+    txt_logger.info("Status saved")
 
 
