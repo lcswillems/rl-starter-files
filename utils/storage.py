@@ -72,8 +72,8 @@ def get_csv_logger(model_dir):
     return csv_file, csv.writer(csv_file)
 
 
-def generate_gif(env, phase, version):
-    path = f"gifs/{version}/phase_{phase}"
+def generate_gif(env, phase, version, gif_version=0):
+    path = f"gifs/{version}/phase_{phase}_{gif_version}"
     
     create_folders_if_necessary(path)
 

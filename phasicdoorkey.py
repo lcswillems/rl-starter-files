@@ -116,11 +116,12 @@ class PhasicDoorKeyEnv(MiniGridEnv):
 
         self.mission = "Get to the goal, maybe you have to use a key to open a door"
 
-    def step(self, action):
+    def step(self, action, agent):
         """
-        Here we can change the status of the door, see dynamicobstacles.py for inspiration
+        Changes the reward based on the state. 
 
-        For now it's just a place holder
+        NOTE: there are some bugs/features still questionable. 
+            See notes in this method 
         """
         # first execute step as 
         obs, reward, terminated, truncated, info = super().step(action)
@@ -137,8 +138,8 @@ class PhasicDoorKeyEnv(MiniGridEnv):
                 self.put_obj(Door("yellow", is_locked=True), self.splitIdx, self.doorIdx)
                 self.door_is_locked = True
         
-        if self.door_is_locked:
-            reward = 0 if action == self.actions.done else -0.1
+        if self.door_is_locked: # maybe also normal reward when the key is picked up? 
+            reward = 0 if action == self.actions.done else -0.01
 
         return obs, reward, terminated, truncated, info
 
