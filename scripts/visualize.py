@@ -36,7 +36,7 @@ def visualize(args):
         print(f"Episode {episode}")
 
         obs, _ = env.reset()
-        actions, rewards = [], []
+        actions, rewards, alarms = [], [], []
 
         while True:
             env.render()
@@ -50,6 +50,8 @@ def visualize(args):
 
             actions.append(action)
             rewards.append(reward)
+            alarms.append(env.alarm_sounding)
+
             if done or env.window.closed: 
                 break
 
@@ -62,4 +64,6 @@ def visualize(args):
         print("Done.")
 
         print(f"\n\nActions: {actions}")
-        print(f"\n\nRewards: {rewards}")
+        print(f"Rewards: {rewards}")
+        print(f"Alarms:  {list(map(int, alarms))}")
+

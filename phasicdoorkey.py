@@ -73,6 +73,7 @@ class PhasicDoorKeyEnv(MiniGridEnv):
 
     @staticmethod
     def _gen_mission():
+        #TODO: needs to be adapted to each phase 
         return "use the key to open the door and then get to the goal"
 
     def _gen_grid(self, width, height):
@@ -109,6 +110,7 @@ class PhasicDoorKeyEnv(MiniGridEnv):
         self.doorIdx = self._rand_int(1, width - 2)
         self.put_obj(Door("yellow", is_locked=False), self.splitIdx, self.doorIdx)
         self.door_is_locked = False
+        self.door_pos = (self.splitIdx, self.doorIdx)
 
         # Place a yellow key on the left side
         if self.phase != 2:
@@ -116,7 +118,7 @@ class PhasicDoorKeyEnv(MiniGridEnv):
 
         self.mission = "Get to the goal, maybe you have to use a key to open a door"
 
-    def step(self, action, agent):
+    def step(self, action):
         """
         Changes the reward based on the state. 
 
@@ -143,3 +145,6 @@ class PhasicDoorKeyEnv(MiniGridEnv):
 
         return obs, reward, terminated, truncated, info
 
+    def gen_obs(self):
+        
+        return super().gen_obs()
