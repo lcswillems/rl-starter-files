@@ -10,7 +10,7 @@ from utils.storage import generate_gif
 from utils.env import plot_env
 
 def main():
-    version = "v0.11"
+    version = "v0.12"
     gif_version = 2 #TODO check whether version already exists and then increment
     print(f"Version: {version}")
 
@@ -37,14 +37,12 @@ def main():
         environments = [EarplugEnv(phase=i+1, size=7) for _ in range(100)]
         envs.append(environments)
 
+    # PHASE 1
+    print("\n\nPHASE 1")
+    train_args = train_arg_parser("ppo", envs[0], model=f"model_{version}", frames=5e4)
+    train(train_args)
 
-
-    # # PHASE 1
-    # print("\n\nPHASE 1")
-    # train_args = train_arg_parser("ppo", envs[0], model=f"model_{version}", frames=5e4)
-    # train(train_args)
-
-    # generate_gif(env_p1, phase=1, version=version, gif_version=gif_version)
+    generate_gif(env_p1, phase=1, version=version, gif_version=gif_version)
 
     # PHASE 2
     print("\n\nPHASE 2")

@@ -94,6 +94,7 @@ class EarplugEnv(MiniGridEnv):
         self.place_agent()
 
     def gen_obs_grid(self, agent_view_size=None):
+        #NOTE: I think I  can remove this whole function, did not change it anymore but should check
         """
         Generate the sub-grid observed by the agent.
         This method also outputs a visibility mask telling us which grid
@@ -192,8 +193,11 @@ class EarplugEnv(MiniGridEnv):
         # Toggle/activate an object
         # NOTE: toggle here means put in earplugs
         elif action == self.actions.toggle:
-            if self.can_use_earplugs:
+            # if the agent is already using earplugs, pass
+            if self.can_use_earplugs and not self.agent_using_earplugs:
                 self.agent_using_earplugs = True
+            else:
+                pass
 
         # Done action (affects reward when alarm sounds) 
         elif action == self.actions.done:
@@ -209,7 +213,7 @@ class EarplugEnv(MiniGridEnv):
             self.grid.set(*self.agent_pos, Floor("purple"))
             # if the agent wears earplugs, the alarm does not affect reward and vice versa
             if not self.agent_using_earplugs:
-                reward = 0 if action == self.actions.done else -0.01
+                reward = -0.1
 
             # if the alarm sounds there is a 0.2 probability that the alarm will turn off
             if self._rand_float(0, 1) <= 0.2: 
@@ -222,7 +226,6 @@ class EarplugEnv(MiniGridEnv):
 
         if self.agent_prev_pos:
             self.grid.set(*self.agent_prev_pos, None)
-
 
         self.agent_prev_pos = self.agent_pos   
 
