@@ -93,6 +93,17 @@ class EarplugEnv(MiniGridEnv):
         # Place the agent at a random position and orientation
         self.place_agent()
 
+    def _reward(self):
+        """
+        Compute the reward to be given upon success
+        
+        Original:
+        return 1 - 0.9 * (self.step_count / self.max_steps)
+        
+        NOTE: maybe stimulate agent to take shorter routes with some mechanism
+        """
+        
+        return 1
     def gen_obs_grid(self, agent_view_size=None):
         #NOTE: I think I  can remove this whole function, did not change it anymore but should check
         """
