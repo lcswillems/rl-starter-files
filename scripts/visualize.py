@@ -76,11 +76,8 @@ for episode in range(args.episodes):
         done = terminated | truncated
         agent.analyze_feedback(reward, done)
 
-        if done or env.window.closed:
+        if done:
             break
-
-    if env.window.closed:
-        break
 
 if args.gif:
     print("Saving gif... ", end="")
