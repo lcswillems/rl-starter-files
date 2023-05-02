@@ -6,7 +6,7 @@ RL starter files in order to immediatly train, visualize and evaluate an agent *
     <img width="300" src="README-rsrc/visualize-keycorridor.gif">
 </p>
 
-These files are suited for [`gym-minigrid`](https://github.com/maximecb/gym-minigrid) environments and [`torch-ac`](https://github.com/lcswillems/torch-ac) RL algorithms. They are easy to adapt to other environments and RL algorithms.
+These files are suited for [`minigrid`](https://github.com/Farama-Foundation/Minigrid) environments and [`torch-ac`](https://github.com/lcswillems/torch-ac) RL algorithms. They are easy to adapt to other environments and RL algorithms.
 
 ## Features
 
@@ -26,7 +26,7 @@ These files are suited for [`gym-minigrid`](https://github.com/maximecb/gym-mini
 
 1. Clone this repository.
 
-2. Install `gym-minigrid` environments and `torch-ac` RL algorithms:
+2. Install `minigrid` environments and `torch-ac` RL algorithms:
 
 ```
 pip3 install -r requirements.txt
@@ -108,7 +108,7 @@ in `model.py` ([more details](#model))
 - utilitarian classes and functions used by the scripts \
 in `utils`
 
-These files are suited for [`gym-minigrid`](https://github.com/maximecb/gym-minigrid) environments and [`torch-ac`](https://github.com/lcswillems/torch-ac) RL algorithms. They are easy to adapt to other environments and RL algorithms by modifying:
+These files are suited for [`minigrid`](https://github.com/Farama-Foundation/Minigrid) environments and [`torch-ac`](https://github.com/lcswillems/torch-ac) RL algorithms. They are easy to adapt to other environments and RL algorithms by modifying:
 - `model.py`
 - `utils/format.py`
 
